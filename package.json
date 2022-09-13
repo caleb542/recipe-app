@@ -1,0 +1,39 @@
+{
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.2.5",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "css-loader": "^6.7.1",
+    "html-webpack-plugin": "^5.5.0",
+    "live-server": "^1.1.0",
+    "mini-css-extract-plugin": "^2.6.1",
+    "moment": "^2.29.4",
+    "mongodb": "^4.9.1",
+    "mongodb-client": "^0.0.1",
+    "node-fetch": "^3.2.10",
+    "realm-web": "^1.7.1",
+    "sass": "^1.54.5",
+    "sass-loader": "^13.0.2",
+    "style-loader": "^3.3.1",
+    "unsplash-js": "^7.0.15",
+    "uuid": "^8.3.2",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.10.0"
+  },
+  "name": "Recipe Webpack 5 JS and SCSS watchers",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev-server": "webpack-dev-server --mode development",
+    "build": "webpack --mode production"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "babel src/index.js -o public/scripts/bundle.js --presets env --watch ",
+  "devDependencies": {
+    "@babel/preset-env": "^7.18.10",
+    "babel-cli": "^6.26.0"
+  }
+}

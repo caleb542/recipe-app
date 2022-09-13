@@ -1,0 +1,84 @@
+import "./style.scss";
+import {stringify, v4 as uuidv4} from 'uuid';
+import { createApi } from 'unsplash-js'
+
+import { unsplashme } from "./unsplash";
+import { initEdit } from "../../notes-app/src/views";
+import { loadRecipes, getTimestamp, saveRecipes } from './functions'
+import * as Realm from "realm-web";
+
+    // dbconnect
+    const APP_ID = 'data-puyvo'
+    const app = new Realm.App({ id: APP_ID });
+    const credentials = Realm.Credentials.anonymous();
+    // set variable for recipes in outer scope 
+    let recs;
+    try {
+        // checkin with credentials
+        const user = await app.logIn(credentials);
+        //pull all the recipes from the database with custom serverside function
+        recs = await user.functions.getAllRecipes();
+        recs ? console.log("getAllRecipes must have delivered:") : console.log("maybe getallRecipes isn't working");
+        recs.forEach(recipe => {
+            console.log(`it's called ${recipe.name}`)
+        });
+  }
+  catch (error){
+    console.error("Failed to log in", error);
+  }
+console.log("...saving...")
+  saveRecipes(recs)
+  console.log("...saved")
+
+
+const cardIndex = document.querySelector("#recipes");
+
+const list = () => {
+    if(recs.length > 0 ){
+
+        console.log('show us the rec first')
+        console.log(recs)
+
+        recs.forEach(rec => { 
+            unsplashme(rec.categories[0]).then(result => {
+                let photoURL = result.photoSmallUrl
+                let photographer = result.photographer
+                let photographerLink = result.photographerLink
+                let photoThumb = result.photoThumb
+            })
+                
+
+                  
+
+                
+                console.log(recs)
+                let name = rec.name
+                let description = rec.description
+                let recipeID = rec.id;
+
+                let recip = '<a href="article.html#'+ recipeID +'"><article><div class="imageElement" style="background-image:url(' + photoURL + ')")" /></span><p class="creator"></p></div><div class="text-area"><h1>'+name+'</h1><p>'+description+'</p></div></article></a><button class="photographer" href="'  + photographerLink + '">Unsplash image by ' + photographer + '</button>';
+                // create DOM cards
+                let card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = recip;
+                cardIndex.appendChild(card);
+            
+            saveRecipes(recipes)
+
+           
+         
+            /*if*/ 
+        }/* foreach */
+    )} /* if recs length is greater than 0*/
+}/*list*/
+
+
+list()
+
+window.addEventListener('storage',  (e) =>  {
+    if (e.key === 'recipes') {
+        console.error('change happened in storage') 
+        list()
+    }
+})
+

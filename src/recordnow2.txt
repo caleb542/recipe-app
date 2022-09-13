@@ -1,0 +1,70 @@
+import { createApi } from "unsplash-js";
+import * as Realm from "realm-web";
+import { loadRecipes, saveRecipes } from "./functions";
+
+//mongo connection 
+
+const APP_ID = 'data-puyvo'
+  const app = new Realm.App({ id: APP_ID });
+  const credentials = Realm.Credentials.anonymous();
+
+  const user = await app.logIn(credentials);
+  let connect = await user.functions.unsplashConnect()
+
+// get api key from stored value in mongo values 
+
+  
+const unsplashme = ((keyword) => {
+  let sendPhotoObject;
+  console.log('starting unsplashme file')
+
+  // connect = 'pAFGHl4fL54WMfLNCf32D-y85iB6H8VxcGeQP9DbJQY'
+  let unsplash = createApi({ accessKey: connect })
+  console.log(unsplash)
+  console.log('^unsplash^')
+    // const clientID = 'pAFGHl4fL54WMfLNCf32D-y85iB6H8VxcGeQP9DbJQY'
+    // let endpoint = `https://api.unsplash.com/photos/random?client_id=${clientID}`;
+  unsplash.search.getPhotos({query:keyword,page:1,perPage:1,orientation:'landscape'}).then(result => {
+
+        // handle success
+       
+        let photo = result.response
+        
+        let photoObject = photo.results[0];
+       
+        const photoSmallUrl = photoObject.urls.small
+        const photoThumb = photoObject.urls.thumb
+        const photographer = photoObject.user.name
+        const photographerLink = photoObject.user.links.html
+        const photoId = photoObject.id
+        
+        sendPhotoObject = { photoSmallUrl: photoSmallUrl,
+                              photoThumb: photoThumb,
+                              photographer: photographer,
+                              photographerLink: photographerLink,
+                              photoId: photoId
+                          };
+                          
+        const recipes = loadRecipes()                             
+        recipes.forEach(recipe => {
+          recipe.photoUrl = photoSmallUrl 
+          recipe.photoThumb = photoThumb
+          recipe.photographer = photographer
+          recipe.photographerLink = photographerLink
+        });
+        saveRecipes(recipes)
+        return sendPhotoObject     
+          
+      })
+      return { photoSmallUrl: "helloworld",
+        photoThumb: "helloworld",
+        photographer: "helloworld",
+        photographerLink:"helloworld",
+        photoId: "helloworld"
+    };
+    })
+  
+  
+
+
+export { unsplashme }
