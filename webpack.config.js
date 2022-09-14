@@ -10,7 +10,8 @@ module.exports = {
     entry: {
         index: './src/index.js',
         edit: './src/edit.js',
-        article:'./src/article.js'
+        article:'./src/article.js',
+        addRecipe:'./src/addRecipe.js'
     },
     output: {
         path: path.resolve(__dirname,'public/scripts'),

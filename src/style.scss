@@ -11,7 +11,10 @@ $footer: #000;
 $normalText:normal 500 'Poppins' 1.6rem/normal;
 $headingText:normal 600 'Paytone One' 1.8rem/normal; 
 $subtitleText:normal 600 'Paytone One' 1.6/normal;
-
+$button_background:orangered;
+$button_color:#fff;
+$button_radius:12px;
+$button_padding:2em;
 $desktop-grid:3fr 6fr 3fr;
 $desktop-grid-gap:4rem;
 
@@ -96,6 +99,7 @@ a {
 
 .container {
   max-width:1380px;
+  position:relative;
   min-width:80%;
   margin: 0 auto;
   padding: 0 1.6rem;
@@ -109,9 +113,10 @@ a {
 
 .header {
   background: transparent;
+  position:relative;
   color: $header-color;
   font-family:$headingText;
-  padding: 1.6rem 0;
+  padding: 1.6rem;
   margin-bottom:3rem;
   text-align: center;
   z-index:1;
@@ -134,6 +139,78 @@ a {
   padding-left:0.75em;
   color:$penInk;
 }
+
+
+.button__header,
+.button__footer{
+    position:relative;
+    height:40px;
+}
+.addIngredient,
+.removeIngredient{
+    border-radius:12px;
+    padding:0.5em 1em;
+    display: grid;
+    place-content: center;
+    width:auto;
+    height:30px;
+    position:absolute;
+    background:$button_background;
+    right:10px;
+}
+.addNewRecipe{
+    width:30px;
+    height:30px;
+    position:absolute;
+    right:0;
+    display:grid;
+    place-content: center;
+    padding:$button_padding;
+    background-color: $button_background;
+    color:$button_color;
+    border-radius:$button_radius;
+    text-decoration:none;
+    width: 40px;
+    height: 40px;
+        &:hover{
+            opacity:0.8;
+        }
+}
+.addNewRecipe span{
+    font-size:3em;
+}
+#group1, 
+#group2{
+    display:grid;
+    grid-template-columns: 6fr 6fr;
+    padding:1rem;
+    column-gap:4em;
+    box-sizing: border-box;
+    border-radius: 12px;;
+}
+#group2 li{
+    border:1px solid black;
+    border-radius:12px;
+    display:flex;
+    flex-direction: column;
+    column-gap: 2em;
+}
+#group2 label{
+    padding:7px 10px;
+    display:flex;
+    justify-content: space-between;
+}
+
+#group2 li {
+    position: relative;
+    border-radius:12px;
+    background-color:lightblue;
+}
+#group2 li .group label{
+    display:flex;
+    flex-wrap:wrap;
+}
+
 
 /* Actions Bar */
 
@@ -372,6 +449,7 @@ article {
     width:100%;
     height:inherit;
     margin-top:0rem;
+    height:400px;
 }
 
 .card:last-of-type{
@@ -527,6 +605,7 @@ form#update #ingredients > ul {
 #ingredients > li{
     margin-bottom:2rem
 }
+
 /* Form Inputs */
 @media screen and (min-width:769px) and (max-width: 1200px){
     div#recipes {

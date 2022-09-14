@@ -24,8 +24,27 @@ const loadRecipes = () => {
     
     
 }
+const loadNewRecipeFromLocalStorage = () => {
+    
+    if(localStorage.getItem('newRecipe')){
+            const recipesJSON = localStorage.getItem('newRecipe')
+        try {
+            recipesJSON ? console.log(JSON.parse(recipesJSON)) : []
+            return recipesJSON ? JSON.parse(recipesJSON) : []
+        } catch (e) {
+        return []
+        }
+    } 
+    
+    
+}
 const saveRecipes = (newRecipes) => {
     localStorage.setItem('recipes', JSON.stringify(newRecipes))
+
+}
+
+const saveNewRecipeToLocalStorage = (newRecipe) => {
+    localStorage.setItem('newRecipe', JSON.stringify(newRecipe))
 
 }
 
@@ -129,4 +148,4 @@ const loadRecipeForm = (recItem) => {
     })*/
 }
 
-export{ loadRecipes, saveRecipes, getTimestamp, loadRecipeForm}
+export{ loadRecipes, saveRecipes, getTimestamp, loadRecipeForm, loadNewRecipeFromLocalStorage, saveNewRecipeToLocalStorage}
