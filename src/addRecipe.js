@@ -4,16 +4,12 @@ import { createApi } from 'unsplash-js'
 
 import { unsplashme } from "./unsplash";
 import { initEdit } from "../../notes-app/src/views";
-import { loadNewRecipeFromLocalStorage, saveNewRecipeToLocalStorage, getTimestamp } from './functions'
+import { loadNewRecipeFromLocalStorage, saveNewRecipeToLocalStorage, getTimestamp, addToExistingRecipes } from './functions'
 import * as Realm from "realm-web";
 
-let newRecipe;
-if(localStorage.getItem('newRecipe')){
-    newRecipe = loadNewRecipeFromLocalStorage()
-    // console.log(newRecipe)
-} else {
+
     let newRecipe = {
-        name: "",
+        name: "New recipe",
         photoURL: "",
         photographer: "",
         photographerLink: "",
@@ -26,21 +22,30 @@ if(localStorage.getItem('newRecipe')){
         article: "",
         id: "",
         ingredients: [{
-            name: "",
-            description: "",
-            amount: "",
-            unit: "",
+            name: "some ingredient",
+            description: "describe",
+            amount: "2",
+            unit: "cups",
             measureWord: "",
             alternatives: [],
-            id: ""
+            id: `${uuidv4()}`
         }]
     }
-} 
+    if(localStorage.getItem('newRecipe') && localStorage.getItem('newRecipe')!='undefined'){
+    
+        newRecipe = loadNewRecipeFromLocalStorage()
+
+    } else {
+        saveNewRecipeToLocalStorage(newRecipe)
+    }
 const name =  document.getElementById('name')
 const description = document.getElementById('description')
 const article = document.getElementById('article')
 const author = document.getElementById('author')
 const directions = document.getElementById('directions')
+const categories = document.getElementById('categories')
+newRecipe.id = "" ? newRecipe.id = uuidv4():false
+
 
     const createForm = (newRecipe) => { 
         console.log(newRecipe)
@@ -49,6 +54,7 @@ const directions = document.getElementById('directions')
         article.value = newRecipe.article;
         author.value = newRecipe.author;
         directions.value = newRecipe.directions;
+        categories.value = newRecipe.categories;
 
         newRecipe.ingredients.forEach(ingred => {
             let dataId;   
@@ -199,6 +205,10 @@ populateFieldsFromStoredData()
         newRecipe.directions = e.target.value
         saveNewRecipeToLocalStorage(newRecipe)
     })
+    categories.addEventListener('input', function(e){
+        newRecipe.categories = e.target.value
+        saveNewRecipeToLocalStorage(newRecipe)
+    })
 // INGREDIENT LISTENERS
 //  let recItem = recipes.find((recipe) => recipe.id === recipeId )
    let ingredientInputs = document.querySelectorAll('#group2 li .group > label > input')
@@ -257,5 +267,8 @@ populateFieldsFromStoredData()
            // document.querySelector('#group2').appendChild(clone)
           //  elem.after(clone)
         })
+    })
+    document.getElementById("submit").addEventListener('click', function(){
+        addToExistingRecipes();
     })
     

@@ -30,6 +30,7 @@ const createArticleDOM = () => {
     const recipeBody = document.createElement('article')
     const card = document.createElement('div')
         card.classList.add('card')
+        card.classList.add('article')
     const header = document.createElement('header')
         header.classList.add('header__title')
     const title = document.createElement('h1')
@@ -95,6 +96,7 @@ console.log(recipeSubTitle)
                 let amount = ingr.amount
                 let unit = ingr.unit
                 let measurementWord = ingr.measureWord
+                measurementWord != '' ? unit = measurementWord:unit=unit  
             
             if(ingr.alternatives.length > 0){
                 let alts = ingr.alternatives
@@ -115,7 +117,7 @@ console.log(recipeSubTitle)
             const checkbox = document.createElement('input')
                 checkbox.setAttribute('type', 'checkbox');
             unit === '' ? unit = measurementWord : unit = unit
-            amt.textContent = `${amount} ${unit} of ${name}`
+            amt.textContent = `${amount} ${unit} of ${name} *${description}`
 
             label.appendChild(checkbox)
             amt ? label.appendChild(amt):console.log('no amt')

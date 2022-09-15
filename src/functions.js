@@ -1,5 +1,7 @@
 
 import moment from 'moment'
+import {stringify, v4 as uuidv4} from 'uuid';
+
 
 const getTimestamp = () => {
     let timestamp = moment()
@@ -9,6 +11,33 @@ const getTimestamp = () => {
     return timestampShort
 }
 
+const addIngredients = () => {
+    const addIngredientsButton = document.querySelectorAll('.addIngredient');
+    addIngredients.forEach(button => {
+        button.addEventListener('click', function(){
+            console.log(newRecipe)
+            newRecipe.ingredients.push(
+                {
+                    name: "",
+                    description: "",
+                    amount: "",
+                    unit: "",
+                    measureWord: "",
+                    alternatives: [],
+                    id: `${uuidv4()}`
+                }
+            )
+            saveNewRecipeToLocalStorage(newRecipe)
+    
+            newRecipe = loadNewRecipeFromLocalStorage()
+            createForm(newRecipe)
+            //const elem = document.querySelector('.ingredient');
+           // const clone = elem.cloneNode(true);
+           // document.querySelector('#group2').appendChild(clone)
+          //  elem.after(clone)
+        })
+    })
+}
 
 const loadRecipes = () => {
     
@@ -60,6 +89,24 @@ const  sendRecipes = async () => {
     const recsd = await user.functions.updateAllRecipes(recipes);
 
   }
+
+const addToExistingRecipes = () => {
+    const newRecipe = loadNewRecipeFromLocalStorage()
+    let recipes = loadRecipes()
+    const time = getTimestamp()
+    newRecipe.createdAt = time
+    newRecipe.id = uuidv4()
+    console.log(recipes)
+    console.log("*************************combining*********************")
+   recipes = [...recipes, newRecipe]
+   console.log("`````````````````````````````````````````````")
+   console.log(recipes)
+   console.log(newRecipe)
+   console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+   saveRecipes(recipes)
+   
+    
+}
  // sendRecipes() this isn't working yet
 const loadRecipeForm = (recItem) => {
 /*
@@ -148,4 +195,4 @@ const loadRecipeForm = (recItem) => {
     })*/
 }
 
-export{ loadRecipes, saveRecipes, getTimestamp, loadRecipeForm, loadNewRecipeFromLocalStorage, saveNewRecipeToLocalStorage}
+export{ addIngredients, loadRecipes, saveRecipes, getTimestamp, loadRecipeForm, loadNewRecipeFromLocalStorage, saveNewRecipeToLocalStorage, addToExistingRecipes}

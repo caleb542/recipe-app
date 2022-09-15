@@ -34,7 +34,6 @@ const  sendRecipes = async () => {
     const credentials =  Realm.Credentials.anonymous();
     let recipes = loadRecipes()
    
-   
     const user = await app.logIn(credentials);
     const recsd = await user.functions.updateAllRecipes(recipes);
 
@@ -263,10 +262,9 @@ let newRecipes = recs
     
     for(let i = 0;i < newRecipes.length; i++){
         let randomBread = `https://source.unsplash.com/random/?${newRecipes[i].categories}`
-     //   newRecipes[i].id = uuidv4()
-        
+       
         newRecipes[i].photoURL = randomBread
-    //    console.log(newRecipes)
+  console.log(recipes)
 
     }
 
@@ -321,6 +319,7 @@ let list = () => {
                 text.appendChild(recipeName)
                 text.appendChild(recipeDescription)
                 cardAnchor.classList.add('card')
+                cardAnchor.classList.add('home')
                 cardAnchor.appendChild(article)
                 article.appendChild(image)
                 article.appendChild(text)
@@ -342,11 +341,7 @@ list()
 
 window.addEventListener('storage',  (e) =>  {
         if (e.key === 'recipes') {
-         
            const newRecipes = loadRecipes()
-        
-      
-   
             let pagename = index            
 
           updateTextElements(pageName);

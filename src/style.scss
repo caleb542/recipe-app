@@ -1,5 +1,10 @@
 /* Base Styles */
 $body-bg:rgb(255, 255, 255);
+$form-background-dark:#1a1918;
+$form-background-coffee:#f7c266;
+$form-color:#ebfaff;
+$form-color-hover-1:#ebfaffc0;
+$form-input-focus-background:#2f4039;
 $body-color:#000;
 $h : #000;
 $p : #000;
@@ -45,8 +50,7 @@ $looseleaf_red:rgb(161, 43, 43);
 
 
 body {
-  background-color: $body-bg;
-  color:$body-color;
+  font-family: 'Poppins',sans-serif;
   display:flex;
   flex-direction:column;
   width:100%;
@@ -54,7 +58,17 @@ body {
   justify-content: normal;
   padding-bottom:20px;
   overflow-x:hidden;
+  font-size: 1.6rem;
+
+    &.edit-page{
+        background:$form-background-dark; 
+    }
 }
+.edit-page .header__title,
+.edit-page .header__subtitle{
+    color:#fff;
+}
+
 
 .looseleaf_red,
 .looseleaf_blue{
@@ -79,12 +93,6 @@ body {
 
 html {
   font-size: 62.5%;
-}
-
-body {
-
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 1.6rem;
 }
 
 button {
@@ -146,7 +154,29 @@ a {
     position:relative;
     height:40px;
 }
+.edit-page nav ul{
+    display:grid;
+    grid-template-columns: 1fr 20fr ;
+    grid-column-gap:0.5em;
+}
+.edit-page nav a{
+    color:#000;
+    background-color:$form-color;
+    display:inline-block;
+    width:40px;
+    height:40px;
+    border:none;
+    text-decoration:none;
+    display:grid;
+    place-content:center;
+    border-radius:12px;
+
+    &:hover{
+        background-color:$form-color-hover-1;
+    }
+}
 .addIngredient,
+.edit-add-ingredient,
 .removeIngredient{
     border-radius:12px;
     padding:0.5em 1em;
@@ -157,6 +187,16 @@ a {
     position:absolute;
     background:$button_background;
     right:10px;
+}
+#ingredients.edit-ingredients{
+    display:grid;
+    grid-template-columns: 3fr 3fr;
+}
+#ingredients ul{
+    display: flex;
+    flex-direction: column;
+    width:100% !important;
+    border:1px solid #000;
 }
 .addNewRecipe{
     width:30px;
@@ -545,39 +585,132 @@ label.article-checklist-items {
 }
 
 .edit-form-list label {
-    grid-template-columns: 3fr 3fr;
+    grid-template-columns: 1fr;
 }
 .section-1 {
+    background-color: $form-background-dark;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 92%;
+    grid-column-gap:0rem;
+    grid-row-gap:0;
+    grid-template-columns: 12fr;
+    width: 100%;
 
 }
 .section-1 > label {
-    background: #f7a1a1;
-    padding: 1em;
+    background-color: $form-background-dark;
+    padding: 0 1em;
     place-content: center;
-    
+    color:$form-color;
+    border-bottom:1px solid $form-color;
+    display: grid;
+    grid-column-gap: 1rem;
+    grid-row-gap: 1rem;
+    grid-template-columns: 3fr 9fr;
 }
-.edit-form-list {
+.section-1 label div {
+
+line-height:2em;
+height:2em;
+font-size:1.8rem;
+padding:0 2rem;
+}
+.edit-form-list{
     display:grid;
-    grid-template-columns: 1fr;
+    row-gap:1em;
 }
-.edit-form-list  li {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    align-content: center;
+.section-1 label input {
+    background:transparent;
+    border:transparent;
+    color:$form-color;
+    line-height:2em;
+    height:2em;
+    font-size:1.8rem;
+    padding:0 2rem;
+    font-family:'Poppins', sans-serif;    
+    &:focus{
+        background-color:$form-input-focus-background;
+        outline:none;
+        border-radius:1em;
+    }
+}
+.section-1 label textarea {
+    background:transparent;
+    border:transparent;
+    color:$form-color;
+    line-height:2em;
+    height:2em;
+    font-size:1.8rem;
+    padding:0 2rem;
+    font-family:'Poppins', sans-serif;    
+    &:focus{
+        background-color:$form-input-focus-background;
+        outline:none;
+        border-radius:1em;
+        
+    }
+    border-radius:1rem;
 }
 
-.edit-form-list  label {
-    display: grid   ;
-    grid-template-columns: 1fr 1fr;
-    gap: 2fr;
+
+.section-1 label {
+    display: grid;
+    grid-template-columns: 1fr 6fr;
+    grid-row-gap: 3rem;
+    padding: 2em 0;
+}
+.section-1 textarea.tall{
+    height:32em;
+}
+.edit-page .recipe li{
+    color:$form-color;
+    display:grid;
+    grid-template-columns: 8fr 4fr;
+    row-gap:2em;
+    width:100%;
+}
+.edit-page .recipe li {
+    width:100%;
+    display:grid;
+}
+.edit-page .recipe label > a{
+    color:$form-color;
+    display:grid;
+    grid-template-rows:3em;
+    grid-template-columns: 8fr 1fr;
+
+        &:hover{
+            color:$form-color-hover-1;
+        }
+}
+.edit-page .recipe li > a{
+    color:red;
 }
 .edit-form-list #ingredients input{
     margin-bottom:0;
 }
+.edit-page .recipe .hide-text{
+    height:0;
+    width:0;
+    padding:0;
+    opacity:0;
+}
+.edit-page a {
+    text-decoration:none;
+}
+.edit-page dialog{
+    display:block;
+    border: none !important;
+    border-radius: calc(5px * var(--ratio));
+    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 1.6rem;
+    max-width: 400px;
+  }
+  
+  dialog img {
+    display: block;
+    max-width: 75%;
+    margin: 1rem 0 auto 2rem;
+  }
 
 form#update ul{
     width:100%;
@@ -586,7 +719,9 @@ form#update ul{
     justify-content: space-between;
     float:left;
 }
-
+.edit-page .recipe li i.fa {
+    line-height:1.5;
+}
 form#update #ingredients > ul {
     width: 46%;
     display: flex;
@@ -643,14 +778,24 @@ form#update #ingredients > ul {
         padding: 0;
         margin: 0;
     }
-    .card {
+    .card.article {
         background-color: #fff;
-        height: 400px;
+        min-height:100vh;
         margin-bottom: unset;
         box-sizing: border-box;
-        background-color: blanchedalmond;
+        background-color:#ffcdcd;
         border-radius: 25px;
-        height: auto;
+        padding-bottom:40px;
+        position: relative;
+        z-index: 0;
+    }
+    .card.home{
+        background-color: #fff;
+        min-height:40vh;
+        margin-bottom: unset;
+        box-sizing: border-box;
+        background-color: blanchedalmond; 
+        border-radius: 25px;
         padding-bottom:40px;
         position: relative;
         z-index: 0;
@@ -663,7 +808,7 @@ form#update #ingredients > ul {
     }
     .imageElement {
         width: 100%;
-        height: 70%;
+        height: 50%;
         background-color: #fff;
         background-position: center;
         background-size: cover;
