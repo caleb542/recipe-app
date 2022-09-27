@@ -1,11 +1,14 @@
 import "./style.scss";
-import { loadRecipes } from "./functions"
+import { loadRecipes, addIngredients } from "./functions"
 import { getTimestamp } from "./functions"
+// import { list } from "unsplash-js/dist/methods/photos";
 
 
 const recipeId = location.hash.substring(1)
 console.log(recipeId)
 
+let recipes = loadRecipes()
+let recItem = recipes.find((recipe) => recipe.id === recipeId )
 
 const createArticleDOM = () => {
     let recipes = loadRecipes()
@@ -32,8 +35,9 @@ const createArticleDOM = () => {
         card.classList.add('card')
         card.classList.add('article')
     const header = document.createElement('header')
-        header.classList.add('header__title')
+       
     const title = document.createElement('h1')
+    title.classList.add('header__title')
     const subTitle = document.createElement('p') 
         subTitle.classList.add('header__subtitle')
     const summary = document.createElement('div')
@@ -55,8 +59,8 @@ const createArticleDOM = () => {
     const updatedAt = recItem.updatedAt
     const authorData = `Created by: ${recItem.author}`
     author.textContent = authorData
-console.log(recipeSubTitle)
-    updatedAt === createdAt ? dates.innerHTML = `<div><strong>Created: </strong> ${createdAt}`: dates.innerHTML = `<p>Created: ${createdAt} / Modified: ${updatedAt}</p></div>`
+    console.log(recipeSubTitle)
+    updatedAt === createdAt ? dates.innerHTML = `<date>Created: ${createdAt}</date>`: dates.innerHTML = `<date>Created: ${createdAt} / Modified: ${updatedAt}</p></date>`
 
 
     imageElement.classList.add('imageElement')
@@ -70,11 +74,12 @@ console.log(recipeSubTitle)
    
     articleHeader.appendChild(dates)
     articleHeader.appendChild(editButton)
-
-    header.appendChild(articleHeader)
-    header.appendChild(author)
     header.appendChild(title)
     header.appendChild(subTitle)
+    header.appendChild(articleHeader)
+    header.appendChild(author)
+   
+   
     recipeBody.appendChild(card)
     card.appendChild(imageElement)
 
@@ -86,7 +91,34 @@ console.log(recipeSubTitle)
     document.querySelector('.container').innerHTML=''
     document.querySelector('.container').appendChild(recipeBody)
     document.title = `Recipe Me - ${recipeTitle}`
+    const lists = document.createElement('div');
+    lists.classList.add('lists')
+    const checkListCont = document.createElement('div')
+    checkListCont.classList.add("checklist-container")
+    const checklist = document.createElement('ul')
+    checklist.classList.add('checklist')
+    const checklistHeader = document.createElement('div')
+    checklistHeader.classList.add('checklistHeader');
+    const checklistTitle = document.createElement('h2')
+    checklistTitle.textContent = "Recipe";
+    const editRecipeButton = document.createElement('button')
+    editRecipeButton.setAttribute('id','edit-recipe');
+    editRecipeButton.textContent = 'Edit recipe'
+    checklistHeader.appendChild(checklistTitle)
+    checklistHeader.appendChild(editRecipeButton)
+    checkListCont.appendChild(checklistHeader)
+    checkListCont.appendChild(checklist)
 
+
+
+    const shoppingListCont = document.createElement('div')
+    shoppingListCont.classList.add("shoppinglist-container")
+    const shoppingList = document.createElement('ul')
+    const shoppingListTitle = document.createElement('h2')
+    shoppingListTitle.textContent = "Shopping List"
+    shoppingListCont.appendChild(shoppingListTitle);
+    shoppingListCont.appendChild(shoppingList)
+    shoppingList.classList.add('shopping-list')
 
     let ingredientsList = () => {
         recItem.ingredients.forEach(ingr => {
@@ -106,8 +138,6 @@ console.log(recipeSubTitle)
             }
             const ingredientsElem = document.createElement("div")
                 ingredientsElem.setAttribute("id","ingredients")
-            const checklist = document.createElement('ul')
-            checklist.classList.add('checklist')
             const checklistItem = document.createElement('li')
             const label = document.createElement('label')
             label.classList.add('article-checklist-items')
@@ -117,7 +147,7 @@ console.log(recipeSubTitle)
             const checkbox = document.createElement('input')
                 checkbox.setAttribute('type', 'checkbox');
             unit === '' ? unit = measurementWord : unit = unit
-            amt.textContent = `${amount} ${unit} of ${name} *${description}`
+            amt.textContent = `${amount} ${unit} of ${name} ${description}`
 
             label.appendChild(checkbox)
             amt ? label.appendChild(amt):console.log('no amt')
@@ -127,7 +157,10 @@ console.log(recipeSubTitle)
             checklist.appendChild(checklistItem)
 
             let card = document.querySelector('.card')   
-            card.appendChild(checklist)
+            card.appendChild(lists)
+            lists.appendChild(checkListCont)
+            lists.appendChild(shoppingListCont)
+
             directionsElem.innerHTML = "<h2>Directions:</h2><div>" + recipeDirections + "</div>";
             card.appendChild(directionsElem)
             
@@ -137,6 +170,99 @@ console.log(recipeSubTitle)
 
 }
 createArticleDOM(recipeId)
+const checkboxes = document.querySelectorAll('.checklist li input');
+const shoppingList = []
+const list = document.querySelector('.shopping-list');
+let your_email = 'caleb542@gmail.com'
+let n = 0;
+
+
+
+
+document.getElementById("edit-recipe").addEventListener('click', function(){
+    addIngredients()
+})
+
+checkboxes.forEach(item => {
+    item.addEventListener('change', function(e){
+        
+        if(item.checked){
+            let parent = item.parentNode;
+            const checkedItemText = parent.childNodes[1].textContent
+            shoppingList.push(checkedItemText)
+//render
+           
+            let dom;
+          shoppingList.forEach(one => {
+            dom = document.createElement('li');
+            dom.textContent = one
+        })
+          list.appendChild(dom)
+          if(!document.querySelector("a#mail-list")){
+            const mailto = document.createElement('a');
+            mailto.classList.add('mailto')
+            mailto.setAttribute('id','mail-list')
+            mailto.textContent = "Email Shopping List";
+            list.appendChild(mailto);
+           }
+            const getHref = () => {
+                let bodyString  = "";
+                let n = 0;
+               shoppingList.forEach(ingredient => {
+               n++;
+                   bodyString +=  `Shopping List For ${recItem.name}%0D%0A%0D%0A${n}) ${ingredient}%0D%0A`
+                   document.querySelector("a#mail-list").setAttribute('href',`mailto:${your_email}?&subject="Sharing this recipe" &body=${bodyString}`);
+               })
+            }
+           getHref()
+    
+        }else if(!item.checked){
+            parent = item.parentNode;
+            const uncheckedItemText = parent.childNodes[1].textContent
+            shoppingList.find(listItem => {
+                if(uncheckedItemText === listItem){
+                   let index = shoppingList.indexOf(listItem)
+                    shoppingList.splice(index, 1)
+                } 
+            })
+            console.log(shoppingList)
+            let dom;
+            const list = document.querySelector('.shopping-list');
+
+            list.innerHTML = ''
+            shoppingList.forEach(one => {
+
+                dom = document.createElement('li');
+                dom.textContent = one
+                list.appendChild(dom)
+          
+                 
+              })
+              if(!document.querySelector("a#mail-list")){
+                const mailto = document.createElement('a');
+                mailto.classList.add('mailto')
+                mailto.setAttribute('id','mail-list')
+                mailto.textContent = "Email Shopping List";
+                list.appendChild(mailto);
+               }
+               const getHref = () => {
+                let bodyString  = "";
+                let n = 0;
+               shoppingList.forEach(ingredient => {
+               n++;
+                   bodyString +=  `Shopping List For ${recItem.name}%0D%0A%0D%0A${n}) ${ingredient}%0D%0A`
+                   document.querySelector("a#mail-list").setAttribute('href',`mailto:${your_email}?&subject="Sharing this recipe" &body=${bodyString}`);
+               })
+            }
+           getHref()
+            
+        }
+      
+ 
+
+        console.log(shoppingList)
+    })
+})
 
 window.addEventListener('storage',  (e) =>  {
     if (e.key === 'recipes') {

@@ -32,7 +32,7 @@ const updateRecipe = (id, update) => {
         note.directions = update.directions
         note.updatedAt = getTimestamp()
     }    
-    if(typeof update.categories === 'string'){
+    if(typeof update.categories === 'object'){
         note.categories = update.categories
         note.updatedAt = getTimestamp()
     }

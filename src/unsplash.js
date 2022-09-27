@@ -26,10 +26,12 @@ const unsplashme = (keyword) => {
   })
 
   let sendPhotoObject = unsplash.search.getPhotos({
-    query: keyword,
+    // query: keyword,
+    query: `${keyword}` ,
     page: 1,
-    perPage: 100,
-    orientation: 'landscape'
+    perPage: 30,
+    orientation: 'landscape',
+    w:30
   }).then(result => {
     if (result.errors) {
       //
@@ -37,9 +39,10 @@ const unsplashme = (keyword) => {
     } else {
       // handle success
       const photo = result.response
-      const photoObject = photo.results[2];
+      let random = Math.floor(Math.random() * 15)
+      const photoObject = photo.results[random];
       // const photoId = photoObject.id
-
+ console.log(photoObject.urls.small)
       const photoSmallUrl = photoObject.urls.small
       const photoThumb = photoObject.urls.thumb
       const photographer = photoObject.user.name
@@ -56,7 +59,37 @@ const unsplashme = (keyword) => {
   return sendPhotoObject
 }
 
+const getImageGroup = ( keyword, page ) => {
+  // get api key from stored value in mongo values   
 
-export {
-  unsplashme
+  const unsplash = createApi({
+    accessKey: connect
+  })
+
+  let sendPhotoObject = unsplash.search.getPhotos({
+    // query: keyword,
+    query: `${keyword}` ,
+    page: `${page}`,
+    perPage: 30,
+    orientation: 'landscape'
+  }).then(result => {
+    if (result.errors) {
+      //
+      console.log('error occurred: ', result.errors[0]);
+    } else {
+     // result.foreach(image => {
+
+    
+      // handle success
+      const photo = result.response
+      let random = Math.floor(Math.random() * 15)
+      const photoObject = photo.results;
+   return photoObject
+    }
+  })
+  return sendPhotoObject
+
 }
+
+
+export { unsplashme, getImageGroup}

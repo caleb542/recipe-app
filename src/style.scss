@@ -5,6 +5,7 @@ $form-background-coffee:#f7c266;
 $form-color:#ebfaff;
 $form-color-hover-1:#ebfaffc0;
 $form-input-focus-background:#2f4039;
+$form-input-hover-background:#2a2a2a;
 $body-color:#000;
 $h : #000;
 $p : #000;
@@ -20,7 +21,7 @@ $button_background:orangered;
 $button_color:#fff;
 $button_radius:12px;
 $button_padding:2em;
-$desktop-grid:3fr 6fr 3fr;
+$desktop-grid:3fr 3fr 3fr 3fr;
 $desktop-grid-gap:4rem;
 
 $padding1: 1rem;
@@ -48,15 +49,89 @@ $looseleaf_red:rgb(161, 43, 43);
     padding: 0;
 }
 
+#select-images{
+    width:800px;
+    overflow:hidden;
+    flex-direction: row;
+    overflow-x: scroll
+}
+#select-images figure{
+    display:grid;
+    grid-template-columns: 1fr;
+    place-content: center;
+    padding:0;
+    background-color: #000;
+    border-radius:0.875rem;
+
+}
+#select-images img{
+    width:auto;
+    border-radius:0.875rem;
+}
+.homepage-header img.imageElement{
+    background-image: url(https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwyOXx8Y291bnRyeSUyMGtpdGNoZW4lMjBwYXJ0eXxlbnwwfDB8fHwxNjY0Mjg1MTY4&ixlib=rb-1.2.1&q=80&w=1080);
+    height: 500px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+}
+.image-show {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    transition: 400ms;
+}
+.edit-page label.feature-image {
+    /* height: 300px; */
+    align-content: baseline;
+    // grid-template-columns: 2fr 8fr;
+    border-bottom: 0;
+}
+button.feature-image{
+    display: inline;
+    width: auto;
+    max-width:20em;
+    height:40px;
+    color:#fff;
+    background-color:#1f7dbc;
+    border-radius:.875rem;
+    font-size:1.6rem;
+
+    &:hover{
+        opacity:0.5
+    }
+}
+
+.faas {
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    align-items: center;
+    gap:1rem;
+   
+}
+.faas i {
+    box-shadow: 0.3rem 0.4rem #bcbcbc;
+    background-color: orangered;
+    color: #fff;
+    display: block;
+    width: 100%;
+    height: calc(16.6666666667vw - 2rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position:relative;
+    font-size: 4rem;
+    border-radius: 0.875rem;
+}
+.faas i span{
+    font-size:0.875rem;
+    color:#000;
+    position:absolute;
+    bottom:0.4rem;
+}
 
 body {
   font-family: 'Poppins',sans-serif;
-  display:flex;
-  flex-direction:column;
-  width:100%;
-  min-height:100vh;
-  justify-content: normal;
-  padding-bottom:20px;
   overflow-x:hidden;
   font-size: 1.6rem;
 
@@ -69,6 +144,12 @@ body {
     color:#fff;
 }
 
+.edit-page header#recipe-header{
+    display:flex;
+    flex-direction: row;
+    gap:2em;
+    padding:0.5em;
+}
 
 .looseleaf_red,
 .looseleaf_blue{
@@ -126,40 +207,92 @@ a {
   font-family:$headingText;
   padding: 1.6rem;
   margin-bottom:3rem;
-  text-align: center;
+//   text-align: center;
   z-index:1;
 }
 .edit_header {
     display:flex;
     width:100%;
 }
-.header__title h1 {
+header{
+    margin-bottom:4rem;
+}
+.header__title{
     font-weight:500;
     font-size:7rem;
-    margin-bottom: .4rem;
+    margin-bottom:0.8rem;
+    text-align: center;
+    font-family: 'Abril Fatface', serif;
 }
 
 .header__subtitle {
-  font-family:$subtitleText;
   font-size: 2.4rem;
-  font-weight: 100;
+  font-weight: 300;
   text-transform: none;
-  padding-left:0.75em;
-  color:$penInk;
+  margin-bottom:3rem;
+  padding-left:0;
+  color:000;
+  text-align: center;
+  position: relative;
+  font-family: 'Abril Fatface', serif;
 }
-
-
+h2.header__subtitle span {
+    color: red;
+    padding: 0rem;
+    font-size: 2.4em;
+    line-height: 0.5;
+    display: inline;
+    font-family: 'Abril Fatface', serif;
+}
+header input {
+    background: transparent;
+    border: transparent;
+    color: #ebfaff;
+    line-height: 2em;
+    height: 2em;
+    font-size: 1.8rem;
+    padding: 0 2rem;
+    font-family: "Poppins", sans-serif;
+    border:1px solid #333333;
+    border-radius: 1em;
+    width:50%;
+    
+}
+header input:focus {
+    background-color:#eee;
+    caret-color: red;
+    color:#000;
+}
+button.search-button {
+    border: 0;
+    background: transparent;
+    font-size: 1em;
+    color: #000;
+    font-weight: 300;
+    scale: -1 1;
+    rotate:0;
+    translate: -3.5rem 1px;
+}
+button {
+    cursor: pointer;
+}
 .button__header,
 .button__footer{
     position:relative;
     height:40px;
 }
-.edit-page nav ul{
-    display:grid;
-    grid-template-columns: 1fr 20fr ;
-    grid-column-gap:0.5em;
+
+.edit-page nav ul,
+.article-page nav ul{
+    display: flex;
+    grid-template-columns: 1fr 36fr;
+    grid-column-gap: 1rem;
+    flex-direction: row;
+    justify-content: left;
 }
-.edit-page nav a{
+
+.edit-page nav a,
+.article-page nav a{
     color:#000;
     background-color:$form-color;
     display:inline-block;
@@ -170,11 +303,15 @@ a {
     display:grid;
     place-content:center;
     border-radius:12px;
-
     &:hover{
         background-color:$form-color-hover-1;
     }
 }
+.edit-page nav ul li,
+.article-page nav ul li {
+    width:auto;
+ }
+
 .addIngredient,
 .edit-add-ingredient,
 .removeIngredient{
@@ -213,7 +350,7 @@ a {
     width: 40px;
     height: 40px;
         &:hover{
-            opacity:0.8;
+            opacity:0.5;
         }
 }
 .addNewRecipe span{
@@ -381,10 +518,16 @@ a {
     align-self: flex-end;
     
 }
-
+.page-container {
+    position: relative;
+    min-height: 100vh;
+  }
+  
+  .content-wrap {
+    padding-bottom: 12rem;    /* Footer height */
+  }
 footer {
     background:$footer;
-    position: relative;
     width:100%;
     color:#fff;
     text-align: center;
@@ -392,7 +535,11 @@ footer {
     flex-direction: row;
     justify-content: center;
     align-items:center;
-    height:80px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 10rem
+
 }
 
 
@@ -451,7 +598,7 @@ div#recipes {
 }
 .dates {
     display: inline-block;
-    font-family: "Roboto";
+    font-family: "Poppins";
     padding: 0;
     color: #000;
     background: transparent;
@@ -466,10 +613,10 @@ a.cta-update{
     height:auto;
     line-height:normal;
 }
-.imageElement{
+.imageElement {
     width:100%;
     height:70%;
-    background-color:#fff;
+    background-color:#396684;
     background-position: center;
     background-size: cover;
     position: relative;
@@ -477,6 +624,24 @@ a.cta-update{
     top:0;
     z-index:0;
     opacity:1;
+}
+.home-page .imageElement{
+    width:100%;
+    height:70%;
+    background-color:#ffdc52;
+    border-radius:6px;
+    background-position: center;
+    background-size: contain;
+    position: relative;
+    left:0;
+    top:0;
+    z-index:0;
+    opacity:1;
+}
+.article-page .imageElement{
+    background-color:#ffdc52;
+    border-radius:6px;
+    height:400px;
 }
 a {
     color:blue
@@ -489,9 +654,33 @@ article {
     width:100%;
     height:inherit;
     margin-top:0rem;
-    height:400px;
+    height:auto;
+    margin-bottom:10rem;
 }
+.article-page article{
+    height:auto;
+    width:70%;
+    margin:0 auto;
+}
+.home-page article{
+    height:400px;
+     
+}
+/*
+.spinner{
+    width: 80px;
+    height: 80px;
+    background: #000;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    z-index: 2;
+    transform:rotate(3600deg);
+    transition-duration:100s;
 
+}
+*/
 .card:last-of-type{
     margin-bottom:1rem;
 }
@@ -504,13 +693,61 @@ article h1 {
     position: relative;
     padding:0;
 }
+
+
 ul {
     margin:0 0 0 0;
     list-style:none;
 }
+.lists{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:2em;
+    margin:2em 0;
+}
+
+.checklist-container h2, shoppinglist-container h2 {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+}
+.checklist ul,
+.checklist li,
+.checklist label{
+    padding:0;
+    margin:0;
+    
+}
+.lists {
+    height:auto;
+    overflow:hidden;
+}
+.checklist,.shopping-list{
+    font-size:1.9rem;
+    line-height:1.9;
+}
+
+.shoppinglist-container,
+.checklist-container{
+    position: relative;
+    border:1px dashed #333;
+    padding:1em 2em;
+
+}
+
+
+.checklist input{
+    margin-left:0;
+    padding:0;
+}
 .checklist:last-of-type {
     margin:0 0 1em 0;
     list-style:none;
+}
+.mailto{
+    position:absolute;
+    bottom:0.5em;
+    right:1.5em;
+    font-size:1.5rem;
 }
 .checklist li {
     display: flex;
@@ -564,14 +801,40 @@ label > div {
 
 label.article-checklist-items {
     width: 100%;
-    background:#1f7dbc38;
     display: flex;
     flex-direction: row;
     justify-content:left;
     align-items: center;
     box-sizing: border-box;
-    padding:0 0 0 0.75em;
+    padding:0 0 0 0;
     font-size: 1.9rem;
+}
+.btn.btn-large {
+    font-size: 1.9rem;
+    padding: 1rem 2rem;
+    color: #000;
+    background: #fff;
+    font-family: "Poppins", sans-serif;
+    display: inline-block;
+    display: flex;
+    border-radius: 6px;
+    width: 200px;
+    justify-content: center;
+    /* text-align: center; */
+    flex-shrink: 1;
+    float: right;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+}
+.btn.header-back-button{
+    font-size: 2rem;
+}
+.btn.btn-home{
+
+}
+.btn:hover{
+    opacity:0.5;
 }
 
 .edit-form-list li {
@@ -626,12 +889,18 @@ padding:0 2rem;
     height:2em;
     font-size:1.8rem;
     padding:0 2rem;
-    font-family:'Poppins', sans-serif;    
+    font-family:'Poppins', sans-serif; 
+    &:hover{
+        background-color:$form-input-hover-background;
+        outline:none;
+        border-radius:1em;
+    }   
     &:focus{
         background-color:$form-input-focus-background;
         outline:none;
         border-radius:1em;
     }
+   
 }
 .section-1 label textarea {
     background:transparent;
@@ -642,11 +911,16 @@ padding:0 2rem;
     font-size:1.8rem;
     padding:0 2rem;
     font-family:'Poppins', sans-serif;    
+    
+    &:hover{
+        background-color:$form-input-hover-background;
+        outline:none;
+        border-radius:1em;
+    }
     &:focus{
         background-color:$form-input-focus-background;
         outline:none;
-        border-radius:1em;
-        
+        border-radius:1em;   
     }
     border-radius:1rem;
 }
@@ -688,23 +962,66 @@ padding:0 2rem;
 .edit-form-list #ingredients input{
     margin-bottom:0;
 }
-.edit-page .recipe .hide-text{
+.hide-text{
     height:0;
     width:0;
     padding:0;
     opacity:0;
 }
+
 .edit-page a {
     text-decoration:none;
 }
+.edit-page button#add-an-ingredient{
+    color: #000;
+    background-color: #ebfaff;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: none;
+    text-decoration: none;
+    display: grid;
+    overflow:hidden;
+    place-content: center;
+    border-radius: 12px;
+    outline:none;
+        &:focus{
+            opacity:0.5;
+        }
+        &:hover{
+            opacity:0.5;
+        }
+}
 .edit-page dialog{
-    display:block;
+    display: block;
     border: none !important;
     border-radius: calc(5px * var(--ratio));
-    box-shadow: 0 0 #0000, 0 0 #0000, 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 rgb(0 0 0 / 0%), 0 0 rgb(0 0 0 / 0%), 0 25px 50px -12px rgb(0 0 0 / 25%);
     padding: 1.6rem;
-    max-width: 400px;
+    /* max-width: 400px; */
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    display: grid;
+    place-content: center;
+    z-index: 2;
+    background:rgba(111,111,111,0.7)
   }
+  div#modal-container {
+    background-color: #333;
+    padding: 5rem;
+    color: #fff;
+    display: flex;
+    grid-template-columns: 37rem;
+    flex-direction: row;
+    border-radius:3rem;
+}
+#modal-container label {
+    display: flex;
+    flex-direction: row;
+    place-content: space-between;
+}
   
   dialog img {
     display: block;
@@ -806,21 +1123,7 @@ form#update #ingredients > ul {
     margin-top: 0rem;
     height: 400px;
     }
-    .imageElement {
-        width: 100%;
-        height: 50%;
-        background-color: #fff;
-        background-position: center;
-        background-size: cover;
-        position: relative;
-        left: 0;
-        top: 0;
-        z-index: 0;
-        opacity: 1;
-        border-radius: 25px;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-    }
+
     .card .text-area {
         padding: 3rem;
     }

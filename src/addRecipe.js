@@ -3,7 +3,7 @@ import {stringify, v4 as uuidv4} from 'uuid';
 import { createApi } from 'unsplash-js'
 
 import { unsplashme } from "./unsplash";
-import { initEdit } from "../../notes-app/src/views";
+//import { initEdit } from "../../notes-app/src/views";
 import { loadNewRecipeFromLocalStorage, saveNewRecipeToLocalStorage, getTimestamp, addToExistingRecipes } from './functions'
 import * as Realm from "realm-web";
 

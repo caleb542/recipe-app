@@ -1,70 +1,89 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-        <link href="./scripts/index.css" rel="stylesheet" media="screen" />
-        <title>Recipe App - Edit</title>
-    </head>
-    <body class="edit-page">
-        <header class="header bigHeader">
-            <nav>
-                <ul>
-                    <li>
-                        <a href="./index.html"><strong>H</strong></a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="history.back()"><strong>X</strong></a>
 
-                    </li>
-                </ul>
-            </nav>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+    href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Fugaz+One&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+        <script src="https://kit.fontawesome.com/610bdb1969.js" crossorigin="anonymous"></script>
+        <link href="./scripts/index.css" rel="stylesheet" media="screen" />
+    <title>Recipe App - Edit</title>
+</head>
+
+<body class="edit-page">
+    <div class="page-container">
+        <div class="content-wrap">
+            <header class="header bigHeader">
+                <nav>
+                    <ul>
+                        
+                        <li>
+                            <a href="#" class="btn header-back-button" onclick="history.back()"><i class="fa-solid fa-arrow-alt-circle-left"></i><span class="hide-text">Back to article</span></a>
+                        </li>
+                        <li>
+                            <a href="./index.html" class="btn button-home"><i class="fa-solid fa-house"></i><span class="hide-text">Home</span></a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="container">
+                    <h1 class="header__title">Edit recipe</h1>
+                    <h2 class="header__subtitle"></h2>
+                </div>
+            </header>
+
             <div class="container">
-                <h1 class="header__title">Edit recipe</h1>
-                <h2 class="header__subtitle"></h2>
-            </div>
-        </header>
-        
-        <div class="container">
-            <div id="recipe">
-                
-                <form id="update">
-                    <div class="edit-form-list">
-                           
+                <div id="recipe">
+
+                 
+                        <div class="edit-form-list">
+
                             <div class="section-1">
                                 <div>
-                                    <label><div>Author</div>
-                                        <input id="recipe-author" class="input" type="text" placeholder="Author" name="text">
+                                    <label>
+                                        <div>Author</div>
+                                        <input id="recipe-author" class="input" type="text" placeholder="Author"
+                                            name="text">
                                     </label>
                                 </div>
                                 <div>
-                                    <label><div>Recipe article</div>
-                                        <textarea id="recipe-article" class="input area tall"  value="what's it worth?" placeholder="one two three four"></textarea>
+                                    <label>
+                                        <div>Recipe article</div>
+                                        <textarea id="recipe-article" class="input area tall" value="what's it worth?"
+                                            placeholder="one two three four"></textarea>
                                     </label>
                                 </div>
                                 <div>
-                                    <label><div>Recipe Directions</div>
-                                        <textarea id="recipe-directions" class="input area tall"  value="" placeholder="How do we make this?"></textarea>
+                                    <label>
+                                        <div>Recipe Directions</div>
+                                        <textarea id="recipe-directions" class="input area tall" value=""
+                                            placeholder="How do we make this?"></textarea>
                                     </label>
                                 </div>
                                 <div>
-                                    <label><div>Recipe Categories</div>
-                                        <div id="recipe-categories" class="input area"  value="" placeholder="How do we make this?"></div>
+                                    <label>
+                                        <div>Recipe Categories</div>
+                                        <div id="recipe-categories" class="input area" value=""
+                                            placeholder="How do we make this?"></div>
                                     </label>
                                 </div>
-                                
+                              
                             </div>
                             <article class="article__recipe">
-                                <header>
-                                    <h1 class="header__title">Recipe</h1>
+                                <header id="recipe-header">
+                                    <h1 class="header__title">Recipe</h1><button id="add-an-ingredient"><i
+                                            class="fa fa-plus"></i><span class="hide-text">Add a new
+                                            ingredient</span></i></button>
                                 </header>
                                 <ul class="recipe">
-            
+
                                 </ul>
                             </article>
 
@@ -72,27 +91,34 @@
 
                             </div>
 
-                    <button>Submit Updates</button>
-                </form>
-            </div>
+                            <a class="btn btn-large" href="#" onclick="history.back()">Done for now</a>
+                   
+                </div>
+               
+             </div><!--container-->
+                <!--content wrap-->
         </div>
-        <script>
-            
-//const form = document.querySelector('form');
+        <footer>Copyright 1980</footer>
 
-// form.addEventListener('submit', function(event) {
+        <!-- page container-->
+    </div>
+    <script>
+        //const form = document.querySelector('form');
 
-//   // code to submit the form goes here
-//   event.preventDefault();
-//   alert('form submitted!');
-//   document.querySelector('input#name').value=''
-// });
+        // form.addEventListener('submit', function(event) {
 
-// document.querySelector('.btn').addEventListener('click', function() {
+        //   // code to submit the form goes here
+        //   event.preventDefault();
+        //   alert('form submitted!');
+        //   document.querySelector('input#name').value=''
+        // });
 
-//     form.requestSubmit();
-// })
-        </script>
-        <script src="./scripts/edit-bundle.js"></script>
-    </body>
+        // document.querySelector('.btn').addEventListener('click', function() {
+
+        //     form.requestSubmit();
+        // })
+    </script>
+    <script src="./scripts/edit-bundle.js"></script>
+</body>
+
 </html>
