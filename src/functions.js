@@ -43,15 +43,27 @@ const addIngredients = () => {
 }
 
 const loadRecipes = () => {
-
+    console.log('looking')
     if (localStorage.getItem('recipes')) {
+      //  alert(typeof localStorage.getItem('recipes'))
         const recipesJSON = localStorage.getItem('recipes')
         try {
-            recipesJSON ? console.log(JSON.parse(recipesJSON)) : []
-            return recipesJSON ? JSON.parse(recipesJSON) : []
+        
+            recipesJSON ? console.log(JSON.parse(recipesJSON)) : console.log('something')
+            return recipesJSON ? JSON.parse(recipesJSON) : console.log('something part 2')
         } catch (e) {
+           
             return []
         }
+    } else{
+        
+        getRecipesFromDatabase().then((value) =>{
+            console.log(JSON.parse(value))
+            saveRecipes(value)
+        })
+       
+
+       
     }
 
 

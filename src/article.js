@@ -36,12 +36,19 @@ const createArticleDOM = () => {
         card.classList.add('article')
     const header = document.createElement('header')
        
-    const title = document.createElement('h1')
-    title.classList.add('header__title')
-    const subTitle = document.createElement('p') 
-        subTitle.classList.add('header__subtitle')
+    const title = document.querySelector('.header__title');
+    const subtitle = document.querySelector('.header__subtitle');
+    // const title = document.createElement('h1')
+    // title.classList.add('header__title')
+    // const subTitle = document.createElement('p') 
+    //     subTitle.classList.add('header__subtitle')
     const summary = document.createElement('div')
+    summary.classList.add('summary')
     const imageElement = document.createElement('div')
+    const photoInfo = document.createElement('p')
+    photoInfo.classList.add('photoInfo')
+    photoInfo.innerHTML = `Photo from Unsplash by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
+
     const directionsElem = document.createElement('div')
         directionsElem.classList.add('directions')
 
@@ -57,35 +64,41 @@ const createArticleDOM = () => {
     const photoURL = recItem.photoURL
     const createdAt = recItem.createdAt
     const updatedAt = recItem.updatedAt
-    const authorData = `Created by: ${recItem.author}`
+    const authorData = `Submitted by ${recItem.author}`
     author.textContent = authorData
     console.log(recipeSubTitle)
-    updatedAt === createdAt ? dates.innerHTML = `<date>Created: ${createdAt}</date>`: dates.innerHTML = `<date>Created: ${createdAt} / Modified: ${updatedAt}</p></date>`
+    updatedAt === createdAt ? dates.innerHTML = `<date>Created: ${createdAt}</date>`: dates.innerHTML = `<date><strong>Created</strong>: ${createdAt}</date>
+    <date><strong>Modified</strong>: ${updatedAt}</date>`
 
 
     imageElement.classList.add('imageElement')
     imageElement.setAttribute('style',`background-image:url(${photoURL})`)
 
     title.textContent = recipeTitle;
-    subTitle.textContent = recipeSubTitle;
+    subtitle.textContent = recipeSubTitle;
     summary.innerHTML = article;
     
 
    
     articleHeader.appendChild(dates)
-    articleHeader.appendChild(editButton)
-    header.appendChild(title)
-    header.appendChild(subTitle)
-    header.appendChild(articleHeader)
-    header.appendChild(author)
+    articleHeader.appendChild(author)
+
+
+
+    // header.appendChild(title)
+    // header.appendChild(subTitle)
+    
+
    
    
     recipeBody.appendChild(card)
-    card.appendChild(imageElement)
-
     card.appendChild(header)
-    card.appendChild(subTitle)
+    card.appendChild(imageElement)
+    imageElement.appendChild(photoInfo)
+    card.appendChild(articleHeader)
+    // card.appendChild(subTitle)
     card.appendChild(summary)
+   
     
 
     document.querySelector('.container').innerHTML=''
@@ -105,7 +118,8 @@ const createArticleDOM = () => {
     editRecipeButton.setAttribute('id','edit-recipe');
     editRecipeButton.textContent = 'Edit recipe'
     checklistHeader.appendChild(checklistTitle)
-    checklistHeader.appendChild(editRecipeButton)
+    // checklistHeader.appendChild(editRecipeButton)
+    checkListCont.appendChild(editButton)
     checkListCont.appendChild(checklistHeader)
     checkListCont.appendChild(checklist)
 
@@ -179,9 +193,9 @@ let n = 0;
 
 
 
-document.getElementById("edit-recipe").addEventListener('click', function(){
-    addIngredients()
-})
+// document.getElementById("edit-recipe").addEventListener('click', function(){
+//     addIngredients()
+// })
 
 checkboxes.forEach(item => {
     item.addEventListener('change', function(e){
