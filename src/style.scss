@@ -210,6 +210,13 @@ a {
 //   text-align: center;
   z-index:1;
 }
+.home-page header {
+    margin-bottom:2rem;
+}
+.home-page input {
+    margin-bottom:0;
+    box-sizing: border-box;
+}
 .article-page header{
     margin-bottom:0;
 }
@@ -252,13 +259,14 @@ header input {
     border: transparent;
     color: #ebfaff;
     line-height: 2em;
-    height: 2em;
-    font-size: 1.8rem;
+    height: 3.2rem;
+    line-height:1.5rem;
+    font-size: 1.4rem;
     padding: 0 2rem;
     font-family: "Poppins", sans-serif;
     border:1px solid #333333;
     border-radius: 1em;
-    width:50%;
+    width:calc(50% - 2rem);
     
 }
 header input:focus {
