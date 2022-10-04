@@ -28,7 +28,7 @@ listRecipes()
 
 // Event Listeners
 document.querySelector('#search-filter').addEventListener('input',  (e) =>  {
-
+  console.log(e.target.value )
   setFilters ({
       searchText: e.target.value
   })
@@ -36,7 +36,7 @@ document.querySelector('#search-filter').addEventListener('input',  (e) =>  {
 })
 
 document.querySelector('#filter-by').addEventListener('change', (e) =>  {
-
+console.log(e.target.value )
   setFilters ({
      sortBy: e.target.value 
   })
@@ -45,9 +45,9 @@ document.querySelector('#filter-by').addEventListener('change', (e) =>  {
 
 window.addEventListener('storage',  (e) =>  {
         if (e.key === 'recipes') {
-           const newRecipes = loadRecipes()
-            let pagename = index            
-
-          updateTextElements(pageName);
+          // const newRecipes = loadRecipes()
+          //  let pagename = index            
+listRecipes()
+//          updateTextElements(pageName);
     }
 })

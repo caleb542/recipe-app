@@ -25,7 +25,7 @@ const createArticleDOM = () => {
     const editButton = document.createElement('a')
         editButton.setAttribute('id','cta-update')
         editButton.setAttribute('href','./edit.html#'+recipeId)
-        editButton.textContent = "Update this recipe"
+        editButton.textContent = "Edit"
         editButton.classList.add('cta-update')
 
 
@@ -56,17 +56,37 @@ const createArticleDOM = () => {
         dates.classList.add('dates')
     const author = document.createElement('p')    
         author.classList.add('author')
-    const recipeSubTitle = recItem.description;
+    // const recipeSubTitle = recItem.description;
     const recipeTitle = recItem.name;
-    const recipeDirections = recItem.directions;
+    const directionsHeading = document.createElement('h2')
+    directionsHeading.classList.add('directions-heading')
+    directionsHeading.innerHTML =  `<h2>Directions:</h2>`;
+  
+/* ----- */
+  const directionsList = document.createElement('ol');
+    directionsElem.appendChild(directionsHeading);
+    directionsElem.appendChild(directionsList);
+    const listDirections = (directions) => {
+       
+        directions.forEach(step => {
+            const li = document.createElement('li')
+            li.innerHTML = `${step.text}`
+            directionsList.appendChild(li)
+        })
+    }
+    const recipeDirections = recItem.directions
+     listDirections(recipeDirections)
+    
+/* ------ */
+
     const article = recItem.article;
     
     const photoURL = recItem.photoURL
     const createdAt = recItem.createdAt
     const updatedAt = recItem.updatedAt
-    const authorData = `Submitted by ${recItem.author}`
+    const authorData = `by ${recItem.author}`
     author.textContent = authorData
-    console.log(recipeSubTitle)
+    // console.log(recipeSubTitle)
     updatedAt === createdAt ? dates.innerHTML = `<date>Created: ${createdAt}</date>`: dates.innerHTML = `<date><strong>Created</strong>: ${createdAt}</date>
     <date><strong>Modified</strong>: ${updatedAt}</date>`
 
@@ -75,8 +95,10 @@ const createArticleDOM = () => {
     imageElement.setAttribute('style',`background-image:url(${photoURL})`)
 
     title.textContent = recipeTitle;
-    subtitle.textContent = recipeSubTitle;
-    summary.innerHTML = article;
+    // subtitle.textContent = recipeSubTitle;
+
+    summary.innerHTML = `<p class="summary">${recItem.description}</p>
+                        <p class="article">${recItem.article}</p>`
     
 
    
@@ -174,13 +196,14 @@ const createArticleDOM = () => {
             card.appendChild(lists)
             lists.appendChild(checkListCont)
             lists.appendChild(shoppingListCont)
-
-            directionsElem.innerHTML = "<h2>Directions:</h2><div>" + recipeDirections + "</div>";
-            card.appendChild(directionsElem)
+           
             
         });
     }
+    
     ingredientsList()
+
+    card.appendChild(directionsElem)
 
 }
 createArticleDOM(recipeId)
@@ -221,16 +244,19 @@ checkboxes.forEach(item => {
            }
             const getHref = () => {
                 let bodyString  = "";
+                let name = recItem.name;
                 let n = 0;
+
                shoppingList.forEach(ingredient => {
                n++;
                    bodyString +=  `Shopping List For ${recItem.name}%0D%0A%0D%0A${n}) ${ingredient}%0D%0A`
-                   document.querySelector("a#mail-list").setAttribute('href',`mailto:${your_email}?&subject="Sharing this recipe" &body=${bodyString}`);
+                   document.querySelector("a#mail-list").setAttribute('href',`mailto:${your_email}?&subject="Shopping list for ${name}" &body=${bodyString}`);
                })
             }
            getHref()
     
-        }else if(!item.checked){
+        } else if(!item.checked){
+           
             parent = item.parentNode;
             const uncheckedItemText = parent.childNodes[1].textContent
             shoppingList.find(listItem => {
@@ -242,35 +268,48 @@ checkboxes.forEach(item => {
             console.log(shoppingList)
             let dom;
             const list = document.querySelector('.shopping-list');
-
-            list.innerHTML = ''
+            const mailto = document.getElementById('mail-list');
+           
+            list.innerHTML = '';
+            let m = 0
             shoppingList.forEach(one => {
-
+                m++
+                console.log
                 dom = document.createElement('li');
+
                 dom.textContent = one
                 list.appendChild(dom)
           
                  
               })
-              if(!document.querySelector("a#mail-list")){
-                const mailto = document.createElement('a');
-                mailto.classList.add('mailto')
-                mailto.setAttribute('id','mail-list')
-                mailto.textContent = "Email Shopping List";
-                list.appendChild(mailto);
-               }
+            
+              m === 0 ? mailto.remove(): list.appendChild(mailto)
+              
+            
+              
+            //     shoppingList.length === 0 ? list.innerHTML = '': list.appendChild(mailto)
+            
+              
+               
+                
+               
                const getHref = () => {
                 let bodyString  = "";
-                let n = 0;
+                let name = recItem.name
+       n=0;
                shoppingList.forEach(ingredient => {
                n++;
-                   bodyString +=  `Shopping List For ${recItem.name}%0D%0A%0D%0A${n}) ${ingredient}%0D%0A`
-                   document.querySelector("a#mail-list").setAttribute('href',`mailto:${your_email}?&subject="Sharing this recipe" &body=${bodyString}`);
+                   bodyString +=  `Shopping List For ${recItem.name}%0D%0A%0D%0A) ${ingredient}%0D%0A`
+                   mailto.setAttribute('href',`mailto:${your_email}?&subject="Shopping list for ${name}" &body=${bodyString}`);
+                   list.appendChild(mailto)
+
                })
             }
+          
            getHref()
             
         }
+
       
  
 

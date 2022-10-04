@@ -13,7 +13,8 @@ const getTimestamp = () => {
     let timestampValueOf = timestamp.valueOf()
     let timestampLong = timestamp.format('MMM Do, YYYY HH:mm')
     let timestampShort = timestamp.format('MMM Do, YYYY HH:mm')
-    return timestampShort
+    let unixTimestamp = moment(timestampShort, 'MMM Do, YYYY HH:mm').unix();
+    return [timestampShort, unixTimestamp]
 }
 
 const addIngredients = () => {
@@ -42,6 +43,7 @@ const addIngredients = () => {
     })
 }
 
+
 const loadRecipes = () => {
     console.log('looking')
     if (localStorage.getItem('recipes')) {
@@ -58,7 +60,7 @@ const loadRecipes = () => {
     } else{
         
         getRecipesFromDatabase().then((value) =>{
-            console.log(JSON.parse(value))
+            // console.log(JSON.parse(value))
             saveRecipes(value)
         })
        
@@ -128,6 +130,7 @@ const sendRecipes = async () => {
 
 }
 
+
 const addToExistingRecipes = () => {
     const newRecipe = loadNewRecipeFromLocalStorage()
     let recipes = loadRecipes()
@@ -196,9 +199,12 @@ const renderImageSelector = (keyword, pageNumber) => {
                  e.preventDefault()
                  recItem.photographer = e.target.getAttribute('dataName')
                  recItem.photographerLink = e.target.getAttribute('dataLink')
-                 recItem.photoURL = e.target.getAttribute('dataURL') 
+                 recItem.photoURL = e.target.getAttribute('dataURL')
+                 recItem.updatedAt = getTimestamp();
                  console.log(recItem)
-                 saveRecipes(recipes)  
+                 saveRecipes(recipes)
+                 document.querySelector('.image-preview img').setAttribute('src',recItem.photoURL);
+                 document.querySelector('.image-preview figcaption').innerHTML = `Unsplash photo by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
                 })
             })
             const imageButtons = document.createElement('div');
@@ -297,11 +303,11 @@ const renderImageSelector = (keyword, pageNumber) => {
 export {
     getRecipesFromDatabase,
     addIngredients,
+    addToExistingRecipes,
     loadRecipes,
     saveRecipes,
     getTimestamp,
     loadNewRecipeFromLocalStorage,
     saveNewRecipeToLocalStorage,
-    addToExistingRecipes,
     renderImageSelector
 }
