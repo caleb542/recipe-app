@@ -87,8 +87,8 @@ const createArticleDOM = () => {
     const authorData = `by ${recItem.author}`
     author.textContent = authorData
     // console.log(recipeSubTitle)
-    updatedAt === createdAt ? dates.innerHTML = `<date>Created: ${createdAt}</date>`: dates.innerHTML = `<date><strong>Created</strong>: ${createdAt}</date>
-    <date><strong>Modified</strong>: ${updatedAt}</date>`
+    updatedAt === createdAt ? dates.innerHTML = `<date>Created: ${createdAt[0]}</date>`: dates.innerHTML = `<date><strong>Created</strong>: ${createdAt[0]}</date>
+    <date><strong>Modified</strong>: ${updatedAt[0]}</date>`
 
 
     imageElement.classList.add('imageElement')
@@ -149,6 +149,7 @@ const createArticleDOM = () => {
 
     const shoppingListCont = document.createElement('div')
     shoppingListCont.classList.add("shoppinglist-container")
+    shoppingListCont.classList.add("hide")
     const shoppingList = document.createElement('ul')
     const shoppingListTitle = document.createElement('h2')
     shoppingListTitle.textContent = "Shopping List"
@@ -224,6 +225,8 @@ checkboxes.forEach(item => {
     item.addEventListener('change', function(e){
         
         if(item.checked){
+            const shop = document.querySelector('.shoppinglist-container') 
+            shop.classList.remove('hide')
             let parent = item.parentNode;
             const checkedItemText = parent.childNodes[1].textContent
             shoppingList.push(checkedItemText)
@@ -267,6 +270,7 @@ checkboxes.forEach(item => {
             })
             console.log(shoppingList)
             let dom;
+            const shop = document.querySelector('.shoppinglist-container');
             const list = document.querySelector('.shopping-list');
             const mailto = document.getElementById('mail-list');
            
@@ -280,10 +284,16 @@ checkboxes.forEach(item => {
                 dom.textContent = one
                 list.appendChild(dom)
           
-                 
+               
               })
             
-              m === 0 ? mailto.remove(): list.appendChild(mailto)
+              if(m === 0) {
+                mailto.remove()
+                shop.classList.add('hide')
+              } else{
+                list.appendChild(mailto)
+              }
+             
               
             
               

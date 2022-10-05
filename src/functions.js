@@ -130,7 +130,25 @@ const sendRecipes = async () => {
 
 }
 
+const toggleMenu = () => {
+    let toggle = document.getElementById('menu-toggle')
+    let menu = document.querySelector('nav');
+    let status = toggle.getAttribute('aria-label');
+    let nav = document.querySelector('nav');
 
+    if(status.toLowerCase() === 'open the menu'){
+        toggle.setAttribute('aria-label','close the menu');
+        nav.classList.remove('hide')
+        nav.classList.add('open')
+        nav.setAttribute('aria-expanded','true')
+    }
+    if(status.toLowerCase() === 'close the menu'){
+        toggle.setAttribute('aria-label','Open the menu');
+        nav.classList.add('hide')
+        nav.classList.remove('open')
+        nav.setAttribute('aria-expanded',false)
+    }
+}
 const addToExistingRecipes = () => {
     const newRecipe = loadNewRecipeFromLocalStorage()
     let recipes = loadRecipes()
@@ -309,5 +327,6 @@ export {
     getTimestamp,
     loadNewRecipeFromLocalStorage,
     saveNewRecipeToLocalStorage,
-    renderImageSelector
+    renderImageSelector,
+    toggleMenu
 }

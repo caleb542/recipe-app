@@ -24,44 +24,62 @@
 <body class="home-page">
     <div class="page-container">
         <div class="content-wrap">
-            <div class="container">
-                <header>
-
+            <header>
+                <div class="header-top">
                     <h1 class="header__title">Recipe Me</h1>
-                    <h2 class="header__subtitle">A Digital Recipe Index <span>.</span></h2>
-                    <div class="homepage-header">
-                        <img class="imageElement"
-                            style="background-image:url(https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwyOXx8Y291bnRyeSUyMGtpdGNoZW4lMjBwYXJ0eXxlbnwwfDB8fHwxNjY0Mjg1MTY4&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)"/>
+                    <a href="#" id="menu-toggle" aria-expanded="false" aria-controls="nav" class="menu-toggle" aria-label="Open the menu">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
+                    </a>
+                    
+                </div>
+                <nav id="nav" class="hide">
+                    <ul>
+                        <li>
+                            <a href="/index.html">Home</a>
+                        </li>
+                        <li>
+                            <a href="/mission.html">Mission Statement</a>
+                        </li>
+                        <li>
+                            <a href="/about.html">About Recipe Me</a>
+                        </li>
+                        
+                    </ul>
+                </nav>
+                <!-- <h2 class="header__subtitle">A Digital Recipe Index <span>.</span></h2> -->
+                <div class="homepage-hero">
+                 <!--  <div class="imageElement" alt="">--> 
+                        <h2>Find a recipe</h2>
+                        <div class="search-filters grid">
+                            <fieldset>
+                                <legend>
+                                    Filter recipes by title or author or category
+                                </legend>    
+                                <input type="text" id="search-filter" placeholder="donuts / peter / seafood" class="search-field">
+                            <!-- <button class="search-button">
+                                        <i class="fa fa-solid fa-magnifying-glass "></i>
+                                    </button> -->
+                            </fieldset>     
+                            <div class="select">
+                            <fieldset>
+                                <legend>Sort results</legend>
+                                <select class="dropdown" id="filter-by">
+                                    <option value="byEdited">Last modified</option>
+                                    <option value="byCreated">Created date</option>
+                                    <option value="alphabetical">Sort alphabetically</option>
+                                </select>
+                            </fieldset>    
+                                
+                            </div>
+                           
+    
+                       <!-- </div> --> 
                     </div>
-                 
-                    <div class="search-filters grid">
-                    <fieldset>
-                        <legend>
-                            Filter recipes by title or author or category
-                        </legend>    
-                      
-                        <input type="text" id="search-filter" placeholder="donuts / peter / seafood" class="search-field">
-                        <!-- <button class="search-button">
-                                    <i class="fa fa-solid fa-magnifying-glass "></i>
-                                </button> -->
-                        </fieldset>     
-                        <div class="select">
-                        <fieldset>
-                            <legend>Sort results</legend>
-                            <select class="dropdown" id="filter-by">
-                                <option value="byEdited">Last modified</option>
-                                <option value="byCreated">Created date</option>
-                                <option value="alphabetical">Sort alphabetically</option>
-                            </select>
-                        </fieldset>    
-                            
-                        </div>
-                        <div>
-                            <a href="edit.html" id="add" class="addNewRecipe">+</a>
-                        </div>
-
-                    </div>
-                </header>
+<!-- url(https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwyOXx8Y291bnRyeSUyMGtpdGNoZW4lMjBwYXJ0eXxlbnwwfDB8fHwxNjY0Mjg1MTY4&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)
+-->                        </div>
+            </header>
+            <div class="container">
+               
 
                 <div id="recipes">
 
