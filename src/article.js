@@ -1,19 +1,21 @@
 import "./style.scss";
 import { loadRecipes, addIngredients } from "./functions"
-import { getTimestamp } from "./functions"
+import { getTimestamp, toggleMenu, hamburger } from "./functions"
 // import { list } from "unsplash-js/dist/methods/photos";
 
 
 const recipeId = location.hash.substring(1)
 console.log(recipeId)
+let recItem
+recItem = await loadRecipes()
+.then(result => result.find((recipe) => recipe.id === recipeId ))
 
-let recipes = loadRecipes()
-let recItem = recipes.find((recipe) => recipe.id === recipeId )
+ 
 
 const createArticleDOM = () => {
-    let recipes = loadRecipes()
+    //let recipes = loadRecipes()
     // "recItem": find the recipe with the id passed in the hash
-    let recItem = recipes.find((recipe) => recipe.id === recipeId )
+   // let recItem = recipes.find((recipe) => recipe.id === recipeId )
 
     if (!recItem) {
         location.assign('/index.html')
@@ -36,7 +38,7 @@ const createArticleDOM = () => {
         card.classList.add('article')
     const header = document.createElement('header')
        
-    const title = document.querySelector('.header__title');
+    const title = document.querySelector('.article__title');
     const subtitle = document.querySelector('.header__subtitle');
     // const title = document.createElement('h1')
     // title.classList.add('header__title')
@@ -207,7 +209,9 @@ const createArticleDOM = () => {
     card.appendChild(directionsElem)
 
 }
-createArticleDOM(recipeId)
+
+createArticleDOM(recipeId);
+
 const checkboxes = document.querySelectorAll('.checklist li input');
 const shoppingList = []
 const list = document.querySelector('.shopping-list');
@@ -225,6 +229,8 @@ checkboxes.forEach(item => {
     item.addEventListener('change', function(e){
         
         if(item.checked){
+            const checkContainer = document.querySelector('.checklist-container') 
+            checkContainer.classList.add('checked')
             const shop = document.querySelector('.shoppinglist-container') 
             shop.classList.remove('hide')
             let parent = item.parentNode;
@@ -288,6 +294,8 @@ checkboxes.forEach(item => {
               })
             
               if(m === 0) {
+                const checkContainer = document.querySelector('.checklist-container') 
+                checkContainer.classList.remove('checked')
                 mailto.remove()
                 shop.classList.add('hide')
               } else{
@@ -327,6 +335,7 @@ checkboxes.forEach(item => {
     })
 })
 
+hamburger() 
 window.addEventListener('storage',  (e) =>  {
     if (e.key === 'recipes') {
         createArticleDOM(recipeId)

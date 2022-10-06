@@ -12,7 +12,9 @@ import {
     saveRecipes,
     getRecipesFromDatabase,
     getTimestamp,
-    renderImageSelector
+    renderImageSelector,
+    toggleMenu,
+    hamburger
 } from "./functions"
 import {
     updateRecipe,
@@ -25,8 +27,8 @@ let newRecipe = {
     photoURL: "/images/default-dish-image.jpg",
     photographer: " ",
     photographerLink: "",
-    createdAt: "",
-    updatedAt: "",
+    createdAt: [],
+    updatedAt: [],
     author: "",
     description: "",
     directions: [{
@@ -66,7 +68,8 @@ if (!location.hash.substring(1)) {
     }
     console.error('new hash')
     // set up a new recipe in the recipes object
-    let rec = loadRecipes()
+    
+    let rec = await loadRecipes()
     newRecipe.id = recipeId
     newRecipe.createdAt = createdAt
 
@@ -104,8 +107,9 @@ if (!location.hash.substring(1)) {
 // }
 
 
-const initEdit = (recipeId) => {
-    let recipes = loadRecipes()
+
+const initEdit = async (recipeId) => {
+    let recipes = await loadRecipes()
     let recItem = recipes.find((recipe) => recipe.id === recipeId)
     if (!recItem) {
         location.assign('/index.html')
@@ -205,11 +209,14 @@ const initEdit = (recipeId) => {
         
     }
     // directions listeners
-    // 1. ADD BUTTON
-    addStepButton.addEventListener('click', function (e) {
+    // 1. ADD BUTTON]
+   
+    addStepButton.addEventListener('click', async function (e) {
+
+
         e.preventDefault()
         let recipeId = location.hash.substring(1);
-        let recipes = loadRecipes()
+        let recipes = await loadRecipes()
         let recItem = recipes.find((recipe) => recipe.id === recipeId)
         
         const id = e.target.getAttribute('dataId')
@@ -234,10 +241,10 @@ const initEdit = (recipeId) => {
   
     })
     // Remove Directions Button
-    const removeDirection = (id) => {
+    const removeDirection = async (id) => {
         let arr = recItem.directions;
         let item = arr.find(direction => direction.id === id)
-       
+        let recipes = await loadRecipes()
         let i;
 
         for (let i = 0; i < arr.length; i++) {
@@ -254,7 +261,7 @@ const initEdit = (recipeId) => {
                         }
 
                     saveRecipes(recipes)
-                      console.log(recipes)
+                    initEdit(recipeId)
                     }
 
 
@@ -274,8 +281,14 @@ const initEdit = (recipeId) => {
     })
    
     // Edit Direction Button
-    const editDirection = (id) => {
+
+
+    const editDirection = async (id) => {
+
+        let recipes = await loadRecipes()
+
         let arr = recItem.directions;
+
         let stepItem = arr.find(direction => direction.id === id)
        
         let text = stepItem.text
@@ -287,8 +300,10 @@ const initEdit = (recipeId) => {
         textBox.value = text;
         
         textBox.addEventListener('input', function (e) {
+        
+
             let recipeId = location.hash.substring(1);
-            let recipes = loadRecipes()
+            
             let recItem = recipes.find((recipe) => recipe.id === recipeId)
 
             let arr = recItem.directions;
@@ -359,6 +374,11 @@ const initEdit = (recipeId) => {
     recItem.ingredients.forEach(ingred => {
         n++
         let iUUID = ingred.id
+        if(iUUID === undefined){
+            ingred.id = uuidv4();
+            saveRecipes(recipes)
+            let iUUID = ingred.id
+        }
         let iName = ingred.name;
         let iDescription = ingred.description
         let iAmount = ingred.amount
@@ -444,13 +464,13 @@ const initEdit = (recipeId) => {
     })
 
 
-    const removeIngredient = (id) => {
+    const removeIngredient = async (id) => {
         console.log(id)
         let arr = recItem.ingredients;
         let item = arr.find(ingredient => ingredient.id === id)
         console.log(item)
         let i;
-
+        let recipes = await loadRecipes()
         for (let i = 0; i < arr.length; i++) {
             if (arr[i].id === id) {
                 recipes.forEach(recipe => {
@@ -497,7 +517,8 @@ const initEdit = (recipeId) => {
             editIngredient(item)
         })
     })
-    const editIngredient = (i) => {
+    const editIngredient = async (i) => {
+        
         const modalContainer = document.createElement('div');
         modalContainer.classList.add('modal-container');
         modalContainer.setAttribute('id','ingredient-modal')
@@ -568,7 +589,7 @@ const initEdit = (recipeId) => {
     }
 
 
-    const addIngredient = () => {
+    const addIngredient = async () => {
         const uuid = uuidv4()
         const newIngredient = {
             name: "New Ingredient",
@@ -579,6 +600,7 @@ const initEdit = (recipeId) => {
             alternatives: [],
             id: uuid
         }
+        let recipes = await loadRecipes();
         recItem.ingredients.push(newIngredient)
         const updateIt = recipes.find((recipe) => {
             if (recipe.id === recItem.id) {

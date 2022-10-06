@@ -4,7 +4,7 @@ import { createApi } from 'unsplash-js'
 import { getFilters, setFilters } from './filters';
 import { sortRecipes, listRecipes } from './recipes'
 import { unsplashme } from "./unsplash";
-import { getRecipesFromDatabase, loadRecipes, getTimestamp, saveRecipes, toggleMenu } from './functions'
+import { getRecipesFromDatabase, loadRecipes, getTimestamp, saveRecipes, toggleMenu, hamburger } from './functions'
 import * as Realm from "realm-web";
 
   
@@ -23,7 +23,10 @@ const  sendRecipes = async () => {
 
 
 
-listRecipes()
+
+    let recipes = await loadRecipes()
+    listRecipes(recipes)
+
 
 
 // Event Listeners
@@ -32,7 +35,7 @@ document.querySelector('#search-filter').addEventListener('input',  (e) =>  {
   setFilters ({
       searchText: e.target.value
   })
-  listRecipes()
+  listRecipes(recipes)
 })
 
 document.querySelector('#filter-by').addEventListener('change', (e) =>  {
@@ -42,11 +45,10 @@ console.log(e.target.value )
   })
   listRecipes()
 })
-const hamburger = document.getElementById('menu-toggle');
-  hamburger.addEventListener('click', function(e){
-   e.preventDefault() 
-  toggleMenu();  
-})
+
+
+
+hamburger()
 window.addEventListener('storage',  (e) =>  {
         if (e.key === 'recipes') {
           // const newRecipes = loadRecipes()

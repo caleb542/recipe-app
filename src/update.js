@@ -1,9 +1,9 @@
 import { loadRecipes, saveRecipes, getTimestamp } from './functions'
 
-
+let recipes = await loadRecipes()
 const updateRecipe = (id, update) => {
     
-    let recipes = loadRecipes()
+    
    
     const note = recipes.find((recipe) =>  recipe.id === id )
 
@@ -42,9 +42,9 @@ const updateRecipe = (id, update) => {
 
 }
 
-const updateIngredient = (recipeId, ingredientId, id, val) => {
+const updateIngredient = async (recipeId, ingredientId, id, val) => {
 
-    let recipes = loadRecipes()
+    let recipes = await loadRecipes()
    
     const note = recipes.find((recipe) =>  recipe.id === recipeId )
 

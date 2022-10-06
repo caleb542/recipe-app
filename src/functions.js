@@ -44,32 +44,78 @@ const addIngredients = () => {
 }
 
 
-const loadRecipes = () => {
-    console.log('looking')
+// Sort your notes by one of three ways
+
+
+const sortRecipes = function (sortBy, recipes) {
+    if (sortBy === 'byEdited') {
+
+        return recipes.sort(function (a, b) {
+
+            if (a.updatedAt[1] > b.updatedAt[1]) {
+                return -1
+            } else if (a.updatedAt[1] < b.updatedAt[1]) {
+                return 1
+            } else {
+                return 0
+            }
+        })
+    } else if (sortBy === 'byCreated') {
+
+        return recipes.sort(function (a, b) {
+            if (a.createdAt[1] > b.createdAt[1]) {
+                return -1
+            } else if (a.createdAt[1] < b.createdAt[1]) {
+                return 1
+            } else {
+                return 0
+            }
+        })
+    } else if (sortBy === 'alphabetical') {
+
+        return recipes.sort(function (a, b) {
+            if (a.name.toLowerCase() < b.name.toLowerCase()) {
+                return -1
+            } else if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                return 1
+            } else {
+                return 0
+            }
+        })
+    } else {
+        return recipes
+    }
+}
+
+const  loadRecipes = async() => {
+   
+    let recs;
     if (localStorage.getItem('recipes')) {
-      //  alert(typeof localStorage.getItem('recipes'))
+    
+      console.log('getting from local storage')
         const recipesJSON = localStorage.getItem('recipes')
         try {
-        
+            console.log("@@@@@@") 
             recipesJSON ? console.log(JSON.parse(recipesJSON)) : console.log('something')
+            console.log("@@@@@@") 
             return recipesJSON ? JSON.parse(recipesJSON) : console.log('something part 2')
         } catch (e) {
            
             return []
         }
     } else{
-        
-        getRecipesFromDatabase().then((value) =>{
-            // console.log(JSON.parse(value))
-            saveRecipes(value)
-        })
+        console.error("fetching from database")
+        return await getRecipesFromDatabase()
        
-
        
     }
 
-
+        
+       
 }
+
+
+
 const loadNewRecipeFromLocalStorage = () => {
 
     if (localStorage.getItem('newRecipe')) {
@@ -129,7 +175,15 @@ const sendRecipes = async () => {
     const recsd = await user.functions.updateAllRecipes(recipes);
 
 }
-
+const hamburger = () => {
+    const hamburger = document.getElementById('menu-toggle');
+    
+        hamburger.addEventListener('click', function(e){
+            e.preventDefault() 
+           toggleMenu();  
+    })
+  
+} 
 const toggleMenu = () => {
     let toggle = document.getElementById('menu-toggle')
     let menu = document.querySelector('nav');
@@ -166,6 +220,9 @@ const addToExistingRecipes = () => {
 
 
 }
+
+let recipes = await loadRecipes()
+   
 const renderImageSelector = (keyword, pageNumber) => {
     let responseLength
     let images;
@@ -206,20 +263,32 @@ const renderImageSelector = (keyword, pageNumber) => {
                 
 
             })
-            let recipes = loadRecipes()
-            //   alert(e.target.getAttribute('dataName'))
-            let recipeId = location.hash.substring(1) 
-            let recItem = recipes.find((recipe) => recipe.id === recipeId)
-            
 
+            let recItem = async () => {
+                let recipes = await loadRecipes()
+                let recipeId = location.hash.substring(1)
+                recItem = recipes.find((recipe) => recipe.id === recipeId)
+                return recItem
+            }
+           
+            //   alert(e.target.getAttribute('dataName'))
+            
+     
+            
+           
             images.forEach(image => {
-                image.addEventListener('click', function(e){
+                image.addEventListener('click', async function(e){
                  e.preventDefault()
+
+                 let recipeId = location.hash.substring(1);
+                 recipes = await loadRecipes()
+                 recItem = recItem = recipes.find((recipe) => recipe.id === recipeId)
+
                  recItem.photographer = e.target.getAttribute('dataName')
                  recItem.photographerLink = e.target.getAttribute('dataLink')
                  recItem.photoURL = e.target.getAttribute('dataURL')
                  recItem.updatedAt = getTimestamp();
-                 console.log(recItem)
+                 console.log(recipes)
                  saveRecipes(recipes)
                  document.querySelector('.image-preview img').setAttribute('src',recItem.photoURL);
                  document.querySelector('.image-preview figcaption').innerHTML = `Unsplash photo by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
@@ -322,11 +391,13 @@ export {
     getRecipesFromDatabase,
     addIngredients,
     addToExistingRecipes,
+    sortRecipes,
     loadRecipes,
     saveRecipes,
     getTimestamp,
     loadNewRecipeFromLocalStorage,
     saveNewRecipeToLocalStorage,
     renderImageSelector,
-    toggleMenu
+    toggleMenu,
+    hamburger
 }
