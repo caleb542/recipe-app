@@ -15,16 +15,15 @@ const  sendRecipes = async () => {
     const app = new Realm.App({ id: APP_ID });
     const credentials =  Realm.Credentials.anonymous();
     const user = await app.logIn(credentials);
-    let recipes = loadRecipes()
+    let recipes = await loadRecipes()
     // const recsd = await user.functions.updateAllRecipes(recipes);
 
   }
 
 
 
+  let recipes = await loadRecipes()
 
-
-    let recipes = await loadRecipes()
     listRecipes(recipes)
 
 
@@ -53,7 +52,7 @@ window.addEventListener('storage',  (e) =>  {
         if (e.key === 'recipes') {
           // const newRecipes = loadRecipes()
           //  let pagename = index            
-listRecipes()
+listRecipes(recipes)
 //          updateTextElements(pageName);
     }
 })

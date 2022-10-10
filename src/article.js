@@ -6,16 +6,24 @@ import { getTimestamp, toggleMenu, hamburger } from "./functions"
 
 const recipeId = location.hash.substring(1)
 console.log(recipeId)
-let recItem
-recItem = await loadRecipes()
-.then(result => result.find((recipe) => recipe.id === recipeId ))
 
- 
 
-const createArticleDOM = () => {
-    //let recipes = loadRecipes()
+
+
+let recipes;
+
+
+let fetchRecipes = async () => {
+    recipes = await loadRecipes()
+    createArticleDOM(recipes)
+}
+fetchRecipes()
+
+
+const createArticleDOM = (recipes) => {
+    // let recipes = loadRecipes()
     // "recItem": find the recipe with the id passed in the hash
-   // let recItem = recipes.find((recipe) => recipe.id === recipeId )
+    let recItem = recipes.find((recipe) => recipe.id === recipeId )
 
     if (!recItem) {
         location.assign('/index.html')
@@ -27,8 +35,8 @@ const createArticleDOM = () => {
     const editButton = document.createElement('a')
         editButton.setAttribute('id','cta-update')
         editButton.setAttribute('href','./edit.html#'+recipeId)
-        editButton.textContent = "Edit"
-        editButton.classList.add('cta-update')
+        editButton.textContent = "Update recipe"
+        editButton.classList.add('cta-update','btn')
 
 
 
@@ -199,64 +207,55 @@ const createArticleDOM = () => {
             card.appendChild(lists)
             lists.appendChild(checkListCont)
             lists.appendChild(shoppingListCont)
-           
-            
+
         });
     }
     
     ingredientsList()
-
     card.appendChild(directionsElem)
 
-}
+    const checkboxes = document.querySelectorAll('.checklist li input');
+    const shoppingListArr = []
+    const list = document.querySelector('.shopping-list');
+    let your_email = 'caleb542@gmail.com'
+    let n = 0;
 
-createArticleDOM(recipeId);
-
-const checkboxes = document.querySelectorAll('.checklist li input');
-const shoppingList = []
-const list = document.querySelector('.shopping-list');
-let your_email = 'caleb542@gmail.com'
-let n = 0;
-
-
-
-
-// document.getElementById("edit-recipe").addEventListener('click', function(){
-//     addIngredients()
-// })
+    
 
 checkboxes.forEach(item => {
+    console.log(item.textContent)
     item.addEventListener('change', function(e){
         
         if(item.checked){
-            const checkContainer = document.querySelector('.checklist-container') 
-            checkContainer.classList.add('checked')
             const shop = document.querySelector('.shoppinglist-container') 
+            const checks = document.querySelector('.checklist-container')
             shop.classList.remove('hide')
+            checks.classList.add('checked')
+
             let parent = item.parentNode;
             const checkedItemText = parent.childNodes[1].textContent
-            shoppingList.push(checkedItemText)
-//render
+            shoppingListArr.push(checkedItemText)
+
            
             let dom;
-          shoppingList.forEach(one => {
-            dom = document.createElement('li');
-            dom.textContent = one
-        })
-          list.appendChild(dom)
-          if(!document.querySelector("a#mail-list")){
-            const mailto = document.createElement('a');
-            mailto.classList.add('mailto')
-            mailto.setAttribute('id','mail-list')
-            mailto.textContent = "Email Shopping List";
-            list.appendChild(mailto);
-           }
+            shoppingListArr.forEach(one => {
+                dom = document.createElement('li');
+                dom.textContent = one
+            })
+            list.appendChild(dom)
+            if(!document.querySelector("a#mail-list")){
+                const mailto = document.createElement('a');
+                mailto.classList.add('mailto')
+                mailto.setAttribute('id','mail-list')
+                mailto.textContent = "Email Shopping List";
+                list.appendChild(mailto);
+            }
             const getHref = () => {
                 let bodyString  = "";
                 let name = recItem.name;
                 let n = 0;
 
-               shoppingList.forEach(ingredient => {
+               shoppingListArr.forEach(ingredient => {
                n++;
                    bodyString +=  `Shopping List For ${recItem.name}%0D%0A%0D%0A${n}) ${ingredient}%0D%0A`
                    document.querySelector("a#mail-list").setAttribute('href',`mailto:${your_email}?&subject="Shopping list for ${name}" &body=${bodyString}`);
@@ -268,13 +267,13 @@ checkboxes.forEach(item => {
            
             parent = item.parentNode;
             const uncheckedItemText = parent.childNodes[1].textContent
-            shoppingList.find(listItem => {
+            shoppingListArr.find(listItem => {
                 if(uncheckedItemText === listItem){
-                   let index = shoppingList.indexOf(listItem)
-                    shoppingList.splice(index, 1)
+                   let index = shoppingListArr.indexOf(listItem)
+                    shoppingListArr.splice(index, 1)
                 } 
             })
-            console.log(shoppingList)
+            console.log(shoppingListArr)
             let dom;
             const shop = document.querySelector('.shoppinglist-container');
             const list = document.querySelector('.shopping-list');
@@ -282,40 +281,34 @@ checkboxes.forEach(item => {
            
             list.innerHTML = '';
             let m = 0
-            shoppingList.forEach(one => {
+            shoppingListArr.forEach(one => {
                 m++
                 console.log
                 dom = document.createElement('li');
 
                 dom.textContent = one
                 list.appendChild(dom)
-          
+                console.log(list)
                
+                if(m === 0) {
+                    shop.classList.add('hide'),
+                    checks.classList.remove('checked')
+                }
               })
-            
+              
               if(m === 0) {
-                const checkContainer = document.querySelector('.checklist-container') 
-                checkContainer.classList.remove('checked')
                 mailto.remove()
                 shop.classList.add('hide')
               } else{
                 list.appendChild(mailto)
               }
              
-              
-            
-              
-            //     shoppingList.length === 0 ? list.innerHTML = '': list.appendChild(mailto)
-            
-              
-               
-                
                
                const getHref = () => {
                 let bodyString  = "";
                 let name = recItem.name
-       n=0;
-               shoppingList.forEach(ingredient => {
+                n=0;
+               shoppingListArr.forEach(ingredient => {
                n++;
                    bodyString +=  `Shopping List For ${recItem.name}%0D%0A%0D%0A) ${ingredient}%0D%0A`
                    mailto.setAttribute('href',`mailto:${your_email}?&subject="Shopping list for ${name}" &body=${bodyString}`);
@@ -327,13 +320,13 @@ checkboxes.forEach(item => {
            getHref()
             
         }
-
-      
- 
-
-        console.log(shoppingList)
+        
     })
 })
+
+
+}
+
 
 hamburger() 
 window.addEventListener('storage',  (e) =>  {

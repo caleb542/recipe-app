@@ -44,6 +44,12 @@ $select-border: #777;
 $select-focus: blue;
 $select-arrow: $select-border;
 
+
+$btn-padding:0 1.5rem;
+$btn-height:1.75rem;
+$btn-lineHeight:1.8rem;
+$btn-border-rad:3rem;
+
 html {
    // font-size: 62.5%;
   }
@@ -65,6 +71,13 @@ html {
 .cross {
     display:none;
     z-index:5;
+}
+.btn {
+   padding: $btn-padding;
+    height: $btn-height;
+    line-height:$btn-lineHeight;
+    display:inline-block;
+    border-radius:$btn-border-rad;
 }
 @import url('https://fonts.googleapis.com/css2?family=Paytone+One&family=Roboto&family=Monsieur+La+Doulaise&family=Parisienne&display=swap');
 
@@ -101,7 +114,7 @@ html {
 }
 .homepage-hero {
     //background-image: url(https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwyOXx8Y291bnRyeSUyMGtpdGNoZW4lMjBwYXJ0eXxlbnwwfDB8fHwxNjY0Mjg1MTY4&ixlib=rb-1.2.1&q=80&w=1080);
-    background-image:url('../public/images/hero3.jpg');
+    background-image:linear-gradient(90deg,rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('../public/images/hero3.jpg');
     height: 500px;
     background-repeat: no-repeat;
     background-size: cover;
@@ -507,11 +520,13 @@ nav.hide{
     width:100%;
     transition: all 0.3s ease-out;
     display:block;
+    z-index:-1;
 }
 nav.open{
     margin-top:0rem;
     opacity:1;
     transition: all 0.3s ease-out;   
+    z-index:3;
 }
 nav ul{
     display: flex;
@@ -839,14 +854,10 @@ date{
     letter-spacing: 0.05em;
 
 }
-a.cta-update{
-    display:inline-block;
-    width:auto;
-    text-align: center;
-    color:$penInk;
-    height:auto;
-    line-height:normal;
-    position:absolute;
+.cta-update{
+    text-decoration:none;
+    color:#fff;
+    background-color:purple;   
     right:2.4rem;
 }
 .imageElement {
@@ -1004,7 +1015,7 @@ ul {
 .checklist-container {
     background:#fff;
     z-index:3;
-    width:calc(200% + 2em);
+    width:100%;
     transition: all 0.9s;
 }
 .checklist-container.checked{
@@ -1017,16 +1028,20 @@ ul {
     border:0;
     padding:0;
     opacity:1;
-    transform: translateX(65em);
-    left: -65em;
-    transition:all 0.9s;
+    transform: translateX(0);
+    left: 0;
+    transition:all 0.3s;
+    border:0;
+    
 }
 .shoppinglist-container.hide {
-    transform: translateX(0em);
-    left: -100em;
-    transition: all 0.9s;
+    transform: translateY(-3px);
+    left: 0em;
+    top:0rem;
+    transition: all 0.3s;
     display:block !important;
-    opacity:0.8;
+    opacity:0;
+    height:0;
 }
 label.article-checklist-items:hover{
     cursor:pointer;
@@ -1544,8 +1559,63 @@ form#update #ingredients > ul {
     }
 }
 @media screen and (min-width:300px) and (max-width:768px){
-  
+    .header-top {
+        min-height:10rem;
+        height:auto;
+    }
+    .home-page .header-top{
+        min-height:5rem;
+    }
+    .header__title {
+        padding: 0rem 2rem;
+    }
+    .menu-toggle {
+        padding:0rem 0rem;
+        margin-top:1rem;
+    }
+    h1.header__title a{
+        font-size:1.5rem;
+        top:0;
+    }
+    .article__title{
+        padding: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        margin: 0;
+        padding: 0 2rem;
+        width: 100%;
+        left: 0;
+        font-size:1.5rem;
+        translate:0;
+        top:6.8rem;
+    }
+   
+    .homepage-hero h2{
+        display:none;
+        top:2.5rem;
+        height:auto;
+
+    }
+    .search-filters fieldset{
+        position:relative;
+    }
+    button.search-button{
+        display: block;
+        position: absolute;
+        background: red;
+        width: 30px;
+        height: 30px;
+        z-index: 6;
+        right:0%;
+        top:0;
+      
+    }
+
     h2 {
+        top:0;
         font-size:1.75rem;
     }
     .container {
@@ -1553,6 +1623,8 @@ form#update #ingredients > ul {
     }
     .home-page .homepage-hero {
         margin-bottom:0;
+        height:auto;
+        overflow:hidden;
     }
 
     .home-page .header__title {
@@ -1568,12 +1640,16 @@ form#update #ingredients > ul {
     }
     .home-page .search-filters.grid{
         display:block;
-        min-height:20rem;
+        min-height:12rem;
         width:calc(100% - 2rem);
         box-sizing: border-box;
         padding: 0 1rem;
         margin:0 auto;
+        position: relative;
 
+    }
+    legend {
+        background:transparent;
     }
     .home-page .search-filters.grid input,
     .home-page .search-filters.grid select{
@@ -1616,12 +1692,23 @@ form#update #ingredients > ul {
         height: auto;
         overflow: hidden;
     }
+    .home-page article {
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        padding:1rem;
+        border-top:1px solid #ddd;
+    } 
     .home-page article h1 {
-        font-size:2rem;
+        font-size:1rem;
     }
     .home-page article p {
         font-size:1.125rem;
+        display:none;
     }
+    .homepage article p {
+        display:none;
+    }
+
     .home-page article h1, .home-page article p {
         color: #000;
         font-family: normal 600 "Paytone One" 1.8rem/normal;
@@ -1719,10 +1806,16 @@ form#update #ingredients > ul {
     }
     .shoppinglist-container.hide {
         transform: translateX(0em);
-        left: -100em;
+        left: 0;
         transition: all 0.2s;
-        display:block !important;
-        opacity:0;
+        display: grid;
+        opacity: 1;
+        height: auto;
+        /* display: none; */
+        left: 0;
+        /* padding: 0 0 0 0 !important; */
+        min-height: unset;
+        min-height:unset;
     }
     .shoppinglist-container,
     .checklist input {
@@ -1743,10 +1836,6 @@ form#update #ingredients > ul {
     .shopping-list{
         padding-left:1.5rem;
     }
-    .shoppinglist-container {
-        border-left:1px solid #000;
-    }
-
     .shopping-list li:last-child{
         margin-bottom:6rem;
     }
@@ -1757,9 +1846,8 @@ form#update #ingredients > ul {
         display: inline-block;
         width: auto;
         text-align: right;
-        color: #1f7dbc;
         height: auto;
-        line-height: 4rem;
+        line-height: 1.75rem;
         position: absolute;
         right: 0;
         font-size:1.125rem;
