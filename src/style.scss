@@ -1008,7 +1008,8 @@ ul {
 }
 
 
-.checklist-container h2, .shoppinglist-container h2 {
+.checklist-container h2,
+ .shoppinglist-container h2 {
     display: inline-block;
     margin-bottom: 0.5rem;
 }
@@ -1024,7 +1025,7 @@ ul {
 }
 
 .shoppinglist-container{
-    min-height:12rem;
+    min-height:8rem;
     border:0;
     padding:0;
     opacity:1;
@@ -1042,6 +1043,9 @@ ul {
     display:block !important;
     opacity:0;
     height:0;
+}
+.directions-heading h2{
+    margin-bottom:1.5rem;
 }
 label.article-checklist-items:hover{
     cursor:pointer;
@@ -1560,37 +1564,41 @@ form#update #ingredients > ul {
 }
 @media screen and (min-width:300px) and (max-width:768px){
     .header-top {
-        min-height:10rem;
+        min-height:unset;
         height:auto;
+        box-shadow: 0 0 7px 0px #aaa;
     }
     .home-page .header-top{
         min-height:5rem;
     }
     .header__title {
-        padding: 0rem 2rem;
+        padding: 0rem 1rem;
     }
     .menu-toggle {
         padding:0rem 0rem;
-        margin-top:1rem;
+        margin: 1.2rem 1rem 0rem 0;
     }
     h1.header__title a{
         font-size:1.5rem;
         top:0;
     }
     .article__title{
+        font-weight:400;
         padding: 0;
         position: absolute;
         top: 50%;
         left: 50%;
-        position: absolute;
+        position: relative;
         top: 50%;
         margin: 0;
-        padding: 0 2rem;
+        padding:0 1rem;
         width: 100%;
         left: 0;
         font-size:1.5rem;
         translate:0;
-        top:6.8rem;
+        top:2rem;
+        margin-bottom:3rem;
+        text-align: left;
     }
    
     .homepage-hero h2{
@@ -1616,7 +1624,8 @@ form#update #ingredients > ul {
 
     h2 {
         top:0;
-        font-size:1.75rem;
+        font-size: 1.5rem;
+        font-weight: 400;
     }
     .container {
         padding:0;
@@ -1677,8 +1686,9 @@ form#update #ingredients > ul {
         display: block;
     }
     .summary {
-        font-size:1.125rem;
-        margin-bottom:1rem;
+        font-size: 1.125rem;
+        margin-bottom: 0rem;
+        margin: 2rem 0 0rem 0;
     }
     .addNewRecipe::before{
         font-size:1.125rem;
@@ -1725,7 +1735,7 @@ form#update #ingredients > ul {
     }
     .article-page .header__title{
         font-size:3rem;
-        margin-bottom:2.4rem;
+        margin-bottom:1rem;
     }
 
     header select.dropdown{
@@ -1749,25 +1759,28 @@ form#update #ingredients > ul {
     font-size:0.875rem;
     font-weight: 200;
   }
-    div#recipes {
-        height: auto;
-        display: grid;
-        grid-template-columns: $mobile-grid;
-        column-gap: $mobile-grid-gap;
-        padding:0;
-        margin:0;
+  div#recipes {
+    height: auto;
+    display: grid;
+    grid-template-columns: $mobile-grid;
+    column-gap: $mobile-grid-gap;
+    padding:0;
+    margin:0;
+    }
+    .article-page .imageElement {
+        aspect-ratio: 4/4;
     }
     .article-page article{
         width: 100%;
     }
     .article > * {
-        padding: 0 1.6rem;
+        padding: 0 1.0rem;
     }
     .article .imageElement {
         padding:0;
     } 
     .article-header {
-        padding: 2rem 1.6rem 1rem 1.6rem;
+        padding: 0rem 0rem 1rem 1rem;
     }
 
     .dates{
@@ -1780,14 +1793,23 @@ form#update #ingredients > ul {
     }
     date{
         white-space: nowrap;
-        text-overflow:ellipsis;
-        overflow:hidden;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-size: 0.875rem;
+        letter-spacing: normal;
         
     }
+    date strong {
+        font-weight: 600;
+        text-transform: capitalize;
+        font-size: 0.875rem;
+        letter-spacing: normal;
+    }
     .author {
-        font-size: 1.125rem;
-        font-weight:600;
-        margin-bottom:2.5rem;
+        font-size: 0.875em;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-transform: Capitalize;
     }
     .lists {
         grid-template-columns: 1fr;
@@ -1797,7 +1819,7 @@ form#update #ingredients > ul {
 
     .checklist-container,
     .shoppinglist-container{
-        min-height:12rem;
+        min-height:8rem;
         border:0;
         padding:0;
         opacity:1;
@@ -1809,7 +1831,7 @@ form#update #ingredients > ul {
         left: 0;
         transition: all 0.2s;
         display: grid;
-        opacity: 1;
+        // opacity: 1;
         height: auto;
         /* display: none; */
         left: 0;
@@ -1868,6 +1890,7 @@ form#update #ingredients > ul {
         grid-template-columns: 1fr;
     }
     .edit-page .header__title{
+
         font-size:2rem;
     }
     .edit-page nav {

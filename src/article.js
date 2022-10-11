@@ -68,7 +68,7 @@ const createArticleDOM = (recipes) => {
         author.classList.add('author')
     // const recipeSubTitle = recItem.description;
     const recipeTitle = recItem.name;
-    const directionsHeading = document.createElement('h2')
+    const directionsHeading = document.createElement('div')
     directionsHeading.classList.add('directions-heading')
     directionsHeading.innerHTML =  `<h2>Directions:</h2>`;
   
@@ -107,13 +107,15 @@ const createArticleDOM = (recipes) => {
     title.textContent = recipeTitle;
     // subtitle.textContent = recipeSubTitle;
 
-    summary.innerHTML = `<p class="summary">${recItem.description}</p>
-                        <p class="article">${recItem.article}</p>`
+    summary.innerHTML = `<p class="article">${recItem.article}</p>`
     
 
-   
+    const descriptionText = document.createElement('p');
+    descriptionText.classList.add('summary');
+    descriptionText.textContent = recItem.description;
     articleHeader.appendChild(dates)
     articleHeader.appendChild(author)
+    articleHeader.appendChild(descriptionText)
 
 
 
@@ -125,9 +127,10 @@ const createArticleDOM = (recipes) => {
    
     recipeBody.appendChild(card)
     card.appendChild(header)
+    card.appendChild(articleHeader)
     card.appendChild(imageElement)
     imageElement.appendChild(photoInfo)
-    card.appendChild(articleHeader)
+    
     // card.appendChild(subTitle)
     card.appendChild(summary)
    
