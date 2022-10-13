@@ -8,6 +8,16 @@ import {
     getImageGroup
 } from './unsplash';
 
+
+const convertTimestamp = (rDate) => {
+    if (typeof rDate === 'object'){
+        // do nothing
+    } else if (typeof rDate === 'string'){
+        const format_unix = moment(rDate, 'MMM Do, YYYY HH:mm').unix();
+        return format_unix
+    } 
+}
+
 const getTimestamp = () => {
     let timestamp = moment()
     let timestampValueOf = timestamp.valueOf()
@@ -95,10 +105,10 @@ const  loadRecipes = async() => {
       console.log('getting from local storage')
         const recipesJSON = localStorage.getItem('recipes')
         try {
-            console.log("@@@@@@") 
-            recipesJSON ? console.log(JSON.parse(recipesJSON)) : console.log('something')
-            console.log("@@@@@@") 
-            return recipesJSON ? JSON.parse(recipesJSON) : console.log('something part 2')
+
+            recipesJSON ? console.log(JSON.parse(recipesJSON)) : console.log('NOJSON')
+
+            return recipesJSON ? JSON.parse(recipesJSON) : console.log('NOJSON')
         } catch (e) {
            
             return []
@@ -114,7 +124,19 @@ const  loadRecipes = async() => {
        
 }
 
+const loadRecipesFromLocalStorage = () => {
 
+    if (localStorage.getItem('recipes')) {
+        const recipesJSON = localStorage.getItem('recipes')
+        try {
+            recipesJSON ? console.log(JSON.parse(recipesJSON)) : []
+            return recipesJSON ? JSON.parse(recipesJSON) : []
+        } catch (e) {
+            return []
+        }
+    }
+
+}
 
 const loadNewRecipeFromLocalStorage = () => {
 
@@ -177,10 +199,11 @@ const sendRecipes = async () => {
 }
 const hamburger = () => {
     const hamburger = document.getElementById('menu-toggle');
-    
+
         hamburger.addEventListener('click', function(e){
+
             e.preventDefault() 
-           toggleMenu();  
+            toggleMenu();  
     })
   
 } 
@@ -195,12 +218,23 @@ const toggleMenu = () => {
         nav.classList.remove('hide')
         nav.classList.add('open')
         nav.setAttribute('aria-expanded','true')
+        const a = document.querySelectorAll('nav a')
+        a.forEach(anchor => {
+            let tabindex = anchor.getAttribute('tabindex')
+            tabindex === "-1" ? anchor.setAttribute('tabindex',"0") : anchor.setAttribute('tabindex',"-1")        
+        })
+       
     }
     if(status.toLowerCase() === 'close the menu'){
         toggle.setAttribute('aria-label','Open the menu');
         nav.classList.add('hide')
         nav.classList.remove('open')
         nav.setAttribute('aria-expanded',false)
+        const a = document.querySelectorAll('nav a')
+        a.forEach(anchor => {
+            let tabindex = anchor.getAttribute('tabindex')
+            tabindex === "0" ? anchor.setAttribute('tabindex',"-1") : anchor.setAttribute('tabindex',"0")        
+        })
     }
 }
 const addToExistingRecipes = () => {
@@ -231,15 +265,21 @@ const renderImageSelector = (keyword, pageNumber) => {
             responseLength = response.length;
             console.log(responseLength)
             const selectImages = document.getElementById("select-images")
+            selectImages.classList.add('show')
             selectImages.innerHTML = ''
+            const imageViewport = document.createElement('div')
+            imageViewport.classList.add('image-viewport')
             const imageShow = document.createElement('ul')
             imageShow.classList.add('image-show');
             response.forEach(imageObject => {
 
                 const li = document.createElement('li')
-                const imgAnchor = document.createElement('a')
-                imgAnchor.classList.add('imageListItem')
-                imgAnchor.setAttribute('href','#')
+                // const imgAnchor = document.createElement('a')
+                // imgAnchor.setAttribute('dataURL', `${imageObject.urls.regular}`)
+                // imgAnchor.setAttribute('dataName', `${imageObject.user.name}`)
+                // imgAnchor.setAttribute('dataLink', `${imageObject.user.links.html}`)
+                // imgAnchor.classList.add('imageListItem')
+                // imgAnchor.setAttribute('href','#')
                 const fig = document.createElement('figure')
                 const img = document.createElement('img')
                 img.setAttribute('src', `${imageObject.urls.thumb}`)
@@ -247,20 +287,21 @@ const renderImageSelector = (keyword, pageNumber) => {
                 img.setAttribute('dataName', `${imageObject.user.name}`)
                 img.setAttribute('dataLink', `${imageObject.user.links.html}`)
                 const caption = document.createElement('figcaption')
-                caption.innerHTML = `<a href="${imageObject.user.links.html}">${imageObject.user.name}</a>`
+                caption.innerHTML = `<p>${imageObject.user.name}</p>`
 
-                fig.appendChild(imgAnchor);
-                fig.appendChild(caption);
-                imgAnchor.appendChild(img)
+                // fig.appendChild(imgAnchor);
+                
+                fig.appendChild(img)
                 li.appendChild(fig)
+                fig.appendChild(caption);
+                imageViewport.appendChild(imageShow)
                 imageShow.appendChild(li);
 
 
-                document.getElementById('select-images').appendChild(imageShow);
+                document.getElementById('select-images').appendChild(imageViewport);
                
 
                 images = document.querySelectorAll('.imageListItem');
-                
 
             })
 
@@ -276,30 +317,15 @@ const renderImageSelector = (keyword, pageNumber) => {
      
             
            
-            images.forEach(image => {
-                image.addEventListener('click', async function(e){
-                 e.preventDefault()
-
-                 let recipeId = location.hash.substring(1);
-                 recipes = await loadRecipes()
-                 recItem = recItem = recipes.find((recipe) => recipe.id === recipeId)
-
-                 recItem.photographer = e.target.getAttribute('dataName')
-                 recItem.photographerLink = e.target.getAttribute('dataLink')
-                 recItem.photoURL = e.target.getAttribute('dataURL')
-                 recItem.updatedAt = getTimestamp();
-                 console.log(recipes)
-                 saveRecipes(recipes)
-                 document.querySelector('.image-preview img').setAttribute('src',recItem.photoURL);
-                 document.querySelector('.image-preview figcaption').innerHTML = `Unsplash photo by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
-                })
-            })
+           
             const imageButtons = document.createElement('div');
             imageButtons.classList.add('image-buttons')
             imageButtons.innerHTML = `
-            <button class="btn prev"><<<span class="hide-text">previous image</span></button>
-            <button class="btn next">>><span class="hide-text">next image</span></button> 
-            <p class="count"></p>`
+            <button disabled class="btn prev"><<<span class="hide-text">previous image</span></button>
+            <button class="btn next">>><span class="hide-text">next image</span></button>`
+            const imageCount = document.createElement('p')
+            imageCount.classList.add('count')
+            imageCount.textContent = 'Viewing image 1'
             const prev = document.createElement('button')
             const next = document.createElement('button')
 
@@ -307,9 +333,22 @@ const renderImageSelector = (keyword, pageNumber) => {
             next.setAttribute('id', 'next-page');
             prev.textContent = "Previous group";
             next.textContent = "Next Group";
-            document.getElementById('select-images').appendChild(imageButtons);
-            document.getElementById('select-images').appendChild(prev);
-            document.getElementById('select-images').appendChild(next);
+            const selectImagesModal = document.getElementById('select-images')
+            selectImagesModal.appendChild(imageButtons);
+            selectImagesModal.appendChild(prev);
+            selectImagesModal.appendChild(next);
+            selectImagesModal.appendChild(imageCount);
+            
+            const selectImage = document.createElement('button')
+            selectImage.setAttribute('id','select-image')
+            selectImage.textContent = 'Select this image';
+            selectImagesModal.appendChild(selectImage);
+
+            const closeImageModal = document.createElement('button')
+            closeImageModal.classList.add('close-image-modal')
+            closeImageModal.innerHTML = `<span class="hide-text">Close Modal</span><i class="fa fas-solid fa-times"></i>`
+            selectImagesModal.appendChild(closeImageModal)
+
 
             const pagedown = document.getElementById('prev-page')
             const pageup = document.getElementById('next-page')
@@ -317,15 +356,17 @@ const renderImageSelector = (keyword, pageNumber) => {
             3333333333333333333
             */
             const slider = document.querySelector('.image-show')
+            let images =  document.querySelectorAll('#select-images img')
+            
             let position = 0;
             let transform = 0;
             const decrementSlider = () => {
                 position++;
-                slider.style.transform = `translateX(${transform-=200}px)`
+                slider.style.transform = `translateX(${transform-=20}rem)`
             }
             const incrementSlider = () => {
                 position--;
-                slider.style.transform = `translateX(${transform+=200}px)`
+                slider.style.transform = `translateX(${transform+=20}rem)`
             }
 
 
@@ -336,6 +377,8 @@ const renderImageSelector = (keyword, pageNumber) => {
             let slideNum = 1;
             let info;
             let count = document.querySelector('.count')
+
+
             previmage.addEventListener('click', function () {
                 if (slideNum !== 1) {
 
@@ -344,7 +387,12 @@ const renderImageSelector = (keyword, pageNumber) => {
                     info = `Viewing image ${slideNum}/${total}`;
                     count.textContent = info;
                     incrementSlider()
+
+                    
                 }
+
+                slideNum === 1 ? previmage.disabled = true : previmage.disabled=false
+                slideNum === responseLength ? nextimage.disabled = true : nextimage.disabled = false
             })
             nextimage.addEventListener('click', function () {
 
@@ -355,9 +403,13 @@ const renderImageSelector = (keyword, pageNumber) => {
                     count.textContent = info;
                     decrementSlider()
                 }
+
+                slideNum === 1 ? previmage.disabled = true : previmage.disabled=false
+                slideNum === responseLength ? nextimage.disabled = true : nextimage.disabled = false
             })
 
-
+            slideNum === 1 ? previmage.disabled = true : previmage.disabled=false
+            slideNum === responseLength ? nextimage.disabled = true : nextimage.disabled = false
 
             /*--------------*/
             pagedown.addEventListener('click', function (e) {
@@ -383,11 +435,68 @@ const renderImageSelector = (keyword, pageNumber) => {
                     console.log(`*page number ${pageNumber}`)
                 }
             })
+
+            selectImage.addEventListener('click', async function(e){
+                 e.preventDefault()
+                const selected = images[slideNum - 1];
+              
+                 let recipeId = location.hash.substring(1);
+                 recipes = await loadRecipes()
+                 recItem = recItem = recipes.find((recipe) => recipe.id === recipeId)
+
+                 recItem.photographer = selected.getAttribute('dataName')
+                 recItem.photographerLink = selected.getAttribute('dataLink')
+                 recItem.photoURL = selected.getAttribute('dataURL')
+                 recItem.updatedAt = getTimestamp();
+             
+                 saveRecipes(recipes)
+                 document.querySelector('.image-preview img').setAttribute('src',recItem.photoURL);
+                 document.querySelector('.image-preview figcaption').innerHTML = `Unsplash photo by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
+                })
+            
+            // const chooseImage = document.querySelectorAll(".imageListItem");
+            // chooseImage.forEach(imageAnchor => {
+            //     imageAnchor.addEventListener('keypress', function(e){
+            //         setAttribute(dataurl)
+            //     })
+            // })
+            const closeModal = document.querySelector('.close-image-modal')
+            closeModal.addEventListener('click', function (e) {
+                e.preventDefault()
+                document.querySelector('.overlay').classList.remove('show')
+                const modal = document.getElementById('select-images')
+                modal.classList.remove('show');
+            })
            
         })
 }
 
+const removeRecipe = async (recipeId) => {
+    let recipes =  loadRecipesFromLocalStorage()
+    let rec = recipes.find((recipe) => recipe.id === recipeId)
+    
+    let recNum = (recipes.indexOf(rec))
+   
+    const removerRec = () => {
+        if(recNum === 0){
+            alert('shift')
+            recipes.shift()
+        }else if((recNum+1) === recipes.length){
+            alert('pop')
+            recipes.pop()
+        }else {
+            alert('splice')
+            recipes.splice(recNum, 1)
+        }
+       
+        saveRecipes(recipes)
+        window.location.href = "/"
+
+    }
+   removerRec()
+}
 export {
+    removeRecipe,
     getRecipesFromDatabase,
     addIngredients,
     addToExistingRecipes,
@@ -395,9 +504,11 @@ export {
     loadRecipes,
     saveRecipes,
     getTimestamp,
+    loadRecipesFromLocalStorage,
     loadNewRecipeFromLocalStorage,
     saveNewRecipeToLocalStorage,
     renderImageSelector,
     toggleMenu,
-    hamburger
+    hamburger,
+    convertTimestamp
 }

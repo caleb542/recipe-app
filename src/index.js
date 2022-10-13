@@ -4,27 +4,37 @@ import { createApi } from 'unsplash-js'
 import { getFilters, setFilters } from './filters';
 import { sortRecipes, listRecipes } from './recipes'
 import { unsplashme } from "./unsplash";
-import { getRecipesFromDatabase, loadRecipes, getTimestamp, saveRecipes, toggleMenu, hamburger } from './functions'
+import { getRecipesFromDatabase, loadRecipes, getTimestamp, saveRecipes, toggleMenu, hamburger, convertTimestamp } from './functions'
 import * as Realm from "realm-web";
 
   
-const recs = await getRecipesFromDatabase()  
+// const recs = await getRecipesFromDatabase()  
 
-const  sendRecipes = async () => {
-    const APP_ID = 'data-puyvo'
-    const app = new Realm.App({ id: APP_ID });
-    const credentials =  Realm.Credentials.anonymous();
-    const user = await app.logIn(credentials);
-    let recipes = await loadRecipes()
-    // const recsd = await user.functions.updateAllRecipes(recipes);
+// const  sendRecipes = async () => {
+//     const APP_ID = 'data-puyvo'
+//     const app = new Realm.App({ id: APP_ID });
+//     const credentials =  Realm.Credentials.anonymous();
+//     const user = await app.logIn(credentials);
+//     let recipes = await loadRecipes()
+//     // const recsd = await user.functions.updateAllRecipes(recipes);
 
-  }
+//   }
 
+// const convertDate = async () => {
+//   const recipes = await loadRecipes()
+//   recipes.forEach(recipe => {
+//     const updated = recipe.updatedAt 
+//     recipe.updatedAt = [recipe.updatedAt, convertTimestamp(updated)]
+//     (recipes)
+//   })
+// }  
+// convertDate()
 
+  // let recipes = await loadRecipes().then(result => {
+  //   saveRecipes(result)
+  // })
 
-  let recipes = await loadRecipes()
-
-    listRecipes(recipes)
+  listRecipes(recipes)
 
 
 

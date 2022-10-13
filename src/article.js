@@ -7,17 +7,16 @@ import { getTimestamp, toggleMenu, hamburger } from "./functions"
 const recipeId = location.hash.substring(1)
 console.log(recipeId)
 
-
-
-
 let recipes;
-
 
 let fetchRecipes = async () => {
     recipes = await loadRecipes()
     createArticleDOM(recipes)
+    console.log(recipes)
 }
+
 fetchRecipes()
+
 
 
 const createArticleDOM = (recipes) => {
@@ -334,7 +333,8 @@ checkboxes.forEach(item => {
 hamburger() 
 window.addEventListener('storage',  (e) =>  {
     if (e.key === 'recipes') {
-        createArticleDOM(recipeId)
+
+        fetchRecipes()
         
     }
 })
