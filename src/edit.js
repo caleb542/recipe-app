@@ -25,13 +25,13 @@ import {
 /***************** */
 
 let newRecipe = {
-    name: "",
+    name: "New unnamed recipe",
     photoURL: "/images/default-dish-image.jpg",
-    photographer: " ",
+    photographer: "         ",
     photographerLink: "",
     createdAt: [],
     updatedAt: [],
-    author: "",
+    author: "anonymous",
     description: "",
     directions: [{
         id: uuidv4(),

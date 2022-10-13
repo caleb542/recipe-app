@@ -92,10 +92,11 @@ const createArticleDOM = (recipes) => {
     
     const photoURL = recItem.photoURL
     const createdAt = recItem.createdAt
-    const updatedAt = recItem.updatedAt
-    const authorData = `by ${recItem.author}`
+    let updatedAt = recItem.updatedAt
+    let authorData = `by ${recItem.author}`
     author.textContent = authorData
     // console.log(recipeSubTitle)
+    updatedAt ? updatedAt = createdAt:updatedAt = updatedAt
     updatedAt === createdAt ? dates.innerHTML = `<date>Created: ${createdAt[0]}</date>`: dates.innerHTML = `<date><strong>Created</strong>: ${createdAt[0]}</date>
     <date><strong>Modified</strong>: ${updatedAt[0]}</date>`
 

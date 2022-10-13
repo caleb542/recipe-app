@@ -1421,6 +1421,7 @@ ol.directions{
     display:grid;
     row-gap:1em;
 }
+
 fieldset {
     border:none;
     padding:2rem 0;
@@ -1691,27 +1692,20 @@ form#update #ingredients > ul {
 #ingredients > li{
     margin-bottom:2rem
 }
+a {color:#fff;}
+.edit-page a#remove-recipe {
+    right: 2rem;
+    top: 2rem;
+    text-decoration: underline;
+    position: absolute;
 
-/* Form Inputs */
-/* directions */
-// .modalContainer {
-//     width: 100%;
-//     height: 100%;
-//     min-height: 100vh;
-//     background-color: #000a;
-//     display: grid;
-//     place-content:center;
-//     position: fixed;
-//     top: 0;
-//     z-index: 4;
-// }
-// .modalContainer dialog{
-//     width:600px;
-//     height:400px;
-//     background:red;
-//     position: relative;
-
-// }
+        &:hover{
+            color:red;
+        }
+        &:focus{
+            color:red;
+        }
+}
 /* directions */
 @media screen and (min-width:769px) and (max-width: 1200px){
   
