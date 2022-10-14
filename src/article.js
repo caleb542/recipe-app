@@ -5,7 +5,6 @@ import { getTimestamp, toggleMenu, hamburger } from "./functions"
 
 
 const recipeId = location.hash.substring(1)
-console.log(recipeId)
 
 let recipes;
 
@@ -53,6 +52,11 @@ const createArticleDOM = (recipes) => {
     //     subTitle.classList.add('header__subtitle')
     const summary = document.createElement('div')
     summary.classList.add('summary')
+    const recipeLink = document.createElement('a')
+    recipeLink.classList.add('recipe-link');
+    recipeLink.setAttribute('href','#recipe');
+    recipeLink.textContent='Hurry to the recipe';
+    summary.appendChild(recipeLink);
     const imageElement = document.createElement('div')
     const photoInfo = document.createElement('p')
     photoInfo.classList.add('photoInfo')
@@ -106,12 +110,13 @@ const createArticleDOM = (recipes) => {
 
     title.textContent = recipeTitle;
     // subtitle.textContent = recipeSubTitle;
-
-    summary.innerHTML = `<p class="article">${recItem.article}</p>`
+    const summaryContent=document.createElement('div');
+    summaryContent.innerHTML = `${recItem.article}` 
+    summary.appendChild(summaryContent);
     
 
     const descriptionText = document.createElement('p');
-    descriptionText.classList.add('summary');
+    descriptionText.classList.add('description,summary');
     descriptionText.textContent = recItem.description;
     articleHeader.appendChild(dates)
     articleHeader.appendChild(author)
@@ -147,15 +152,17 @@ const createArticleDOM = (recipes) => {
     checklist.classList.add('checklist')
     const checklistHeader = document.createElement('div')
     checklistHeader.classList.add('checklistHeader');
-    const checklistTitle = document.createElement('h2')
+    checklistHeader.setAttribute('id','recipe')
+    const checklistTitle = document.createElement('h3')
     checklistTitle.textContent = "Recipe";
     const editRecipeButton = document.createElement('button')
     editRecipeButton.setAttribute('id','edit-recipe');
     editRecipeButton.textContent = 'Edit recipe'
     checklistHeader.appendChild(checklistTitle)
     // checklistHeader.appendChild(editRecipeButton)
-    checkListCont.appendChild(editButton)
+    
     checkListCont.appendChild(checklistHeader)
+    checklistHeader.appendChild(editButton)
     checkListCont.appendChild(checklist)
 
 
@@ -164,7 +171,7 @@ const createArticleDOM = (recipes) => {
     shoppingListCont.classList.add("shoppinglist-container")
     shoppingListCont.classList.add("hide")
     const shoppingList = document.createElement('ul')
-    const shoppingListTitle = document.createElement('h2')
+    const shoppingListTitle = document.createElement('h3')
     shoppingListTitle.textContent = "Shopping List"
     shoppingListCont.appendChild(shoppingListTitle);
     shoppingListCont.appendChild(shoppingList)

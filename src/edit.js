@@ -684,8 +684,15 @@ hamburger()
 
 const removeRecipeButton = document.getElementById('remove-recipe');
 removeRecipeButton.addEventListener('click', function(e){
-    const recipeId = location.hash.substring(1);
-    removeRecipe(recipeId);
+    
+        let text = "Are you sure you \n want to delete this recipe?";
+        if (confirm(text) == true) {
+            removeRecipe(recipeId);
+            const recipeId = location.hash.substring(1);
+        } else {
+          return
+        }
+       
 })
 
 window.addEventListener('storage', (e) => {

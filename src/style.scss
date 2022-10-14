@@ -52,6 +52,10 @@ $btn-padding:0 1.5rem;
 $btn-height:1.75rem;
 $btn-lineHeight:1.8rem;
 $btn-border-rad:3rem;
+$container_width:1380px;
+
+
+
 
 html {
    // font-size: 62.5%;
@@ -275,9 +279,16 @@ button.feature-image{
     position:absolute;
     bottom:0.4rem;
 }
+html{
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
 
+}
 body {
-  font-family: 'Poppins',sans-serif;
+  font: normal normal 400  18px/28px 'Source Sans Pro', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    // font-family: 'Poppins',sans-serif;
+   
   overflow-x:hidden;
     &.edit-page{
         background:$form-background-dark
@@ -368,7 +379,6 @@ a {
 .container {
   max-width:1380px;
   position:relative;
-  min-width:80%;
   margin: 0 auto;
   padding: 0 2rem;
   display:flex;
@@ -428,7 +438,7 @@ header{
     left: 50%;
     transform:translate(-50%, 0);
     font-weight: 600;
-    color: red;
+    color: #000;
     z-index: 4;
 }
 .header__subtitle {
@@ -886,7 +896,9 @@ nav ul li {
   }
   
   .content-wrap {
-    padding-bottom: 12rem;    /* Footer height */
+    padding-bottom: 12rem;
+    max-width:100vw;
+    overflow-x:hidden;    /* Footer height */
   }
 footer {
     background:$footer;
@@ -920,7 +932,7 @@ div#recipes {
     height: $desktopCardHeight;
     margin-bottom:0rem;
     padding:0 0 2rem 0;
-    margin:0 0 0 1rem;;
+    margin:0;
     box-sizing:border-box;
     box-shadow:$box-shadow;
 
@@ -985,11 +997,22 @@ date{
 
 }
 .cta-update{
-    text-decoration:none;
-    color:#fff;
-    background-color:purple;   
+    text-decoration:underline;
+    text-underline-offset:0.2rem;
+    color:#000;
     right:0;
     position:absolute;
+    text-transform: uppercase;
+    font-weight:600;
+    font-size:0.875rem;
+    top:1rem;
+}
+
+
+ h3{
+    font-size:1.25rem;
+    font-weight:600;
+    margin-bottom:1rem;
 }
 .imageElement {
     width:100%;
@@ -1030,7 +1053,9 @@ date{
     background-position: center;
     background-size: cover;
     position: relative;
-    height: calc(25vw - 8rem);
+    height: calc((1380px - 10rem) / 4);
+    background-position: center;
+    background-repeat: no-repeat;
     left: 0;
     top: 0;
     z-index: 0;
@@ -1089,10 +1114,10 @@ p {
     margin-bottom:1rem;
 
     &.summary {
-        font-size:1.2rem;
-        font-weight:500;
-        color:#000;
-        text-align: center;
+        font-size: 1.2rem;
+        font-weight: 400;
+        color: #000;
+        text-align: left;
     }
     &.author{
         margin-bottom:2rem;
@@ -1150,11 +1175,7 @@ ul {
 }
 
 
-.checklist-container h2,
- .shoppinglist-container h2 {
-    display: inline-block;
-    margin-bottom: 0.5rem;
-}
+
 .checklist-container {
     background:#fff;
     z-index:3;
@@ -1320,24 +1341,34 @@ label.article-checklist-items, .shopping-list li {
 
 .btn.btn-large {
     font-size: 1.25rem;
+    font-weight: normal;
     padding: 0rem 2rem;
-    color: #000;
-    background: turquoise;
-    font-family: "Poppins", sans-serif;
+    text-transform: initial;
+    color: #fff;
+    background: linear-gradient(10deg,#300,rgb(79, 54, 54),#303);
+    font-family: "source sans pro";
     display: inline-block;
     display: flex;
-    border-radius: 6px;
     justify-content: center;
+    border-radius: 6px;
+    ALIGN-ITEMS:CENTER;
     flex-shrink: 1;
     float: right;
     right: 2rem;
     bottom: 0;
     position: absolute;
-    height: 3rem;
+    height: 6rem;
     line-height: 3rem;
     position: fixed;
     bottom: 20rem;
     width: 120px;
+    bottom: 0;
+    width: calc(100% - 0rem);
+    left: 0;
+    border: unset;
+    border-color: #692323;
+    border-width: 0.3rem 0.9rem;
+    border-style: ridge;
         &:hover{
             background:#40e09e;
             opacity:1;
@@ -1450,7 +1481,8 @@ legend{
     display:grid;
     grid-template-columns: 1fr 6fr;
 }
-.section-1 label input, .section-1 fieldset input {
+.section-1 label input, 
+.section-1 fieldset input {
     background:$form-input-idle-background;
     border:transparent;
     color:$form-color;
@@ -1459,7 +1491,7 @@ legend{
     font-size:1.125rem;
     padding:0 2rem;
     font-family:'Poppins', sans-serif; 
-    border-radius:0.25em;
+    border-radius:0rem;
     transition:all 0.235s;
     &:hover{
         background-color:$form-input-hover-background;
@@ -1469,7 +1501,7 @@ legend{
     &:focus{
         background-color:$form-input-focus-background;
         outline:none;
-        border-radius:1em;
+        border-radius:0.5em;
         transition:all 0.235s;
     }
    
@@ -1479,32 +1511,32 @@ legend{
     border:$form-input-idle-background;
     color:$form-color;
     line-height:2em;
-    height:2em;
+    height:12rem;
     font-size:1.125rem;
     padding:0 2rem;
     font-family:'Poppins', sans-serif;
-    border-radius:0.3rem;
+    border-radius:0;
     transition:all 0.235s;
     &:hover{
         background-color:$form-input-hover-background;
         outline:none;
-        border-radius:0.3em;
+        border-radius:0;
         transition:all 0.235s;
     }
     &:focus{
         background-color:$form-input-focus-background;
         outline:none;
-        border-radius:1em;
+        border-radius:0;
         transition:all 0.235s;
     }
-    border-radius:1rem;
+
 }
 
 
 .section-1 label {
     display: grid;
-    grid-template-columns: 1fr 6fr 1fr;
-    grid-row-gap: 3rem;
+    grid-template-columns: 1fr 5fr 1fr;
+    grid-row-gap: 1rem;
     padding: 2em 0;
 }
 .section-1 textarea.tall{
@@ -1711,7 +1743,7 @@ form#update #ingredients > ul {
 a {color:#fff;}
 .edit-page a#remove-recipe {
     right: 2rem;
-    top: 2rem;
+    top: 5rem;
     text-decoration: underline;
     position: absolute;
 
@@ -1740,7 +1772,7 @@ a {color:#fff;}
     }
     .menu-toggle {
         padding:0rem 0rem;
-        margin: 1.2rem 1rem 0rem 0;
+        margin: 2rem 2rem 0rem 0;
     }
     h1.header__title a{
         font-size:1.5rem;
@@ -1755,14 +1787,15 @@ a {color:#fff;}
         position: relative;
         top: 50%;
         margin: 0;
-        padding:0 1rem;
+        padding:0 2rem;
         width: 100%;
         left: 0;
-        font-size:1.5rem;
+        font-size:1.75rem;
         transform:translate(0);
         top:2rem;
-        margin-bottom:3rem;
+        margin-bottom:2.5rem;
         text-align: left;
+        line-height:1.25;
     }
     
     .homepage-hero h2{
@@ -1814,12 +1847,13 @@ a {color:#fff;}
     }
 
     .home-page .search-filters.grid{
-        display:block;
-        min-height:12rem;
-        width:calc(100% - 2rem);
+        display: block;
+        min-height: unset;
+        padding: 0.5rem 2rem 0 2rem;
+        width: auto;
         box-sizing: border-box;
-        padding: 0 1rem;
-        margin:0 auto;
+        /* padding: 0 0rem; */
+        margin: 0 auto;
         position: relative;
 
     }
@@ -1828,7 +1862,7 @@ a {color:#fff;}
         background:transparent;
     }
     .home-page fieldset{
-        padding: 0.5rem 0;
+        padding: 0.5rem 0 0 0;
     }
     
     .home-page .search-filters.grid input,
@@ -1915,7 +1949,7 @@ a {color:#fff;}
         background-position: center;
         background-size: cover;
         position: relative;
-        height: calc(50vw - 2.5rem);
+        height: calc(30vw - 1rem);
         left: 0;
         top: 0;
         z-index: 0;
@@ -1930,17 +1964,18 @@ a {color:#fff;}
     }
 
     .home-page article {
-        display:grid;
-        grid-template-columns: 1fr 1fr;
-        padding:1rem;
-        border-top:1px solid #ddd;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        padding: 1rem 2rem;
+        
     } 
     .home-page article h1 {
         font-size:1rem;
     }
     .home-page article p {
         font-size:1.125rem;
-        display:none;
+        display:block;
+        font-size: 0.875rem;
     }
     .homepage article p {
         display:none;
@@ -1948,9 +1983,25 @@ a {color:#fff;}
 
     .home-page article h1, .home-page article p {
         color: #000;
-        font-family: normal 600 "Paytone One" 1.8rem/normal;
+       // font-family: normal 600 "Paytone One" 1.8rem/normal;
         padding: 0 0 1rem 0;
         line-height: 1.25;
+        font-weight:normal;
+    }
+    .home-page article p {
+
+      //  font-family: normal 600 "Paytone One" 1.8rem/normal;
+        padding: 0 0 1rem 0;
+        line-height: 1.25;
+        font-weight: normal;
+        -webkit-line-clamp: 3;
+        max-height: 52px;
+        /* background: red; */
+        text-overflow: ellipsis;
+        white-space: normal;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
     }
     .article-page .header{
         padding:0;
@@ -2004,18 +2055,44 @@ a {color:#fff;}
         width: 100%;
     }
     .article > * {
-        padding: 0 1.0rem;
+        padding: 0 2rem;
+    }
+    .article a {
+        color: #fff;
+        color: #000;
+        text-underline-offset: 0.3rem;
+        display: inline-block;
+        
+    }
+    a.recipe-link {
+        display:inline-block;
+        padding:0.75rem 1rem;
+        box-shadow:0 0 0.1rem 1px #bbb;
+        color:#000;
+            &:focus{
+                color:#fff;
+                background:#333;
+            }
+            &:hover{
+                color:#fff;
+                background:#333;
+            }
+            margin-bottom:1rem;
     }
     .article .imageElement {
         padding:0;
     } 
     .article-header {
-        padding: 0rem 0rem 1rem 1rem;
+        padding: 0rem 2rem 1rem 2rem;
     }
     .photoInfo {
-        padding:1rem;
+        padding:1rem 2rem;
         text-align: left;
         background-color: rgba(0,0,0,0.4);
+
+        & a{
+            color:#fff;
+        }
     }
     .article-page nav {
         background:#fff;
@@ -2102,14 +2179,8 @@ a {color:#fff;}
         align-items:baseline;
     }
     a.cta-update {
-        display: inline-block;
-        width: auto;
-        text-align: right;
-        height: auto;
-        line-height: 1.75rem;
-        position: absolute;
-        right: 0;
-        font-size:1.125rem;
+     
+        font-size:1rem;
     }
     .mailto {
         font-size:1.125rem;
@@ -2126,9 +2197,9 @@ a {color:#fff;}
         max-width:100vw;
         grid-template-columns: 1fr;
     }
-    .edit-page .header__title{
-
-        font-size:2rem;
+    .edit-page .header__title,
+    .edit-page .header__subtitle{
+        font-size:1.125rem;
     }
     .edit-page nav {
         padding:1rem 0 3rem 0;
