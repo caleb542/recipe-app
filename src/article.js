@@ -178,7 +178,12 @@ const createArticleDOM = (recipes) => {
     shoppingList.classList.add('shopping-list')
 
     let ingredientsList = () => {
-        recItem.ingredients.forEach(ingr => {
+        if(recItem.ingredients.length < 1){
+            alert('do something about this')
+            card.appendChild(lists)
+            lists.appendChild(checkListCont)
+        }else{
+             recItem.ingredients.forEach(ingr => {
            
                 let name = ingr.name;
                 let description = ingr.description
@@ -219,6 +224,8 @@ const createArticleDOM = (recipes) => {
             lists.appendChild(shoppingListCont)
 
         });
+        }
+       
     }
     
     ingredientsList()
@@ -267,7 +274,7 @@ checkboxes.forEach(item => {
 
                shoppingListArr.forEach(ingredient => {
                n++;
-                   bodyString +=  `Shopping List For ${recItem.name}%0D%0A%0D%0A${n}) ${ingredient}%0D%0A`
+                    bodyString +=  `${ingredient}%0D%0A`
                    document.querySelector("a#mail-list").setAttribute('href',`mailto:${your_email}?&subject="Shopping list for ${name}" &body=${bodyString}`);
                })
             }
@@ -320,11 +327,12 @@ checkboxes.forEach(item => {
                 n=0;
                shoppingListArr.forEach(ingredient => {
                n++;
-                   bodyString +=  `Shopping List For ${recItem.name}%0D%0A%0D%0A) ${ingredient}%0D%0A`
+                   bodyString +=  `${ingredient}%0D%0A`
                    mailto.setAttribute('href',`mailto:${your_email}?&subject="Shopping list for ${name}" &body=${bodyString}`);
                    list.appendChild(mailto)
 
                })
+
             }
           
            getHref()

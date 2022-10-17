@@ -344,10 +344,9 @@ h2.recipe-header{
 nav {
     position:absolute;
     z-index:3;
-    padding:1rem;
-    background:rgba(255,255,255,0.5);
+    padding:1rem 0;
     right:0;
-    background:#eee;
+    background:#fefefe;
     width:100%;
    
 }
@@ -358,6 +357,9 @@ nav ul {
 }
 nav a {
     color:#000;
+    text-transform: uppercase;
+    font-size: 1rem;
+    font-weight: 600;
 
     &:hover {
         cursor:pointer;
@@ -620,7 +622,7 @@ button.search-button {
 }
 
 
-button {
+button:hover {
     cursor: pointer;
 }
 .button__header,
@@ -641,7 +643,7 @@ nav {
 nav.hide{
     position: absolute;
     z-index: 3;
-    padding: 1rem;
+    padding: 1rem 0;
     background: rgba(255, 255, 255, 0.5);
     margin-top:-2rem;
     opacity:0;
@@ -662,8 +664,9 @@ nav ul{
     display: flex;
     flex-direction: column;
     /* justify-content: center; */
-    align-items: center;
-    gap: 1rem;
+    align-items: baseline;
+    padding: 0 2rem;
+    gap: 0.25rem;
     list-style: none;
 }
 
@@ -1123,10 +1126,13 @@ p {
         margin-bottom:2rem;
     }
     &.count{
-        position:relative;
-        display:inline-block;
-        height:2rem;
-        line-height:2rem;
+        position: relative;
+        display: inline-block;
+        height: 2rem;
+        line-height: 2rem;
+        top: -1rem;
+        left: 50%;
+        transform: translateX(-50%);
     }
 }
 article {
@@ -1546,6 +1552,14 @@ legend{
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+    flex-wrap: wrap;
+}
+.section-1 fieldset.feature-image input{
+    margin-bottom:1rem;
+    width:calc(100% - 2rem);
 }
 button.feature-image {
     background: transparent;
@@ -1564,8 +1578,9 @@ button.feature-image {
             outline:none;
         }
 }
-.image-preview {
-    width:200px;
+.image-preview img{
+    width:calc(100% - 2rem);
+
 }
 fieldset.feature-image figcaption {
     position: relative;
@@ -1661,24 +1676,28 @@ fieldset.feature-image figcaption {
 }
 dialog {
     background-color: #333;
-    padding: 5rem;
     color: #fff;
     display: flex;
-    grid-template-columns: 37rem;
-    flex-direction: row;
-    border-radius:3rem;
+    flex-direction: column;
+    border-radius:0rem;
     top:50%;
     bottom:unset;
     left:50%;
-    right:unset;
-    transform:translate(-50%, -50%);
+    padding: 1rem;
     position:fixed;
+    transform:translate(-50%, -50%);
+    width: calc(100% - 4rem);
+    order:none;
     z-index:5;
 }
+#select-image{
+    padding:0.5rem 1rem;
+    float:right;
+}
 dialog .image-viewport {
-    width:20rem;
+    width:100%;
     overflow:hidden;
-    border:1px solid red;
+    border:1px solid #000;
     background:rgba(0,0,0,0.5);
 }
 
@@ -1687,7 +1706,13 @@ dialog .image-viewport {
     border:#333;
     padding:1rem 1.5rem;
 }
-
+button.dialog-close-button {
+    background: #000;
+    float: right;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    bottom: 2rem;
+}
 dialog fieldset{
     height:inherit;
     border:none;
@@ -1695,7 +1720,7 @@ dialog fieldset{
 dialog textarea{
    height:inherit;
    display:block;
-   height:200px;
+   height:10rem;
    width:100%;
    background:$form-background-dark;
    color:$form-color;
@@ -1891,10 +1916,10 @@ a {color:#fff;}
         line-height: 2rem;
         background: transparent;
         color: #fff;
-        font-size: 0.875rem;
+        font-size: 0.7em;
         position: absolute;
         left: 54px;
-        top: -1.69rem;
+        top: -1.79rem;
     }
     .home-page .search-filters.grid select::after{
         content: "";
@@ -2028,9 +2053,9 @@ a {color:#fff;}
         font-weight:400;
     }
   .select::after {
-    top: 6px;
+    top: 0.75rem;
     right: unset;
-    left: 188px;
+    left: 13rem;
     background-color: #fff;
   }
   legend{
@@ -2225,7 +2250,7 @@ a {color:#fff;}
     }
     #select-images {
         position:relative;
-        width: calc(100vh - 2rem);
+        width: calc(100vw - 2rem);
     }
     #ingredient2 {
         width:100%;
