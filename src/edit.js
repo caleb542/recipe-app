@@ -553,11 +553,12 @@ const initEdit = async (recipeId) => {
 
     addAnIngredient.addEventListener('click', async function (e) {
         e.preventDefault();
-        // const hasDialog = document.querySelectorAll('.ingredient-modal');
-        if(hasDialog.length > 0){
+        const hasDialog = document.querySelectorAll('.ingredient-modal');
+        
+        if(hasDialog && hasDialog.length > 0){
             return
         }
-        console.log(`number of dialogs open = ${hasDialog.length}`)
+        // console.log(`number of dialogs open = ${hasDialog.length}`)
 
        
         let recipeId = location.hash.substring(1);
@@ -581,7 +582,7 @@ const initEdit = async (recipeId) => {
         const updateIt = recipes.find((recipe) => {
             if (recipe.id === recItem.id) {
                 let thisItem = recItem.ingredients.find(ingredient => ingredient.id === uuid)
-                alert(thisItem.name)
+                // alert(thisItem.name)
                 editIngredient(thisItem)
                 //recipe.ingredients.push(newIngredient)
                 saveRecipes(recipes)
