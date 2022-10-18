@@ -153,6 +153,17 @@ html {
     display: grid;
     place-content: center;
 }
+.close-ingredient-modal{
+    position: absolute;
+    top: unset;
+    bottom:0;
+    right: 0;
+    width: auto;
+    padding:0.5rem;
+    height: 2rem;
+    display: grid;
+    place-content: center;
+}
 .next,
 .prev{
     background: #ccc;
@@ -326,6 +337,11 @@ body {
 h2.recipe-header{
     color:$form-color;
 }
+header#recipe-header .header__title{
+    text-align:left;
+    padding:1rem;
+    font-size:1.5rem;
+}
 .hide {
     display:none;
 }
@@ -418,6 +434,9 @@ a {
 }
 header{
     margin-bottom:4rem;
+}
+header#recipe-header{
+    margin-bottom:0rem;
 }
 .header__title {
     font-weight: 200;
@@ -1656,11 +1675,15 @@ fieldset.feature-image figcaption {
     place-content: center;
     border-radius: 12px;
     outline:none;
+    position:relative;
+    float:right;
+    right:1rem;
+    margin-bottom:1rem;
         &:focus{
-            opacity:0.5;
+            background-color:#0dd;
         }
         &:hover{
-            opacity:0.5;
+            background-color:#0dd;
         }
 }
 
@@ -2260,7 +2283,7 @@ a {color:#fff;}
         flex-wrap:wrap;
         max-width:calc(100% - 2rem)
     }
-    #ingredient-modal dialog {
+    .ingredient-modal dialog {
         padding:1rem;
         border-radius:0;
         grid-template-columns:unset;
@@ -2270,11 +2293,16 @@ a {color:#fff;}
         top:0;
         border:none;
     }
-    #ingredient-modal dialog input {
+    .ingredient-modal dialog input {
         height: 2em;
         padding: 0 0.5em;
         font-size: 1.25em;
         margin-bottom: 0.5em;
+    }
+    dialog input {
+        height: 2rem;
+        margin-bottom: 0.75rem;
+        padding: 0 0.5rem;
     }
     .section-1 .direction-container {
         grid-auto-flow: unset;
