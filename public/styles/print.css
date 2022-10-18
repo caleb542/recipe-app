@@ -1,0 +1,130 @@
+/* To Do: Print recipe and directions */
+
+body{
+    font-size:32px;
+    font-family:sans-serif;
+}
+date{
+    font-size:0.75em;
+    line-height:1rem;
+}
+.author{
+    font-size:0.75em;
+}
+nav{
+    display:none;
+}
+.page__title{
+    font-size:30px;
+    width:100%;
+    display:block;
+    text-align:center;
+}
+.imageElement{
+    display:none;
+}
+.summary{
+    /* display:none; */
+}
+.summary strong{
+    margin-bottom:20px;
+}
+p,
+br,
+h2{
+    margin-bottom:20px;
+}
+figure{
+    display:none;
+}
+figcaption{
+    display:none;
+}
+.photoInfo {
+    display:none;
+}
+a {
+    display:none;
+}
+.shoppinglist-container{
+    display:none;
+}
+
+input[type="checkbox"] {
+    /* ...existing styles */
+     display:inline-block;
+        display:flex;
+        justify-content:baseline;
+        white-space:normal;
+        width:auto;
+  }
+  input[type="checkbox"] {
+    appearance: none;
+    background-color: #fff;
+    margin: 0;
+    font: inherit;
+    width: 1.15em;
+    height: 1.15em;
+    border: 0.15em solid currentColor;
+    border-radius: 0.15em;
+    transform: translateY(1.1em) translateX(-1.3em);
+  }
+
+  li {list-style:none;}
+  input[type="checkbox"]::before {
+    content: "";
+    width: 0.5em;
+    height: 0.5em;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em var(--form-control-color);
+  }
+  
+  input[type="checkbox"]:checked::before {
+    transform: scale(1);
+  }
+
+  
+.article-page ol {
+        max-width: unset;
+     counter-reset: directions-counter;
+ 
+     list-style: none;
+     padding-left: 1.75rem;
+ }
+ .article-page ol li {
+     margin: 0 0.5rem 0 0.5rem ;
+     counter-increment: directions-counter;
+     position: relative;
+     padding:0.5rem 0 0 2rem;
+ }
+ .article-page ol li::before {
+     content: counter(directions-counter);
+     color: #000;
+     font-size: 2rem;
+     font-weight: bold;
+     position: absolute;
+     --size: 1.4rem;
+     left: calc(-1 * var(--size) - 0.8rem);
+     line-height: var(--size);
+     width: var(--size);
+     height: var(--size);
+     top: 0rem;
+     margin-top:0px;
+     padding:0.5rem ;
+     margin-right:1rem;
+     border:1px solid #000;
+     border-radius:50%;
+     background: transparent;
+     
+ }    
+ .article-page ol ol li::before {
+     content: counter(directions-counter, lower-roman);
+     font-weight:normal;
+     font-size:1.5rem;
+ }
+
+ footer{
+    margin-top:6rem;
+    font-size:0.5em;
+ }
