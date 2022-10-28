@@ -1,22 +1,25 @@
-import { loadRecipes, saveRecipes, getTimestamp } from './functions'
+import { loadRecipes, saveRecipes, getTimestamp, loadRecipesFromLocalStorage} from './functions'
 
-let recipes = await loadRecipes()
+let recipes = await loadRecipesFromLocalStorage()
 const updateRecipe = (id, update) => {
-    
+  
     
    
     const note = recipes.find((recipe) =>  recipe.id === id )
+
 
     if(!note) {
         return
     }
 
     if(typeof update.name === 'string'){
+       
         note.name = update.name
         note.updatedAt = getTimestamp()
     }
   
     if(typeof update.description === 'string'){
+      
         note.description = update.description
         note.updatedAt = getTimestamp()
     }
@@ -44,7 +47,7 @@ const updateRecipe = (id, update) => {
 
 const updateIngredient = async (recipeId, ingredientId, id, val) => {
 
-    let recipes = await loadRecipes()
+    let recipes = await loadRecipesFromLocalStorage()
    
     const note = recipes.find((recipe) =>  recipe.id === recipeId )
 
@@ -80,6 +83,6 @@ const ingredient = note.ingredients.find((ingredient) => ingredient.id === ingre
     console.log(ingredient)
     console.log(note)
     saveRecipes(recipes)
-    return note
+   // return note
 }
 export { updateRecipe, updateIngredient}

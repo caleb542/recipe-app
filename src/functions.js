@@ -10,12 +10,12 @@ import {
 
 
 const convertTimestamp = (rDate) => {
-    if (typeof rDate === 'object'){
+    if (typeof rDate === 'object') {
         // do nothing
-    } else if (typeof rDate === 'string'){
+    } else if (typeof rDate === 'string') {
         const format_unix = moment(rDate, 'MMM Do, YYYY HH:mm').unix();
         return format_unix
-    } 
+    }
 }
 
 const getTimestamp = () => {
@@ -26,6 +26,192 @@ const getTimestamp = () => {
     let unixTimestamp = moment(timestampShort, 'MMM Do, YYYY HH:mm').unix();
     return [timestampShort, unixTimestamp]
 }
+const listDirections = (directions) => {
+    const directionsList = document.getElementById("directions-list");
+
+    directions.forEach((step, index) => {
+        const li = document.createElement('li')
+        li.innerHTML = `<div class="direction-container"><div>${step.text}</div><a class="edit-item" href="#" dataId="${step.id}"><span dataId="${step.id}"></span><i class="fa fa-pencil" area-hidden="true" dataId="${step.id}" aria-hidden="true"></i><span class="hide-text">Edit</span></a><a href="#" title="remove" class="remove" dataId="${step}"><span dataId="${step.id}">RemoveX</span></a></div>`
+        directionsList.appendChild(li)
+    })
+
+    let editDirectionsButtons = document.querySelectorAll(".direction-container a.edit-item")
+    editDirectionsButtons.forEach(button => {
+        button.addEventListener( 'click', function(e){
+            e.preventDefault()
+            const id = button.getAttribute('dataId');
+            editDirection(id)
+        })
+    })
+    let removeDirectionsButtons = document.querySelectorAll(".direction-container a.remove")
+    removeDirectionsButtons.forEach(button => {
+        button.addEventListener( 'click', function(e){
+            e.preventDefault()
+            
+            const id = e.target.getAttribute('dataId');
+            const text = this.parentNode.firstChild.textContent;
+            removeDirection(id, text)
+        })
+    })
+
+
+    const emptyBlock = document.createElement('div')
+    const directionsHeading = document.getElementById("directions-heading") 
+    // directionsHeading.appendChild(emptyBlock)
+}
+const openDirectionsDialogue = async(id, text) => {
+    
+    let recipeId = location.hash.substring(1);
+    recipes = await loadRecipesFromLocalStorage()
+    let recItem = recipes.find(recipe => recipe.id === recipeId)
+
+    const overlay = document.querySelector('.overlay')
+    overlay.classList.add('show');
+    const modal = document.createElement('dialog')
+    modal.setAttribute('open','');
+    modal.setAttribute('autofocus','');
+    modal.setAttribute('id', 'add-directions');
+    const form = document.createElement('div');
+    form.innerHTML = `<h2>${recItem.name} - Directions</h2><p>What's the next step?</p><form><fieldset><textarea placeholder="The next step is..." id="enter-next-step"></textarea></fieldset></form><button class="dialog-close-button">Done</button>`
+    const page = document.querySelector('.page-container')
+    page.appendChild(modal);
+    modal.appendChild(form)
+    const textBox = document.getElementById("enter-next-step");
+    text === undefined ? text = '':text = text
+    textBox.value = text
+    saveRecipes(recipes)
+    textBox.addEventListener('input', function (e) {
+        let recipeId = location.hash.substring(1);
+        let recItem = recipes.find((recipe) => recipe.id === recipeId)
+        let arr = recItem.directions;
+        console.log(arr)
+        console.log(arr)
+        let stepItem = arr.find(direction => direction.id === id)
+        
+        stepItem.text = e.target.value
+        saveRecipes(recipes)
+
+        const updateList = async () => {
+            recipes = await loadRecipesFromLocalStorage()
+            recItem = recipes.find((recipe) => recipe.id === recipeId)
+
+            console.log(recItem)
+            // initEdit(recipeId)
+            // alert(recItem.name)
+            let updatedDirections = recItem.directions
+            console.log(updatedDirections)
+            const directionsList = document.getElementById("directions-list");
+            directionsList.innerHTML=''
+            listDirections(updatedDirections)     
+        }
+      updateList()
+    })
+     
+       
+    modal.querySelector('textarea').focus();
+    modal.addEventListener('transitionend', (e) => {
+        modal.querySelector('textarea').focus();
+    });
+    // dialog-close-button
+    
+    const closeDialog = document.querySelector(".dialog-close-button")
+
+    closeDialog.addEventListener('click', function (e) {
+        e.preventDefault();
+        modal.remove()
+
+        document.querySelector('.overlay').classList.remove('show')
+        document.querySelector('#add-step').focus();
+    })
+
+}
+ // Edit Direction Button
+ const editDirection = async (id) => {
+    let recipes = await loadRecipesFromLocalStorage()
+    let recipeId = location.hash.substring(1);
+    let recItem = recipes.find(recipe => recipe.id === recipeId)
+    let arr = recItem.directions;
+    let stepItem = arr.find(direction => direction.id === id)
+    let text = stepItem.text
+    openDirectionsDialogue(id, text)
+    // const textBox = document.getElementById("enter-next-step");
+    // textBox.value = text;
+    // textBox.addEventListener('input', function (e) {
+    //     let recipeId = location.hash.substring(1);
+    //     let recItem = recipes.find((recipe) => recipe.id === recipeId)
+    //     let arr = recItem.directions;
+    //     let stepItem = arr.find(direction => direction.id === id)
+    //     stepItem.text = e.target.value
+    //     saveRecipes(recipes)
+
+    //     const updateList = async () => {
+    //         recipes = await loadRecipesFromLocalStorage()
+    //         recItem = recipes.find((recipe) => recipe.id === recipeId)
+
+    //         console.log(recItem)
+    //         // initEdit(recipeId)
+    //         // alert(recItem.name)
+    //         let updatedDirections = recItem.directions
+    //         console.log(updatedDirections)
+    //         directionsList.innerHTML=''
+    //         listDirections(updatedDirections)     
+    //     }
+    //   updateList()
+    // })
+}
+
+
+   // Remove Directions Button
+    const removeDirection = async (itemID, text) => {
+
+        let recipes = await loadRecipesFromLocalStorage()
+        let recipeId = location.hash.substring(1);
+        let recItem = recipes.find((recipe) => recipe.id === recipeId)
+
+        let arr = recItem.directions;
+        console.log(`argument id: ${itemID}`)
+        arr.forEach(item => console.log(item.id))
+        
+        const context = `Erase ${text}?`
+        if (confirm(context) == true) {
+           // continue
+        } else {
+            return
+        }
+        let item = arr.find(direction => direction.id === itemID)
+        let itemNum = (arr.indexOf(item))
+        const removerDir = () => {
+            if (itemNum === 0) {
+
+                alert(`shift ${itemNum}`)
+                arr.shift()
+            } else if ((itemNum + 1) === arr.length) {
+               
+                alert(`pop ${itemNum}`)
+                arr.pop()
+            } else {
+                alert(`splice ${itemNum}`)
+                arr.splice(itemNum, 1)
+            }
+
+            saveRecipes(recipes)
+            const updateList = async () => {
+                recipes = await loadRecipesFromLocalStorage()
+                recItem = recipes.find((recipe) => recipe.id === recipeId)
+
+                // initEdit(recipeId)
+                // alert(recItem.name)
+                let updatedDirections = recItem.directions
+                console.log(updatedDirections)
+                const directionsList = document.getElementById("directions-list");
+                directionsList.innerHTML=''
+                listDirections(updatedDirections)     
+            }
+          updateList()
+        }
+        removerDir()
+    }
+
 
 const addIngredients = () => {
     const addIngredientsButton = document.querySelectorAll('.addIngredient');
@@ -55,8 +241,6 @@ const addIngredients = () => {
 
 
 // Sort your notes by one of three ways
-
-
 const sortRecipes = function (sortBy, recipes) {
     if (sortBy === 'byEdited') {
 
@@ -97,12 +281,12 @@ const sortRecipes = function (sortBy, recipes) {
     }
 }
 
-const  loadRecipes = async() => {
-   
+const loadRecipes = async () => {
+
     let recs;
     if (localStorage.getItem('recipes')) {
-    
-      console.log('getting from local storage')
+
+        console.log('getting from local storage')
         const recipesJSON = localStorage.getItem('recipes')
         try {
 
@@ -110,27 +294,27 @@ const  loadRecipes = async() => {
 
             return recipesJSON ? JSON.parse(recipesJSON) : console.log('NOJSON')
         } catch (e) {
-           
+
             return []
         }
-    } else{
+    } else {
         console.error("fetching from database")
         return await getRecipesFromDatabase()
-       
-       
+
+
     }
 
-        
-       
+
+
 }
 
-const loadRecipesFromLocalStorage = () => {
-
+const loadRecipesFromLocalStorage = async () => {
+console.error('loading local')
     if (localStorage.getItem('recipes')) {
         const recipesJSON = localStorage.getItem('recipes')
         try {
-            recipesJSON ? console.log(JSON.parse(recipesJSON)) : []
-            return recipesJSON ? JSON.parse(recipesJSON) : []
+            recipesJSON ? console.log(JSON.parse(recipesJSON)) : alert('waaa')
+            return await JSON.parse(recipesJSON)
         } catch (e) {
             return []
         }
@@ -184,6 +368,47 @@ const getRecipesFromDatabase = async () => {
     }
 
 }
+const updateRecipeInDatabase = async () => {
+    //   alert("Yes this is the intended function ...")
+    // put this in a backebd-connect statement
+    const APP_ID = 'data-puyvo'
+    const app = new Realm.App({
+        id: APP_ID
+    });
+    const credentials = Realm.Credentials.anonymous();
+
+    let recipes = await loadRecipes()
+
+    try {
+        // checkin with credentials
+        const user = await app.logIn(credentials);
+        console.log(user)
+        //pull all the recipes from the database with custom serverside function
+        const updateRecipe = JSON.stringify(recipes[0])
+
+
+        let currentId = location.hash.substring(1)
+
+        let theRecipe = recipes.find(recipe => recipe.id === currentId)
+        
+        console.log("$(&*@#$(#*Q$&))")
+        console.log(theRecipe)
+        delete theRecipe._id 
+        console.log(theRecipe)
+        console.log("$(&*@#$(#*Q$&))")
+        // newRec = JSON.stringify(newRec)
+
+        user.functions.replaceOrInsert(theRecipe)
+            .then(result => console.log(`Successfully inserted item with _id: ${result}`))
+            .catch(err => console.error(`Failed to insert item: ${err}`))
+
+        // console.log(addRecipeToDb)        
+
+    } catch (error) {
+        console.error("POST", error);
+    }
+
+}
 const sendRecipes = async () => {
     const APP_ID = 'data-puyvo'
     const app = new Realm.App({
@@ -200,40 +425,40 @@ const sendRecipes = async () => {
 const hamburger = () => {
     const hamburger = document.getElementById('menu-toggle');
 
-        hamburger.addEventListener('click', function(e){
+    hamburger.addEventListener('click', function (e) {
 
-            e.preventDefault() 
-            toggleMenu();  
+        e.preventDefault()
+        toggleMenu();
     })
-  
-} 
+
+}
 const toggleMenu = () => {
     let toggle = document.getElementById('menu-toggle')
     let menu = document.querySelector('nav');
     let status = toggle.getAttribute('aria-label');
     let nav = document.querySelector('nav');
 
-    if(status.toLowerCase() === 'open the menu'){
-        toggle.setAttribute('aria-label','close the menu');
+    if (status.toLowerCase() === 'open the menu') {
+        toggle.setAttribute('aria-label', 'close the menu');
         nav.classList.remove('hide')
         nav.classList.add('open')
-        nav.setAttribute('aria-expanded','true')
+        nav.setAttribute('aria-expanded', 'true')
         const a = document.querySelectorAll('nav a')
         a.forEach(anchor => {
             let tabindex = anchor.getAttribute('tabindex')
-            tabindex === "-1" ? anchor.setAttribute('tabindex',"0") : anchor.setAttribute('tabindex',"-1")        
+            tabindex === "-1" ? anchor.setAttribute('tabindex', "0") : anchor.setAttribute('tabindex', "-1")
         })
-       
+
     }
-    if(status.toLowerCase() === 'close the menu'){
-        toggle.setAttribute('aria-label','Open the menu');
+    if (status.toLowerCase() === 'close the menu') {
+        toggle.setAttribute('aria-label', 'Open the menu');
         nav.classList.add('hide')
         nav.classList.remove('open')
-        nav.setAttribute('aria-expanded',false)
+        nav.setAttribute('aria-expanded', false)
         const a = document.querySelectorAll('nav a')
         a.forEach(anchor => {
             let tabindex = anchor.getAttribute('tabindex')
-            tabindex === "0" ? anchor.setAttribute('tabindex',"-1") : anchor.setAttribute('tabindex',"0")        
+            tabindex === "0" ? anchor.setAttribute('tabindex', "-1") : anchor.setAttribute('tabindex', "0")
         })
     }
 }
@@ -256,7 +481,7 @@ const addToExistingRecipes = () => {
 }
 
 let recipes = await loadRecipes()
-   
+
 const renderImageSelector = (keyword, pageNumber) => {
     let responseLength
     let images;
@@ -274,12 +499,7 @@ const renderImageSelector = (keyword, pageNumber) => {
             response.forEach(imageObject => {
 
                 const li = document.createElement('li')
-                // const imgAnchor = document.createElement('a')
-                // imgAnchor.setAttribute('dataURL', `${imageObject.urls.regular}`)
-                // imgAnchor.setAttribute('dataName', `${imageObject.user.name}`)
-                // imgAnchor.setAttribute('dataLink', `${imageObject.user.links.html}`)
-                // imgAnchor.classList.add('imageListItem')
-                // imgAnchor.setAttribute('href','#')
+               
                 const fig = document.createElement('figure')
                 const img = document.createElement('img')
                 img.setAttribute('src', `${imageObject.urls.thumb}`)
@@ -290,7 +510,7 @@ const renderImageSelector = (keyword, pageNumber) => {
                 caption.innerHTML = `<p>${imageObject.user.name}</p>`
 
                 // fig.appendChild(imgAnchor);
-                
+
                 fig.appendChild(img)
                 li.appendChild(fig)
                 fig.appendChild(caption);
@@ -299,7 +519,7 @@ const renderImageSelector = (keyword, pageNumber) => {
 
 
                 document.getElementById('select-images').appendChild(imageViewport);
-               
+
 
                 images = document.querySelectorAll('.imageListItem');
 
@@ -311,23 +531,25 @@ const renderImageSelector = (keyword, pageNumber) => {
                 recItem = recipes.find((recipe) => recipe.id === recipeId)
                 return recItem
             }
-           
+
             //   alert(e.target.getAttribute('dataName'))
-            
-     
-            
-           
-           
+
+
+
+
+
             const imageButtons = document.createElement('div');
             imageButtons.classList.add('image-buttons')
             imageButtons.innerHTML = `
-            <button disabled class="btn prev"><<<span class="hide-text">previous image</span></button>
-            <button class="btn next">>><span class="hide-text">next image</span></button>`
+            <button disabled class="btn prev"><i class="fa fas-solid fa-angle-left"></i><span class="hide-text">previous image</span></button>
+            <button class="btn next"><i class="fa fas-solid fa-angle-right"></i><span class="hide-text">next image</span></button>`
             const imageCount = document.createElement('p')
             imageCount.classList.add('count')
             imageCount.textContent = 'Viewing image 1'
             const prev = document.createElement('button')
             const next = document.createElement('button')
+            const modal = document.querySelector('dialog');
+           
 
             prev.setAttribute('id', 'prev-page');
             next.setAttribute('id', 'next-page');
@@ -338,9 +560,9 @@ const renderImageSelector = (keyword, pageNumber) => {
             selectImagesModal.appendChild(prev);
             selectImagesModal.appendChild(next);
             selectImagesModal.appendChild(imageCount);
-            
+
             const selectImage = document.createElement('button')
-            selectImage.setAttribute('id','select-image')
+            selectImage.setAttribute('id', 'select-image')
             selectImage.textContent = 'Select this image';
             selectImagesModal.appendChild(selectImage);
 
@@ -352,12 +574,18 @@ const renderImageSelector = (keyword, pageNumber) => {
 
             const pagedown = document.getElementById('prev-page')
             const pageup = document.getElementById('next-page')
+
+            selectImagesModal.querySelector('.next').focus();
+            selectImagesModal.addEventListener('transitionend', (e) => {
+                selectImagesModal.querySelector('.btn').focus();
+              });
+
             /*
             3333333333333333333
             */
             const slider = document.querySelector('.image-show')
-            let images =  document.querySelectorAll('#select-images img')
-            
+            let images = document.querySelectorAll('#select-images img')
+
             let position = 0;
             let transform = 0;
             const decrementSlider = () => {
@@ -388,10 +616,10 @@ const renderImageSelector = (keyword, pageNumber) => {
                     count.textContent = info;
                     incrementSlider()
 
-                    
+
                 }
 
-                slideNum === 1 ? previmage.disabled = true : previmage.disabled=false
+                slideNum === 1 ? previmage.disabled = true : previmage.disabled = false
                 slideNum === responseLength ? nextimage.disabled = true : nextimage.disabled = false
             })
             nextimage.addEventListener('click', function () {
@@ -404,11 +632,11 @@ const renderImageSelector = (keyword, pageNumber) => {
                     decrementSlider()
                 }
 
-                slideNum === 1 ? previmage.disabled = true : previmage.disabled=false
+                slideNum === 1 ? previmage.disabled = true : previmage.disabled = false
                 slideNum === responseLength ? nextimage.disabled = true : nextimage.disabled = false
             })
 
-            slideNum === 1 ? previmage.disabled = true : previmage.disabled=false
+            slideNum === 1 ? previmage.disabled = true : previmage.disabled = false
             slideNum === responseLength ? nextimage.disabled = true : nextimage.disabled = false
 
             /*--------------*/
@@ -436,24 +664,24 @@ const renderImageSelector = (keyword, pageNumber) => {
                 }
             })
 
-            selectImage.addEventListener('click', async function(e){
-                 e.preventDefault()
+            selectImage.addEventListener('click', async function (e) {
+                e.preventDefault()
                 const selected = images[slideNum - 1];
-              
-                 let recipeId = location.hash.substring(1);
-                 recipes = await loadRecipes()
-                 recItem = recItem = recipes.find((recipe) => recipe.id === recipeId)
 
-                 recItem.photographer = selected.getAttribute('dataName')
-                 recItem.photographerLink = selected.getAttribute('dataLink')
-                 recItem.photoURL = selected.getAttribute('dataURL')
-                 recItem.updatedAt = getTimestamp();
-             
-                 saveRecipes(recipes)
-                 document.querySelector('.image-preview img').setAttribute('src',recItem.photoURL);
-                 document.querySelector('.image-preview figcaption').innerHTML = `Unsplash photo by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
-                })
-            
+                let recipeId = location.hash.substring(1);
+                recipes = await loadRecipes()
+                recItem = recItem = recipes.find((recipe) => recipe.id === recipeId)
+
+                recItem.photographer = selected.getAttribute('dataName')
+                recItem.photographerLink = selected.getAttribute('dataLink')
+                recItem.photoURL = selected.getAttribute('dataURL')
+                recItem.updatedAt = getTimestamp();
+
+                saveRecipes(recipes)
+                document.querySelector('.image-preview img').setAttribute('src', recItem.photoURL);
+                document.querySelector('.image-preview figcaption').innerHTML = `Unsplash photo by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
+            })
+
             // const chooseImage = document.querySelectorAll(".imageListItem");
             // chooseImage.forEach(imageAnchor => {
             //     imageAnchor.addEventListener('keypress', function(e){
@@ -467,35 +695,39 @@ const renderImageSelector = (keyword, pageNumber) => {
                 const modal = document.getElementById('select-images')
                 modal.classList.remove('show');
             })
-           
+
         })
 }
 
 const removeRecipe = async (recipeId) => {
-    let recipes =  loadRecipesFromLocalStorage()
+    let recipes = await loadRecipes()
     let rec = recipes.find((recipe) => recipe.id === recipeId)
-    
+
     let recNum = (recipes.indexOf(rec))
-   
+
     const removerRec = () => {
-        if(recNum === 0){
+        if (recNum === 0) {
             alert('shift')
             recipes.shift()
-        }else if((recNum+1) === recipes.length){
+        } else if ((recNum + 1) === recipes.length) {
             alert('pop')
             recipes.pop()
-        }else {
+        } else {
             alert('splice')
             recipes.splice(recNum, 1)
         }
-       
+
         saveRecipes(recipes)
         window.location.href = "/"
 
     }
-   removerRec()
+    removerRec()
 }
 export {
+    openDirectionsDialogue,
+    listDirections,
+    editDirection,
+    removeDirection,
     removeRecipe,
     getRecipesFromDatabase,
     addIngredients,
@@ -510,5 +742,6 @@ export {
     renderImageSelector,
     toggleMenu,
     hamburger,
+    updateRecipeInDatabase,
     convertTimestamp
 }

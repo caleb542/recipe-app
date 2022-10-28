@@ -9,6 +9,7 @@
     "css-loader": "^6.7.1",
     "dns": "^0.2.2",
     "html-webpack-plugin": "^5.5.0",
+    "imagekit-javascript": "^1.5.4",
     "live-server": "^1.1.0",
     "mini-css-extract-plugin": "^2.6.1",
     "moment": "^2.29.4",

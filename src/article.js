@@ -1,5 +1,5 @@
 import "./style.scss";
-import { loadRecipes, addIngredients } from "./functions"
+import { loadRecipes, addIngredients, loadRecipesFromLocalStorage } from "./functions"
 import { getTimestamp, toggleMenu, hamburger } from "./functions"
 // import { list } from "unsplash-js/dist/methods/photos";
 
@@ -9,7 +9,7 @@ const recipeId = location.hash.substring(1)
 let recipes;
 
 let fetchRecipes = async () => {
-    recipes = await loadRecipes()
+    recipes = await loadRecipesFromLocalStorage()
     createArticleDOM(recipes)
     console.log(recipes)
 }
@@ -22,7 +22,7 @@ const createArticleDOM = (recipes) => {
     // let recipes = loadRecipes()
     // "recItem": find the recipe with the id passed in the hash
     let recItem = recipes.find((recipe) => recipe.id === recipeId )
-
+    console.error(recItem.directions.length)
     if (!recItem) {
         location.assign('/index.html')
     }
@@ -46,10 +46,7 @@ const createArticleDOM = (recipes) => {
        
     const title = document.querySelector('.article__title');
     const subtitle = document.querySelector('.header__subtitle');
-    // const title = document.createElement('h1')
-    // title.classList.add('header__title')
-    // const subTitle = document.createElement('p') 
-    //     subTitle.classList.add('header__subtitle')
+
     const summary = document.createElement('div')
     summary.classList.add('summary')
     const recipeLink = document.createElement('a')
@@ -69,7 +66,6 @@ const createArticleDOM = (recipes) => {
         dates.classList.add('dates')
     const author = document.createElement('p')    
         author.classList.add('author')
-    // const recipeSubTitle = recItem.description;
     const recipeTitle = recItem.name;
     const directionsHeading = document.createElement('div')
     directionsHeading.classList.add('directions-heading')

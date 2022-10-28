@@ -54,6 +54,10 @@ $btn-lineHeight:1.8rem;
 $btn-border-rad:3rem;
 $container_width:1380px;
 
+textarea:focus, input:focus, button:focus, a:focus {
+    box-shadow: 0 0 0 0.25rem rgb(150, 200, 224, 0.5);
+    outline:none;
+}
 
 
 
@@ -104,7 +108,6 @@ html {
     width: auto;
     padding:2rem;
     overflow: hidden;
-    border: 0;
     border-radius: 0;
     flex-wrap: wrap;
     display:none;
@@ -133,7 +136,7 @@ html {
     padding: 0 1rem;
 }
 .image-buttons {
-    width:20rem;
+    width:100%;
     background:transparent;
     display:flex;
     flex-direction: row;
@@ -142,7 +145,14 @@ html {
     position:relative;
 }
 .image-buttons button{
-    width:0.5rem;
+    padding:1.2rem;
+    width:1.2rem;
+    position:relative;
+    display:grid;
+    place-content:center;
+}
+.image-buttons button i{
+    font-size:1.5rem;
 }
 .close-image-modal{
     position: absolute;
@@ -176,7 +186,7 @@ html {
 .next:hover,
 .prev:hover{
     opacity:1;
-    background:purple;
+    background:#000;
     color:#fff;
 }
 .next:disabled,
@@ -185,10 +195,10 @@ html {
 .next:disabled:hover,
 .prev:disabled:focus,
 .next:disabled:focus{
-    opacity:0.3;
+    opacity:1;
     cursor:default;
-    background:#ccc;
-    color:#000;
+    background:#ddd;
+    color:#eee;
 }
 #prev-page,#next-page{display:none}
 
@@ -381,7 +391,9 @@ nav a {
         cursor:pointer;
     }
     &:focus {
-        color:red;
+        
+        box-shadow: 0 0 0 0.25rem rgba(150,200,224,0.5);
+                
     }
 }
 button {
@@ -539,7 +551,7 @@ select::-ms-expand {
             cursor:pointer
         }
         &:focus {
-
+            box-shadow: 0 0 0 0.25rem rgba(150,200,224,0.5);
         }
   }
   
@@ -922,6 +934,20 @@ nav ul li {
     max-width:100vw;
     overflow-x:hidden;    /* Footer height */
   }
+  .content-wrap {
+    // padding-bottom: 12rem;
+    // max-width: 100vw;
+    // overflow-x: hidden;
+    // background-image:linear-gradient(90deg,rgba(151, 106, 255,0.6),rgba(248, 77, 197,0.5)) ;
+    // // background-image: linear-gradient(45deg,rgba(255,255,255,.9),rgba(255,255,2555,.7)),url(../public/images/pexels-eberhard-grossgasteiger-2086361.jpg);
+    // // background-image: linear-gradient(45deg,rgba(255,255,255,.9),rgba(255,255,2555,.7)),url(../public/images/dan-gold-background-smaller.jpg);
+    // // background-image: linear-gradient(90deg,rgba(255,255,255,1),rgba(255,255,255,.5)),url(../public/images/pexels-dominika-roseclay.jpg); 
+    // background-size: 56%;
+    // background-repeat: repeat;
+    // background-position: right, center;
+    // background-attachment: fixed;
+    // backdrop-filter: opacity(0.5),opacity(0.5);
+}
 footer {
     background:$footer;
     width:100%;
@@ -947,6 +973,11 @@ div#recipes {
     row-gap:$desktop-grid-gap;
     padding:0;
     margin:0;
+    grid-auto-columns:1fr;
+    grid-template-areas: 
+    'one two three three'
+    'five four three three'
+    'six  four seven seven ';
 
 }
 .card{
@@ -957,9 +988,24 @@ div#recipes {
     margin:0;
     box-sizing:border-box;
     box-shadow:$box-shadow;
-
-    
+       
 }
+.card:nth-child(1){
+    grid-area:one;
+}
+.card:nth-child(2){
+    grid-area:two;
+}
+.card:nth-child(3){
+    grid-area:three;
+}
+.card:nth-child(4){
+    grid-area:four;
+}
+.card:nth-child(5){
+    grid-area:five ;
+}
+
 .card .text-area{
     padding:0;
     margin:0 1rem;
@@ -1410,9 +1456,7 @@ label.article-checklist-items, .shopping-list li {
 .btn.btn-home{
 
 }
-.btn:hover{
-    opacity:0.5;
-}
+
 
 .edit-form-list li {
     padding:0;
@@ -1759,7 +1803,20 @@ dialog label {
     display: block;
     margin: 0;
   }
-
+dialog[open]:focus-within{
+    border:2px solid #555;}
+dialog[open]:not(:focus-within) {
+    border-color: rgb(255, 255, 254);
+    transition: border-color 0.01s;
+  }
+  dialog input {
+    height: 2rem;
+    padding: 0.5rem;
+}
+dialog ul {
+    display: grid;
+    grid-row-gap: 0.5rem;
+}
 form#update ul{
     width:100%;
     display:flex;
@@ -1788,18 +1845,22 @@ form#update #ingredients > ul {
 #ingredients > li{
     margin-bottom:2rem
 }
-a {color:#fff;}
+a {
+    color:#fff;
+}
 .edit-page a#remove-recipe {
     right: 2rem;
     top: 5rem;
+    padding:0 0.5rem;
     text-decoration: underline;
     position: absolute;
 
         &:hover{
-            color:red;
+            box-shadow: 0 0 0 0.25rem rgb(150, 200, 224, 0.5);
         }
         &:focus{
-            color:red;
+            box-shadow: 0 0 0 0.25rem rgb(150, 200, 224, 0.5);
+
         }
 }
 /* directions */
