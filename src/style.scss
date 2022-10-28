@@ -23,7 +23,7 @@ $button_background:orangered;
 $button_color:#fff;
 $button_radius:12px;
 $button_padding:2em;
-$desktop-grid:3fr 3fr 3fr 3fr;
+$desktop-grid:1fr 1fr 1fr 1fr;
 $desktop-grid-gap:2rem;
 
 
@@ -33,10 +33,10 @@ $padding3: 3rem;
 
 $desktopCardHeight: 400px;
 
-$tablet-grid: 6fr 6fr;
+$tablet-grid: 1fr 1fr;
 $tablet-grid-gap: 3rem;
 
-$mobile-grid: 12fr;
+$mobile-grid: 1fr;
 $mobile-grid-gap: 3rem;
 
 $penInk:#1f7dbc;
@@ -234,7 +234,8 @@ dialog {
 .homepage-hero {
     //background-image: url(https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwyOXx8Y291bnRyeSUyMGtpdGNoZW4lMjBwYXJ0eXxlbnwwfDB8fHwxNjY0Mjg1MTY4&ixlib=rb-1.2.1&q=80&w=1080);
     background-image:linear-gradient(90deg,rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('../public/images/hero3.jpg');
-    height: 500px;
+    min-height: 500px;
+    height:auto;
     background-repeat: no-repeat;
     background-size: cover;
     width: 100%;
@@ -434,6 +435,39 @@ a {
 }
 .homepage-hero {
     margin-bottom:3rem;
+    position:relative;
+}
+#categories-cloud{
+    display:flex;
+    flex-wrap: wrap;
+    position:absolute;
+    align-self:center;
+    justify-content:center;
+    align-items:center;
+    gap:0.5rem;
+    background:#000;
+    width:100%;
+    height:auto;
+    min-height:3rem;
+    z-index:8;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    padding:0.5rem;
+}
+.cat-item{
+    display:grid;
+    place-content:center;
+    text-align: center;
+    text-decoration:none;
+    padding:0.2rem;
+    line-height:1;
+    text-transform:capitalize;
+    background: rgba(255,255,255,0.2);
+    color:#fff;
+    border-radius:0.5rem;
+    max-height:2rem;
+    font-size:0.875rem;
 }
 
 
@@ -973,11 +1007,11 @@ div#recipes {
     row-gap:$desktop-grid-gap;
     padding:0;
     margin:0;
-    grid-auto-columns:1fr;
-    grid-template-areas: 
-    'one two three three'
-    'five four three three'
-    'six  four seven seven ';
+   grid-auto-columns:1fr;
+    // grid-template-areas: 
+    // 'one two three three'
+    // 'five four three three'
+    // 'six  four seven seven ';
 
 }
 .card{
@@ -990,21 +1024,22 @@ div#recipes {
     box-shadow:$box-shadow;
        
 }
-.card:nth-child(1){
-    grid-area:one;
-}
-.card:nth-child(2){
-    grid-area:two;
-}
-.card:nth-child(3){
-    grid-area:three;
-}
-.card:nth-child(4){
-    grid-area:four;
-}
-.card:nth-child(5){
-    grid-area:five ;
-}
+// this kind of thing for desktop only
+// .card:nth-child(1){
+//     grid-area:one;
+// }
+// .card:nth-child(2){
+//     grid-area:two;
+// }
+// .card:nth-child(3){
+//     grid-area:three;
+// }
+// .card:nth-child(4){
+//     grid-area:four;
+// }
+// .card:nth-child(5){
+//     grid-area:five ;
+// }
 
 .card .text-area{
     padding:0;
@@ -1940,6 +1975,7 @@ a {
     .home-page .homepage-hero {
         margin-bottom:0;
         height:auto;
+        min-height: 300px;
         overflow:hidden;
     }
 

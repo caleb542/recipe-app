@@ -80,22 +80,7 @@ categories = uniq(categories)
 categories.unshift("All")
   const categoriesCloud = document.createElement("div")
   categoriesCloud.setAttribute("id", "categories-cloud");
-  categoriesCloud.style.display="flex"
-  categoriesCloud.style.flexGrow="0"
-  categoriesCloud.style.flexWrap="wrap"
-  categoriesCloud.style.alignSelf="center"
-  categoriesCloud.style.justifyContent="center"
-  categoriesCloud.style.alignItems="center"
-  categoriesCloud.style.gap="0.5rem"
-  categoriesCloud.style.background = 'transparent'
-  categoriesCloud.style.width = 'calc(50% - 4rem)'
-  categoriesCloud.style.height = '3rem'
-  categoriesCloud.style.zIndex = '8'
-  categoriesCloud.style.bottom ='0'
-  categoriesCloud.style.position='absolute'
-  categoriesCloud.style.margin='0 auto'
-  categoriesCloud.style.left="50%"
-  categoriesCloud.style.transform='translateX(-50%)'
+ 
   categories.forEach(cat => {
 
 
@@ -113,18 +98,7 @@ categories.unshift("All")
     diva.setAttribute('sort', cat)
     diva.firstChild.setAttribute('sort',cat)
     diva.firstChild.nextSibling.setAttribute('sort',cat)
-    diva.style.display="grid"
-    diva.style.placeContent="center"
-    diva.style.textAlign="center"
-    diva.style.textDecoration='none'
-    diva.style.padding='0.2rem'
-    diva.style.lineHeight='1'
-    diva.style.textTransform='capitalize'
-    diva.style.background='rgba(250,250,250,0.1)'
-    diva.style.color='#fff'
-    diva.style.fontSize='0.875rem'
-    diva.style.borderRadius="0.5rem"
-    diva.style.maxHeight="2rem"
+
     categoriesCloud.appendChild(div)
   })
   document.querySelector(".homepage-hero").appendChild(categoriesCloud);  
