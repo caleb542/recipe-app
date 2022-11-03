@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 
 <head>
@@ -12,9 +11,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Fugaz+One&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
-        <script src="https://kit.fontawesome.com/610bdb1969.js" crossorigin="anonymous"></script>
-        <link href="./scripts/index.css" rel="stylesheet" media="screen" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Fugaz+One&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap"
+        rel="stylesheet">
+    <script src="https://kit.fontawesome.com/610bdb1969.js" crossorigin="anonymous"></script>
+    <script src="./scripts/ckeditor/ckeditor.js"></script>
+    <link href="./scripts/index.css" rel="stylesheet" media="screen" />
+    referrerpolicy="origin"></script>
     <title>Recipe App - Edit</title>
 </head>
 
@@ -24,10 +27,11 @@
             <header class="">
                 <div class="header-top">
                     <h1 class="site__title"><a href="/">Recipe Me</a></h1>
-                    <a href="#" id="menu-toggle" aria-expanded="false" aria-controls="nav" class="menu-toggle" aria-label="Open the menu">
+                    <a href="#" id="menu-toggle" aria-expanded="false" aria-controls="nav" class="menu-toggle"
+                        aria-label="Open the menu">
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </a>
-                    
+
                 </div>
                 <nav id="nav" class="hide">
                     <ul>
@@ -45,58 +49,117 @@
                         </li>
                     </ul>
                 </nav>
-                
+
                 <div class="container">
-                    <h2 class="header__title">Edit recipe: <span class="header__subtitle">New Recipe</span></h2>
+                    <h2 class="header__title">Edit recipe: <span class="header__subtitle">Lemonade Supremes</span></h2>
                     <a id="remove-recipe" href="#">Remove recipe (forever)</a>
                 </div>
             </header>
 
             <div class="container">
-                <div id="recipe">
+                <div id="blah">
+                    <div class="edit-form-list">
+                        <div class="section-1">
+                            <label id="name">
+                                <div>Name</div>
+                                    <input id="recipe-name" class="input" type="text"
+                                    placeholder="Recipe Name" name="text" value="Lemonade Supremes">
+                            </label>
+                            <label id="description">
+                                <div>Description</div><textarea id="recipe-description"
+                                    placeholder="Recipe Description"></textarea>
+                            </label>
+                            <label id="article">
+                                <div>Article</div><textarea id="recipe-article" placeholder="Recipe Article"></textarea>
+                            </label>
+                            <label id="author">
+                                <div>Author</div><input id="recipe-author" class="input" type="text"
+                                    placeholder="Peter Peter pumpkin eater" name="text" value="Mister Sour Lemon">
+                            </label>
+                            <label id="directions-heading">
+                                <div>Directions</div>
+                                <ol id="directions-list" class="directions">
 
-                 
-                        <div class="edit-form-list">
+                                </ol>
+                                <div id="add-container"><a id="add-step" href="#"><i class="fa fa-plus"
+                                    aria-hidden="true"></i><span class="hide-text">Add another step</span></a>
+                                </div>
+                            </label>
+                    
+                            <dialog id="add-directions">
+                                <h2>Directions</h2>
+                                <p></p>
+                                <form>
+                                    <fieldset>
+                                        <textarea placeholder="Add some directions" id="enter-next-step"></textarea>
 
-                            <div class="section-1">
-                              
-                              
-                            </div>
-                            <div class="overlay"></div>
-                            <article class="article__recipe">
-                                <header id="recipe-header">
-                                    <h1 class="header__title">Recipe</h1>
-                                </header>
-                                <button id="add-an-ingredient"><i
-                                    class="fa fa-plus"></i><span class="hide-text">Add a new
-                                    ingredient</span></i>
-                                </button>
-                                <ul class="recipe">
-                                    
+                                        <button class="dialog-close-button">Done</button>
+                                    </fieldset>
+                                </form>
+                            </dialog>
 
-                                </ul>
-                                
-                            </article>
+                            <label id="categories">
+                                <div class="category">Categories</div><textarea placeholder="categories"
+                                    id="recipe-categories"></textarea>
+                            </label>
+                            <fieldset id="image" class="feature-image">
+                                <legend>Feature Image</legend><input id="feature-keyword"
+                                    placeholder="Search for a photo"><button class="feature-image"
+                                    id="feature-image-button"><i class="fa fa-solid fa-magnifying-glass"
+                                        aria-hidden="true"></i></button>
+                                <figure class="image-preview"><img
+                                        src="https://images.unsplash.com/photo-1622597468473-84f65fdc3fc0?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwxMHx8TGVtb25hZGV8ZW58MHwwfHx8MTY2Njk3MTMzNA&amp;ixlib=rb-4.0.3&amp;q=80&amp;w=1080"
+                                        style="width:200px;aspect-ratio:16/9">
+                                    <figcaption>Unsplash photo by <a
+                                            href="https://unsplash.com/@jugoslocos">Jugoslocos</a></figcaption>
+                                </figure>
+                            </fieldset>
+                            <dialog open="" id="select-images">
+                                <textarea></textarea>
+                                <button>Close</button>
+                            </dialog>
 
-                            <div id="ingredients">
-
-                            </div>
-
-                            <a class="btn btn-large" id="done-editing" href="#" >Done</a>
-                   
+                        </div>
+                        <div class="overlay"></div>
+                        <dialog id="ingredient-modal" class="ingredient-modal">
+                            
+                            <button class="close-ingredient-modal">Close</button>
+                        </dialog>
+                        <article id="recipe" class="article__recipe">
+                            <header id="recipe-header">
+                                <h1 class="header__title">Recipe</h1>
+                            </header>
+                            <button id="add-an-ingredient"><i class="fa fa-plus" aria-hidden="true"></i><span
+                                    class="hide-text">Add a new
+                                    ingredient</span>
+                            </button>
+                            <ul class="recipe">
+                            </ul>
+                        </article>
+                        <div id="ingredients" class="edit-ingredients">
+                        </div>
+                        <a class="btn btn-large" id="done-editing" href="">Done</a>
+                    </div>
                 </div>
-               
-             </div><!--container-->
+                <!--container-->
                 <!--content wrap-->
-        </div>
-        <footer>
-            <p>&copy; Caleb Hamilton 2022</p>
-        </footer>
+            </div>
+            <footer>
+                <p>© Caleb Hamilton 2022</p>
+            </footer>
 
-        <!-- page container-->
+            <!-- page container-->
+        </div>
+
+        <script src="./scripts/edit-bundle.js"></script>
+        <script>
+        
+        </script>
+
+
     </div>
-   
-    <script src="./scripts/edit-bundle.js"></script>
+
+
 </body>
 
 </html>

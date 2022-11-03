@@ -46,8 +46,9 @@ let listRecipes = async () => {
           // create DOM cards
           let cardAnchor = document.createElement('a');
           cardAnchor.setAttribute('href',`article.html#${recipeID}`);
-          let article = document.createElement('article'); 
-          let image = document.createElement('div');
+          let article = document.createElement('article');
+          let figure = document.createElement('figure');
+          let image = document.createElement('img');
           image.classList.add('imageElement');
      
           let creator = document.createElement('p');
@@ -57,19 +58,22 @@ let listRecipes = async () => {
           let recipeName = document.createElement('h1');
           recipeName.textContent = name;
           let recipeDescription = document.createElement('p');
-          recipeDescription.textContent = description;
+          recipeDescription.innerHTML = description;
           text.appendChild(recipeName)
           text.appendChild(recipeDescription)
           cardAnchor.classList.add('card')
           cardAnchor.classList.add('home')
           cardAnchor.appendChild(article)
-          article.appendChild(image)
+          article.appendChild(figure)
+          figure.appendChild(image)         
           article.appendChild(text)
           cardIndex.classList.add('cards')
           cardIndex.appendChild(cardAnchor)
 
             let photoURL = recipe.photoURL
-            image.setAttribute('style',`background-image:url(${photoURL})`);
+            image.setAttribute('src',`${photoURL}`)
+            image.setAttribute('alt',"related product image")
+            //image.setAttribute('style',`background-image:url(${photoURL})`);
             image.setAttribute('description',`Decorative image relating to ${recipe.name}`);
 
 

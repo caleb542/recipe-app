@@ -29,8 +29,26 @@ import {
 } from './functions'
 import * as Realm from "realm-web";
 
+const firstLoad = document.getElementById("static-landing-page");
+const pageContainer = document.querySelector('.page-container')
+pageContainer.style.opacity='0'
+pageContainer.style.left="120%"
+
+const stlCta = document.querySelector('.stl-cta')
+stlCta.addEventListener("click", function(e){
+  firstLoad.style.opacity="0"
+
+  firstLoad.style.left="-120%"
+  firstLoad.style.transition="all 0.8s ease-out"
+  pageContainer.style.opacity="1"
+  pageContainer.style.left="0"
+  pageContainer.style.display="block"
+  pageContainer.style.transition="all 0.8s ease-out"
+})
 
 await listRecipes(recipes)
+
+
 
 // Event Listeners
 document.querySelector('#search-filter').addEventListener('input', (e) => {

@@ -11,9 +11,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
         integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Fugaz+One&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Fugaz+One&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap"
+        rel="stylesheet">
     <link href="./scripts/index.css" rel="stylesheet" media="screen" />
 
     <title>Recipe Me</title>
@@ -22,18 +24,28 @@
 </head>
 
 <body class="home-page">
+    <div id="static-landing-page" class="fullscreen">
+        <div class="centered-title">
+            <h2 class="site__title stl-h2">Recipe Me</h2>
+            <p class="stl-p">Recipe Me is a simple recipe card index, you can use to publish your own recipe ideas for cheap</p>
+            <button class="stl-cta">Get started</button>
+        </div>
+
+    </div>
     <div class="page-container">
         <div class="content-wrap">
+           
             <header>
                 <div class="header-top">
                     <h1 class="site__title"><a href="/">Recipe Me</a></h1>
-                    <a href="#" id="menu-toggle" aria-expanded="false" aria-controls="nav" class="menu-toggle" aria-label="Open the menu">
+                    <a href="#" id="menu-toggle" aria-expanded="false" aria-controls="nav" class="menu-toggle"
+                        aria-label="Open the menu">
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </a>
-                    
+
                 </div>
-                <nav  id="nav" class="hide">
-                    
+                <nav id="nav" class="hide">
+
                     <ul>
                         <li><a tabindex="-1" class="add" href="/edit.html" title="add a recipe">Add a recipe</a></li>
                         <li>
@@ -45,24 +57,25 @@
                         <li>
                             <a tabindex="-1" href="/about.html">About Recipe Me</a>
                         </li>
-                        
+
                     </ul>
                 </nav>
                 <!-- <h2 class="header__subtitle">A Digital Recipe Index <span>.</span></h2> -->
                 <div class="homepage-hero">
-                 <!--  <div class="imageElement" alt="">--> 
-                        <h2>Find a recipe</h2>
-                        <div class="search-filters grid">
-                            <fieldset>
-                                <legend>
-                                    Filter recipes by title or author or category
-                                </legend>    
-                                <input type="text" id="search-filter" placeholder="donuts / peter / seafood" class="search-field">
-                                <button class="search-button">
-                                        <i class="fa fa-solid fa-magnifying-glass "></i>
-                                </button> 
-                            </fieldset>     
-                            <div class="select">
+                    <!--  <div class="imageElement" alt="">-->
+                    <h2>Find a recipe</h2>
+                    <div class="search-filters grid">
+                        <fieldset>
+                            <legend>
+                                Filter recipes by title or author or category
+                            </legend>
+                            <input type="text" id="search-filter" placeholder="donuts / peter / seafood"
+                                class="search-field">
+                            <button class="search-button">
+                                <i class="fa fa-solid fa-magnifying-glass "></i>
+                            </button>
+                        </fieldset>
+                        <div class="select">
                             <fieldset>
                                 <legend>Sort results</legend>
                                 <select class="dropdown" id="filter-by">
@@ -70,31 +83,71 @@
                                     <option value="byCreated">Created date</option>
                                     <option value="alphabetical">Sort alphabetically</option>
                                 </select>
-                            </fieldset>    
-                                
-                            </div>
-                           
-    
-                       <!-- </div> --> 
+                            </fieldset>
+
+                        </div>
+
+
+                        <!-- </div> -->
                     </div>
-<!-- url(https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwyOXx8Y291bnRyeSUyMGtpdGNoZW4lMjBwYXJ0eXxlbnwwfDB8fHwxNjY0Mjg1MTY4&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)
--->                        </div>
+                    <!-- url(https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwyOXx8Y291bnRyeSUyMGtpdGNoZW4lMjBwYXJ0eXxlbnwwfDB8fHwxNjY0Mjg1MTY4&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)
+                    -->
+                </div>
             </header>
             <div class="container">
-               
+
 
                 <div id="recipes" class="cards">
-                    <a href="article.html#c6c9d4be-6713-4965-a4f3-08a9a3a089dd" class="card home"><article><div class="imageElement" style="background-image:url(https://images.unsplash.com/photo-1579954115567-dff2eeb6fdeb?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwxMnx8aWNlJTIwY3JlYW18ZW58MHwwfHx8MTY2NTk3MDAxNA&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)" description="Decorative image relating to A new new recipe"></div><div class="text-area"><h1>A new new recipe</h1><p>OMG You're gonna love this recipe</p></div></article></a>
-                    <a href="article.html#a0e4b295-46dc-47d9-8d42-deb78a16aa19" class="card home"><article><div class="" style="" description="Decorative image relating to Vegetarian Gumbo"></div><div class="text-area"><h1>Vegetarian Gumbo</h1><p>This flavourful vegan dinner is a version of the Louisiana classic.  </p></div></article></a>
-                    <a href="article.html#b0a11025-b18f-4ecd-842f-8f0c8388c099" class="card home"><article><div class="imageElement" style="background-image:url(https://images.unsplash.com/photo-1579523360595-bee0f3b9fafb?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHw2fHxiYW5hbmF8ZW58MHwwfHx8MTY2NTc4NTc3MQ&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)" description="Decorative image relating to Undecided Recipe"></div><div class="text-area"><h1>Undecided Recipe</h1><p>Banana.</p></div></article></a>
-                    <a href="article.html#d6f22d08-ab09-4335-bc58-e0b0df065dbf" class="card home"><article><div class="imageElement" style="background-image:url(https://images.unsplash.com/photo-1495480137269-ff29bd0a695c?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwxMHx8RnJ1aXQlMjBQaWV8ZW58MHwwfHx8MTY2NTc4Mjg4Mw&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)" description="Decorative image relating to Fruit Pie"></div><div class="text-area"><h1>Fruit Pie</h1><p>Yummy fruit cooked into a pie with some lemon juice and sugar added.</p></div></article></a>
-                   
+                    <a href="article.html#c6c9d4be-6713-4965-a4f3-08a9a3a089dd" class="card home">
+                        <article>
+                            <div class="imageElement"
+                                style="background-image:url(https://images.unsplash.com/photo-1579954115567-dff2eeb6fdeb?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwxMnx8aWNlJTIwY3JlYW18ZW58MHwwfHx8MTY2NTk3MDAxNA&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)"
+                                description="Decorative image relating to A new new recipe"></div>
+                            <div class="text-area">
+                                <h1>A new new recipe</h1>
+                                <p>OMG You're gonna love this recipe</p>
+                            </div>
+                        </article>
+                    </a>
+                    <a href="article.html#a0e4b295-46dc-47d9-8d42-deb78a16aa19" class="card home">
+                        <article>
+                            <div class="" style="" description="Decorative image relating to Vegetarian Gumbo"></div>
+                            <div class="text-area">
+                                <h1>Vegetarian Gumbo</h1>
+                                <p>This flavourful vegan dinner is a version of the Louisiana classic. </p>
+                            </div>
+                        </article>
+                    </a>
+                    <a href="article.html#b0a11025-b18f-4ecd-842f-8f0c8388c099" class="card home">
+                        <article>
+                            <div class="imageElement"
+                                style="background-image:url(https://images.unsplash.com/photo-1579523360595-bee0f3b9fafb?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHw2fHxiYW5hbmF8ZW58MHwwfHx8MTY2NTc4NTc3MQ&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)"
+                                description="Decorative image relating to Undecided Recipe"></div>
+                            <div class="text-area">
+                                <h1>Undecided Recipe</h1>
+                                <p>Banana.</p>
+                            </div>
+                        </article>
+                    </a>
+                    <a href="article.html#d6f22d08-ab09-4335-bc58-e0b0df065dbf" class="card home">
+                        <article>
+                            <div class="imageElement"
+                                style="background-image:url(https://images.unsplash.com/photo-1495480137269-ff29bd0a695c?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwxMHx8RnJ1aXQlMjBQaWV8ZW58MHwwfHx8MTY2NTc4Mjg4Mw&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)"
+                                description="Decorative image relating to Fruit Pie"></div>
+                            <div class="text-area">
+                                <h1>Fruit Pie</h1>
+                                <p>Yummy fruit cooked into a pie with some lemon juice and sugar added.</p>
+                            </div>
+                        </article>
+                    </a>
+
                 </div>
                 <div class="cards"></div>
             </div>
 
             <!--content wrap-->
         </div>
+       
         <footer>
             <p>&copy; Caleb Hamilton 2022</p>
         </footer>

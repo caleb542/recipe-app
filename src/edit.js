@@ -25,6 +25,7 @@ import {
     updateRecipe,
     updateIngredient
 } from "./update"
+
 /***************** */
 
 let newRecipe = {
@@ -105,52 +106,45 @@ const initEdit = async (recipeId) => {
         location.assign('/index.html')
     }
     let section1 = document.querySelector('.section-1')
-    section1.innerHTML=''
+    // section1.innerHTML=''
 
-    const recipeName = document.createElement('label')
+    const recipeName = document.getElementById('name')
     recipeName.innerHTML = '<div>Name</div><input id="recipe-name" class="input" type="text" placeholder="Recipe Name" name="text" value="' + recItem.name + '"/>'
-    section1.appendChild(recipeName)
+    
 
-    const recipeDescription = document.createElement('label')
-    recipeDescription.innerHTML = '<div>Description</div><textarea id="recipe-description"  placeholder="Recipe Description"></textarea>'
-    section1.appendChild(recipeDescription)
-    document.getElementById('recipe-description').value = recItem.description
-    section1.appendChild(recipeDescription)
+    const recipeDescription = document.getElementById('recipe-description')
+    recipeDescription.value = recItem.description
 
-    const recipeArticle = document.createElement('label')
-    recipeArticle.innerHTML = '<div>Article</div><textarea id="recipe-article"  placeholder="Recipe Article"></textarea>'
-    section1.appendChild(recipeArticle)
-    document.getElementById('recipe-article').value = recItem.article
-    section1.appendChild(recipeArticle)
 
-    const recipeAuthor = document.createElement('label')
+    const recipeArticle = document.getElementById('recipe-article')
+    recipeArticle.value = recItem.article
+
+
+    const recipeAuthor = document.getElementById('author')
     recipeAuthor.innerHTML = '<div>Author</div><input id="recipe-author" class="input" type="text" placeholder="Peter Peter pumpkin eater" name="text" value="' + recItem.author + '"/>'
-    section1.appendChild(recipeAuthor)
 
-    const directionsHeading = document.createElement('label');
+    const directionsHeading = document.getElementById('directions-heading');
     directionsHeading.setAttribute("id","directions-heading")
-    directionsHeading.textContent = "Directions"
-    const directionsList = document.createElement("ol");
+    const directionsList = document.querySelector("#directions-heading ol");
     directionsList.setAttribute('id','directions-list')
     directionsList.classList.add("directions")
-    directionsHeading.innerHTML = `<div>Directions</div>`;
 
     /* ----- */
 
-    directionsHeading.appendChild(directionsList);
+
     const recipeDirections = recItem.directions
     
-    const addContainer = document.createElement('div')
-    addContainer.setAttribute('id', 'add-container');
-    directionsHeading.appendChild(addContainer)
-    const add = document.createElement('a');
-    add.setAttribute('id', 'add-step');
-    add.setAttribute('href', '#');
-    add.innerHTML = `<i class="fa fa-plus"></i><span class="hide-text">Add another step</span>`
+    // const addContainer = document.createElement('div')
+    // addContainer.setAttribute('id', 'add-container');
+    // directionsHeading.appendChild(addContainer)
+    // const add = document.createElement('a');
+    // add.setAttribute('id', 'add-step');
+    // add.setAttribute('href', '#');
+    // add.innerHTML = `<i class="fa fa-plus"></i><span class="hide-text">Add another step</span>`
    
     
-    section1.appendChild(directionsHeading);
-    addContainer.appendChild(add)
+    // section1.appendChild(directionsHeading);
+    // addContainer.appendChild(add)
     listDirections(recipeDirections)
     const addStepButton = document.getElementById("add-step");
 
@@ -161,34 +155,25 @@ const initEdit = async (recipeId) => {
 
     addStepButton.addEventListener('click', async function (e) {
 
-
         e.preventDefault()
-       
-        e.target.parentNode.classList.add('return-focus')
-        // let focus = {button:".return-focus"}
-        // localStorage.setItem("focusState",JSON.stringify(focus))
+
+        let recipeId = location.hash.substring(1);
+        recipes = await loadRecipesFromLocalStorage()
+        let recItem = recipes.find(recipe => recipe.id === recipeId)
         let newDirections = {
             id: uuidv4(),
             text: ""
         }
-
-        let recipeId = location.hash.substring(1);
-        let recipes = await loadRecipes()
-        let recItem = recipes.find((recipe) => recipe.id === recipeId)
-
-        const id = newDirections.id;
-        let dialogs = document.querySelectorAll('dialog');
-        if(dialogs.length > 0){
-            dialogs.forEach(di => {
-                di.remove()
-            })
-        }
-        
-        recItem.directions.push(newDirections);
+        recItem.directions.push(newDirections)
+        const id = newDirections.id
+        const text  = newDirections.text
+        // e.target.parentNode.classList.add('return-focus')
         saveRecipes(recipes)
-
+        // let focus = {button:".return-focus"}
+        // localStorage.setItem("focusState",JSON.stringify(focus))
         
-        openDirectionsDialogue(id)
+        let directionDialog = document.querySelectorAll('#add-directions');
+        openDirectionsDialogue(id,text)
     })
 
     
@@ -207,114 +192,90 @@ const initEdit = async (recipeId) => {
    
 
     const editDirectionButtons = document.querySelectorAll('.directions a.edit-item');
+
     editDirectionButtons.forEach(pencil => {
         pencil.addEventListener('click', function (e) {
             e.preventDefault();
+
+            alert('pow!')
             const id = e.target.getAttribute('dataId');
-            let dialogs = document.querySelectorAll('dialog');
-            if(dialogs.length > 0){
-                dialogs.forEach(di => {
-                    di.remove()
-                })
-            }  
             editDirection(id)
         })
 
     })
 
 
-       const recipeCategoriesLabel = document.createElement('label');
-    const recipeCategories = document.createElement("textarea");
-    const recipeCategoriesName = document.createElement("div");
-    recipeCategoriesName.classList.add("categorey")
-    recipeCategoriesName.textContent='Categories'
+    const recipeCategoriesLabel = document.getElementById('categories');
+    const recipeCategories = recipeCategoriesLabel.querySelector("textarea");
+    const recipeCategoriesName = recipeCategoriesLabel.querySelector("div");
+
 
     recipeCategories.value = recItem.categories.join("'")
-
-    recipeCategoriesLabel.appendChild(recipeCategoriesName);
-    recipeCategoriesLabel.appendChild(recipeCategories)
-    recipeCategories.setAttribute("placeholder","categories")
-    recipeCategories.setAttribute("id","recipe-categories");
-    section1.appendChild(recipeCategoriesLabel);
     recipeCategories.textContent = recItem.categories
-    // section1.appendChild(recipeCategories)
-    const featureImageFieldset = document.createElement('fieldset')
-    const featureKeywordText = document.createElement('legend')
-    const div = document.createElement('div')
 
-    const featureImageButton = document.createElement('button')
-    const featureImageButtonIcon = document.createElement('i');
-    const featureImageButtonSpan = document.createElement('span');
+    const featureImageFieldset = document.getElementById('image')
+    const featureKeywordText = document.querySelector('#image legend')
+    const div = featureKeywordText.querySelector('div')
 
-    featureImageButtonIcon.classList.add('fa','fa-solid','fa-magnifying-glass')
+    const featureImageButton = document.getElementById("feature-image-button")
+    const featureImageButtonIcon = document.querySelector('#feature-image-button i');
 
-    featureImageButton.appendChild(featureImageButtonIcon)
-    featureImageButtonSpan.classList.add('hide-text')
-    featureImageButtonSpan.textContent = "Search"
-    featureImageButton.classList.add('feature-image')
-    featureImageButton.setAttribute('id', 'feature-image-button')
 
-    const selectImages = document.createElement('dialog')
-    selectImages.setAttribute('open','')
-    selectImages.setAttribute('autofocus','')
-    selectImages.setAttribute('id', 'select-images')
+
+    const selectImages = document.getElementById('select-images')
     featureKeywordText.textContent = "Feature Image";
     featureImageFieldset.classList.add('feature-image');
 
-    const featureKeyword = document.createElement("input")
-    featureKeyword.setAttribute('id', 'feature-keyword')
-    featureKeyword.setAttribute('placeholder', 'Search for a photo')
-    featureKeyword.value = recItem.name
-    featureImageFieldset.appendChild(featureKeywordText)
-    featureImageFieldset.appendChild(featureKeyword)
-
-    featureImageFieldset.appendChild(featureImageButton)
+    const featureKeyword = document.createElement("feature-keyword")
+    featureKeyword.value = recItem.name;
     const storedImage = recItem.photoURL;
 
-    const imagePreview = document.createElement('figure');
-    imagePreview.classList.add('image-preview');
-    const image = document.createElement('img');
+    const imagePreview = document.querySelector('figure.image-preview');
+    const image = imagePreview.querySelector('img');
     image.setAttribute('src', storedImage);
-    const figcaption = document.createElement('figcaption')
+    const figcaption = document.querySelector('figcaption')
     figcaption.innerHTML = `Unsplash photo by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`
-    imagePreview.appendChild(image);
-    imagePreview.appendChild(figcaption);
     image.setAttribute('style', 'width:200px;aspect-ratio:16/9');
-    section1.appendChild(featureImageFieldset)
-    section1.appendChild(selectImages)
-    featureImageFieldset.appendChild(imagePreview)
-
+    // section1.appendChild(featureImageFieldset)
+    // section1.appendChild(selectImages)
+    // featureImageFieldset.appendChild(imagePreview)
 
     const recipeContainer = document.querySelector('#recipe ul.recipe')
     const ingredientsContainer = document.getElementById('ingredients');
     ingredientsContainer.classList.add('edit-ingredients')
-
-    recipeContainer.innerHTML = ''
-    let n = 0;
-    recItem.ingredients.forEach(ingred => {
-        n++
-        let iUUID = ingred.id
-        if (iUUID === undefined) {
-            ingred.id = uuidv4();
-            saveRecipes(recipes)
+    const listIngredients = () => {
+        const recipeContainer = document.querySelector('#recipe ul.recipe')
+        recipeContainer.innerHTML = ''
+        
+        recItem.ingredients.forEach(ingred => {
+            
             let iUUID = ingred.id
-        }
-        let iName = ingred.name;
-        let iDescription = ingred.description
-        let iAmount = ingred.amount
-        let iMeasureWord = ingred.measureWord
-        let iUnit = ingred.unit;
-        iMeasureWord !== "" ? iUnit = iMeasureWord : iUnit = ingred.unit
-        const subtitle = document.querySelector('.header__subtitle');
+            if (iUUID === undefined) {
+                ingred.id = uuidv4();
+                saveRecipes(recipes)
+                let iUUID = ingred.id
+            }
+            let iName = ingred.name;
+            let iDescription = ingred.description
+            let iAmount = ingred.amount
+            let iMeasureWord = ingred.measureWord
+            let iUnit = ingred.unit;
+            iMeasureWord !== "" ? iUnit = iMeasureWord : iUnit = ingred.unit
+            const subtitle = document.querySelector('.header__subtitle');
+    
+            subtitle.textContent = recItem.namerecipeDescription
+    
+            const recipeIngredients = document.createElement('li');
+            recipeIngredients.innerHTML = `<label ><a class="edit-item" href="#" data="${iUUID}"><span data="${iUUID}">${iAmount} ${iUnit} ${iName} </span><i class="fa fa-pencil" area-hidden="true"  data="${iUUID}" ></i><span class="hide-text">Edit</span></a></label>
+         <a href="#" class="remove" data="${iUUID}">Remove<span  data="${iUUID}">X</span></a>`
+    
+            recipeContainer.appendChild(recipeIngredients)
+        })
+    
+    }
+    
+    listIngredients()
 
-        subtitle.textContent = recItem.name
-
-        const recipeIngredients = document.createElement('li');
-        recipeIngredients.innerHTML = `<label ><a class="edit-item" href="#" data="${iUUID}"><span data="${iUUID}">${iAmount} ${iUnit} ${iName} </span><i class="fa fa-pencil" area-hidden="true"  data="${iUUID}" ></i><span class="hide-text">Edit</span></a></label>
-     <a href="#" class="remove" data="${iUUID}">Remove<span  data="${iUUID}">X</span></a>`
-
-        recipeContainer.appendChild(recipeIngredients)
-    })
 
     recipes = await loadRecipes()
     document.getElementById("recipe-name").addEventListener('input', (e) => {
@@ -325,21 +286,38 @@ const initEdit = async (recipeId) => {
         })
         //dateElement.textContent = generateLastEdited(note.updatedAt)
     })
-    recipeDescription.addEventListener('input', (e) => {
-        
-        updateRecipe(recipeId, {
-            description: e.target.value
-        })
-
-        //dateElement.textContent = generateLastEdited(note.updatedAt)
+   
+    document.querySelector('#recipe-article').addEventListener('focus', () => {
+        const editor = CKEDITOR.replace( recipeArticle )
+        editor.on('change', function( evt ) {
+            // getData() returns CKEditor's HTML content.
+            // console.log( 'Total bytes: ' + evt.editor.getData().length );
+                updateRecipe(recipeId, {
+                    article:  evt.editor.getData()
+                })
+            });
     })
-    recipeArticle.addEventListener('input', (e) => {
-        updateRecipe(recipeId, {
-            article: e.target.value
-        })
 
-        //dateElement.textContent = generateLastEdited(note.updatedAt)
+    document.querySelector('#recipe-description').addEventListener('focus', () => {
+        const editorDescription = CKEDITOR.replace( recipeDescription )
+        editorDescription.on('change', function( evt ) {
+               
+            // getData() returns CKEditor's HTML content.
+            // console.log( 'Total bytes: ' + evt.editor.getData().length );
+    
+            updateRecipe(recipeId, {
+                description:  evt.editor.getData()
+            })
+        });
     })
+     
+      
+    
+   
+    
+
+
+            
     recipeAuthor.addEventListener('input', (e) => {
         updateRecipe(recipeId, {
             author: e.target.value
@@ -383,7 +361,7 @@ const initEdit = async (recipeId) => {
         }
         // console.log(rec)
         saveRecipes(recipes)
-        initEdit(recipeId)
+        listIngredients()
 
     }
 
@@ -396,7 +374,7 @@ const initEdit = async (recipeId) => {
             if (confirm(text) == true) {
                 removeIngredient(id)
             } else {
-                return
+                
             }
           
         }, {
@@ -410,13 +388,10 @@ const initEdit = async (recipeId) => {
     const editRecipeButtons = document.querySelectorAll('.recipe li a.edit-item');
     editRecipeButtons.forEach(button => {
         button.addEventListener('click', function (e) {
+            alert('click')
             e.preventDefault();
-            let dialogs = document.querySelectorAll('dialog');
-            if(dialogs.length > 0){
-                dialogs.forEach(di => {
-                    di.remove()
-                })
-            }  
+            let dialogs = document.querySelector('#ingredient-modal');
+                            
            
             button.classList.add('return-focus')
             
@@ -431,18 +406,19 @@ const initEdit = async (recipeId) => {
         const overlay = document.querySelector('.overlay')
         overlay.classList.add('show')
         
-        let dialogs = document.querySelectorAll('dialog');
-            if(dialogs.length > 0){
-              dialogs.forEach(dialog => {
-                dialog.remove()
-              })
-            }
+        let dialogs = document.querySelectorAll('#ingredient-modal');
+        if(dialogs.length > 1){
+            dialogs.forEach(di => {
+               
+                
+                
+            })
+        }  
 
-        const modal = document.createElement('dialog');
-        modal.setAttribute("open","");
+        const modal = document.getElementById("ingredient-modal")
 
-        modal.classList.add('ingredient-modal');
-        const modalInner = `<ul id="ingredient${n}">
+        modal.removeAttribute('open')
+        const modalInner = `<ul id="ingredient">
         <li><label><div>Name:</div> <input dataId="${i.id}" id="name" value="${i.name}" /></label></li>
         <li><label><div>Description:</div> <input id="description" dataId="${i.id}" value="${i.description}" /></label></li>
         <li><label><div>Amount:</div> <input id="amount" dataId="${i.id}" value="${i.amount}" /></label></li>
@@ -454,11 +430,11 @@ const initEdit = async (recipeId) => {
         <button class="close-ingredient-modal" id="close-ingredient-modal">Close</button>
         </div>
         </ul>`;
-        const pageContainer = document.querySelector('.page-container')
-        pageContainer.appendChild(modal)
+        // const pageContainer = document.querySelector('.page-container')
+        // pageContainer.appendChild(modal)
         modal.innerHTML = modalInner;
 
-        modal.setAttribute('autofocus','')
+        modal.setAttribute('open','')
         modal.querySelector('input').focus();
 
         modal.addEventListener('transitionend', (e) => {
@@ -471,11 +447,10 @@ const initEdit = async (recipeId) => {
             recipeId = location.hash.substring(1); 
             const overlay = document.querySelector('.overlay');
             overlay.classList.remove('show');
-            modal.removeAttribute('open')
             modal.removeAttribute('autofocus')
-            modal.remove();
+            modal.removeAttribute('open');
             // document.querySelector('.return-focus').focus();
-            initEdit(recipeId)
+            listIngredients()
         });
 
         const inputs = modal.querySelectorAll('input');
@@ -515,6 +490,7 @@ const initEdit = async (recipeId) => {
 
     recipeCategories.addEventListener("input", function(e){
         const recipeId = location.hash.substring(1);
+        
         let categories = e.target.value
             // categories === "" ? categories = 'food':categories
             let f = categories.split("");
@@ -541,19 +517,22 @@ const initEdit = async (recipeId) => {
 
     addAnIngredient.addEventListener('click', async function (e) {
         e.preventDefault();
+
+
         // const buttons = document.querySelectorAll('.return-focus');
         // buttons.forEach(button => {
         //     button.classList.remove('return-focus')
         // })
         // addAnIngredient.classList.add('return-focus');
-        const hasDialogs = document.querySelectorAll('.ingredient-modal');
+        const hasDialogs = document.querySelectorAll('#ingredient-modal');
         
-        if(hasDialogs && hasDialogs.length > 0){
+        if(hasDialogs && hasDialogs.length > 1){
+            alert('NO GO')
             return
         }
         // console.log(`number of dialogs open = ${hasDialog.length}`)
         let recipeId = location.hash.substring(1);
-        recipes = await loadRecipes()
+        let recipes = await loadRecipes()
         let recItem = recipes.find((recipe) => recipe.id === recipeId)
 
         let newIngredient = {
@@ -567,7 +546,6 @@ const initEdit = async (recipeId) => {
         }
         //  let recipes = await loadRecipes();
         let uuid = newIngredient.id
-        //   alert('pushing');
         recItem.ingredients.push(newIngredient)
         const updateIt = recipes.find((recipe) => {
             if (recipe.id === recItem.id) {
@@ -587,8 +565,8 @@ const initEdit = async (recipeId) => {
     // keep this listener at the bottom
     const setFocus = async function() {
         let focusElement = await JSON.parse(localStorage.getItem("focusState"))
-        console.log(focusElement.button)
-        let bbutton = document.querySelector(`${focusElement.button}`)
+      
+        // let bbutton = document.querySelector(`${focusElement.button}`)
        // bbutton.focus()
     }
     setFocus()  
@@ -607,19 +585,18 @@ updateOne.addEventListener('click', function(e) {
 
 const removeRecipeButton = document.getElementById('remove-recipe');
 removeRecipeButton.addEventListener('click', function (e) {
-
+    const recipeId = location.hash.substring(1);
     let text = "DELETE THE RECIPE\nAre You Sure?";
     if (confirm(text) == true) {
+        
+       
         removeRecipe(recipeId);
-        const recipeId = location.hash.substring(1);
     } else {
         return
     }
 
 })
 
-window.addEventListener('storage', function(e){
-    e.key === 'recipes' ? initEdit(recipeId):console.log("not that")
-})
-
-
+// window.addEventListener('storage', function(e){
+//     e.key === 'recipes' ? initEdit(recipeId):console.log("not that")
+// })

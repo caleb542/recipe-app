@@ -113,7 +113,7 @@ const createArticleDOM = (recipes) => {
 
     const descriptionText = document.createElement('p');
     descriptionText.classList.add('description,summary');
-    descriptionText.textContent = recItem.description;
+    descriptionText.innerHTML = recItem.description;
     articleHeader.appendChild(dates)
     articleHeader.appendChild(author)
     articleHeader.appendChild(descriptionText)

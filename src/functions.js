@@ -60,49 +60,58 @@ const listDirections = (directions) => {
     // directionsHeading.appendChild(emptyBlock)
 }
 const openDirectionsDialogue = async(id, text) => {
-    
-    let recipeId = location.hash.substring(1);
-    recipes = await loadRecipesFromLocalStorage()
-    let recItem = recipes.find(recipe => recipe.id === recipeId)
-
     const overlay = document.querySelector('.overlay')
-    overlay.classList.add('show');
-    const modal = document.createElement('dialog')
+   // overlay.classList.add('hide');
+    const modal = document.querySelector('#add-directions')
     modal.setAttribute('open','');
     modal.setAttribute('autofocus','');
-    modal.setAttribute('id', 'add-directions');
-    const form = document.createElement('div');
-    form.innerHTML = `<h2>${recItem.name} - Directions</h2><p>What's the next step?</p><form><fieldset><textarea placeholder="The next step is..." id="enter-next-step"></textarea></fieldset></form><button class="dialog-close-button">Done</button>`
-    const page = document.querySelector('.page-container')
-    page.appendChild(modal);
-    modal.appendChild(form)
+    //const form = document.createElement('div');
+    let recipes = await loadRecipesFromLocalStorage()
+    let recipeId = location.hash.substring(1);
+    let recItem = recipes.find((recipe) => recipe.id === recipeId)
+    document.querySelector("#add-directions h2").textContent=`${recItem.name} Directions`
+    // form.innerHTML = `<h2>${recItem.name} - Directions</h2><p>What's the next step?</p><form><fieldset><textarea placeholder="The next step is..." id="enter-next-step"></textarea></fieldset></form><button class="dialog-close-button">Done</button>`
+
+    // const page = document.querySelector('.page-container')
+    // page.appendChild(modal);
     const textBox = document.getElementById("enter-next-step");
-    text === undefined ? text = '':text = text
+    // Populate the textbox value, make sure if text is undefined it doesn't show up as undefined in the box, rather just an empty string like so ''
+    text === undefined ? text = '' : text = text
     textBox.value = text
-    saveRecipes(recipes)
-    textBox.addEventListener('input', function (e) {
+    // listen for typing
+    // alert(`real id ${id}`)
+    recipes = await loadRecipesFromLocalStorage()
+    textBox.addEventListener('input', async function (e) {
+       console.log('running type listener')
+        // load current recipes object from local store
+       
+        // identify the right recipe from the id found in the url    
         let recipeId = location.hash.substring(1);
         let recItem = recipes.find((recipe) => recipe.id === recipeId)
-        let arr = recItem.directions;
-        console.log(arr)
-        console.log(arr)
-        let stepItem = arr.find(direction => direction.id === id)
-        
+        // store the directions array as 'arr'
+        let arr = await recItem.directions;
+        // console.error(arr)// output the directions to the console 
+
+        // set a variable 'stepItem' to identify the array item by id
+        // console.error(`id ${id}`)
+        const stepItem = arr.find((arrItem) => arrItem.id === id)
+        // console.error(stepItem)
         stepItem.text = e.target.value
+        // console.error(stepItem)
+
         saveRecipes(recipes)
 
         const updateList = async () => {
             recipes = await loadRecipesFromLocalStorage()
             recItem = recipes.find((recipe) => recipe.id === recipeId)
 
-            console.log(recItem)
+            //console.log(recItem)
             // initEdit(recipeId)
             // alert(recItem.name)
             let updatedDirections = recItem.directions
-            console.log(updatedDirections)
             const directionsList = document.getElementById("directions-list");
             directionsList.innerHTML=''
-            listDirections(updatedDirections)     
+            listDirections(updatedDirections)
         }
       updateList()
     })
@@ -112,13 +121,14 @@ const openDirectionsDialogue = async(id, text) => {
     modal.addEventListener('transitionend', (e) => {
         modal.querySelector('textarea').focus();
     });
-    // dialog-close-button
     
     const closeDialog = document.querySelector(".dialog-close-button")
 
     closeDialog.addEventListener('click', function (e) {
         e.preventDefault();
-        modal.remove()
+        modal.removeAttribute("open")
+        modal.removeAttribute("autofocus")
+
 
         document.querySelector('.overlay').classList.remove('show')
         document.querySelector('#add-step').focus();
@@ -309,12 +319,13 @@ const loadRecipes = async () => {
 }
 
 const loadRecipesFromLocalStorage = async () => {
-console.error('loading local')
     if (localStorage.getItem('recipes')) {
         const recipesJSON = localStorage.getItem('recipes')
         try {
-            recipesJSON ? console.log(JSON.parse(recipesJSON)) : alert('waaa')
+           if(recipesJSON) {
             return await JSON.parse(recipesJSON)
+           }
+           
         } catch (e) {
             return []
         }
