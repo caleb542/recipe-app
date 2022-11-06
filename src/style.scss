@@ -1,4 +1,14 @@
 /* Base Styles */
+$cSet1_bg:#f6fbfa;
+$cSet2_bg:#edece9;
+$cSetCTAPrim_bg:#1abc9c; //  color #fff
+$cSetCTASecond_bg:#97938e; // color #ffrf
+$cSettext_clr:#2d2d2d;
+$cSetDisCTA_bg:#ebebeb; // color #fff
+$cSetDisCTA_clr:#4f4f4f;// hov #2d2d2d
+
+
+
 $body-bg:rgb(255, 255, 255);
 $box-shadow:2px 3px 10px rgb(0 0 0 / 9%);
 $form-background-dark:#1a1918;
@@ -16,9 +26,13 @@ $div: orangered;
 $header: #fff;
 $header-color: #000;
 $footer: #000;
-$normalText:normal 500 'Poppins'1.125rem/normal;
-$headingText:normal 600 'Paytone One'2rem/normal;
+
+$normalText:normal 500 'Poppins' 1.125rem/normal;
+$headingText:normal 600 'Paytone One' 2rem/normal;
+$headingText:normal 600 'Paytone One' 2rem/normal;
 $subtitleText:normal 600 'Paytone One'1.75/normal;
+$headingText:normal 600 'Lato' 3/normal;
+
 $button_background:orangered;
 $button_color:#fff;
 $button_radius:12px;
@@ -48,10 +62,10 @@ $select-focus: blue;
 $select-arrow: $select-border;
 
 
-$btn-padding:0 1.5rem;
+$btn-padding:0 1rem;
 $btn-height:1.75rem;
-$btn-lineHeight:1.8rem;
-$btn-border-rad:3rem;
+$btn-lineHeight:1.5rem;
+$btn-border-rad:0;
 $container_width:1380px;
 
 textarea:focus,
@@ -91,11 +105,7 @@ html {
 }
 
 .btn {
-    padding: $btn-padding;
-    height: $btn-height;
-    line-height: $btn-lineHeight;
     display: inline-block;
-    border-radius: $btn-border-rad;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Paytone+One&family=Roboto&family=Monsieur+La+Doulaise&family=Parisienne&display=swap');
@@ -411,12 +421,17 @@ body {
     // font-family: 'Poppins',sans-serif;
 
     overflow-x: hidden;
+    &.article-page {
+        background-color: $cSet1_bg;
+    }
 
     &.edit-page {
         background: $form-background-dark
     }
 }
-
+h2 {
+    font: normal normal 400 3rem/28px 'Lato', sans-serif !important;
+}
 .header-top {
     display: flex;
     flex-direction: row;
@@ -509,18 +524,25 @@ nav a {
 }
 a.recipe-link {
     display: inline-block;
-    padding: 0.75rem 1rem;
-    box-shadow: 0 0 0.1rem 1px #bbb;
-    color: #000;
+    padding: 0.2rem 0.8rem;
+    box-shadow: none;
+    color:#fff;
+    background: $cSetCTAPrim_bg;
+    border:0px solid $cSetCTASecond_bg;
+
+    text-decoration: none;
+    text-transform: uppercase;
 
     &:focus {
         color: #fff;
-        background: #333;
+        background: #52004a;
+
+        
     }
 
     &:hover {
         color: #fff;
-        background: #333;
+        background: #52004a;
     }
 
     margin-bottom:1rem;
@@ -716,10 +738,11 @@ select::-ms-expand {
 }
 
 .select:focus-within::after {
-    background-color: #fff;
-    scale: -1;
+    background-color: #2d2d2d;
     transition: 0.2s;
+    transform: translateX(12rem) rotate(180deg) scale(0.95);
 }
+
 
 .select {
     // ...existing styles
@@ -1207,8 +1230,12 @@ div#recipes {
     box-sizing: border-box;
     box-shadow: $box-shadow;
 
+   
 }
 
+.article-page .card {
+    background-color: $cSet1_bg;
+}
 // this kind of thing for desktop only
 // .card:nth-child(1){
 //     grid-area:one;
@@ -1296,15 +1323,27 @@ date {
 }
 
 .cta-update {
-    text-decoration: underline;
-    text-underline-offset: 0.2rem;
-    color: #000;
-    right: 0;
+    // text-decoration: none;
+    // text-underline-offset: 0.2rem;
+    // color: #fff;
+    // padding: 0.2rem 0.8rem;
+    // border-radius:none;
+    // background-color: $cSetCTASecond_bg;
+    // right: 0;
+    // position: absolute;
+    // text-transform: uppercase;
+    // font-weight: normal;                                
+    // font-size: 1rem;
+    // top: 1rem;
     position: absolute;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 0.875rem;
     top: 1rem;
+    right: 1rem;
+    font-size: 1rem;
+    color: #2d2d2d;
+    padding: 0 1rem;
+    background-color: #f6fbfa;
+    text-decoration: none;
+    border: 1px solid #2d2d2d;
 }
 
 
@@ -1513,7 +1552,7 @@ ul {
 
 
 .checklist-container {
-    background: #fff;
+    background: transparent;
     z-index: 3;
     width: 100%;
     transition: all 0.9s;
@@ -1529,27 +1568,6 @@ input[type="checkbox"]:focus-visible {
     box-shadow: inset 0 0 0px 3px #000;
 }
 
-.shoppinglist-container {
-    min-height: 8rem;
-    border: 0;
-    padding: 0;
-    opacity: 1;
-    transform: translateX(0);
-    left: 0;
-    transition: all 0.3s;
-    border: 0;
-}
-
-
-.shoppinglist-container.hide {
-    transform: translateY(-3px);
-    left: 0em;
-    top: 0rem;
-    transition: all 0.3s;
-    display: block !important;
-    opacity: 0;
-    height: 0;
-}
 
 .directions-heading h2 {
     margin-bottom: 1.5rem;
@@ -1589,6 +1607,28 @@ label.article-checklist-items:hover {
 
 }
 
+.shoppinglist-container {
+    padding: 1rem 1rem;
+    background:$cSet2_bg;
+    min-height: 8rem;
+    border: 0;
+    opacity: 1;
+    transform: translateX(0);
+    left: 0;
+    transition: all 0.3s;
+    border: 0;
+}
+
+
+.shoppinglist-container.hide {
+    transform: translateY(-3px);
+    left: 0em;
+    top: 0rem;
+    transition: all 0.3s;
+    display: block !important;
+    opacity: 0;
+    height: 0;
+}
 .checklist:last-of-type {
     margin: 0 0 1em 0;
     list-style: none;
@@ -1596,11 +1636,14 @@ label.article-checklist-items:hover {
 
 .mailto {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    top: 1rem;
+    right: 1rem;
     font-size: 1rem;
-    color: #000;
-
+    color: #2d2d2d;
+    padding:0 1rem;
+    background-color:$cSet1_bg;
+    text-decoration: none;
+    border:1px solid #2d2d2d;
     &:hover {
         color: #555;
     }
@@ -2527,6 +2570,12 @@ form#update #ingredients>ul {
         left: 13rem;
         background-color: #fff;
     }
+    .select::after {
+        top: 0.75rem;
+        right: unset;
+        left: 13rem;
+        background-color: #fff;
+    }
 
     legend {
         font-size: 0.875rem;
@@ -2680,10 +2729,6 @@ form#update #ingredients>ul {
         align-items: baseline;
     }
 
-    a.cta-update {
-
-        font-size: 1rem;
-    }
 
     .mailto {
         font-size: 1.125rem;
