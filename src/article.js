@@ -22,7 +22,7 @@ const createArticleDOM = (recipes) => {
     // let recipes = loadRecipes()
     // "recItem": find the recipe with the id passed in the hash
     let recItem = recipes.find((recipe) => recipe.id === recipeId )
-    console.error(recItem.directions.length)
+    // console.error(recItem.directions.length)
     if (!recItem) {
         location.assign('/index.html')
     }

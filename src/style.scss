@@ -121,11 +121,12 @@ html {
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-    background-color: purple;
+    background-color: #52004a;
     display:flex;
     flex-direction: column;
     align-items: center;
     align-content: center;
+    justify-content: center;
     position: fixed;
 }
 .centered-title{
@@ -133,8 +134,10 @@ html {
     display:flex;
     flex-direction: column;
     width:auto;
-    text-align: center;
-    justify-content: center;
+    gap:1rem;
+    width:16rem;
+    align-items: center;
+    
 }
 
 .centered-title .site__title{
@@ -142,26 +145,29 @@ html {
 }
 .stl-p {
     color: #fff;
-    width:300px;
+    text-align: center;
+    margin:0;
 }
 
 .stl-h2 {
     font-weight: 500;
     font-size: 2rem;
-    text-align: left;
     padding: 0rem;
     font-family: "Abril Fatface";
     color: #fff;
 }
 
 .stl-cta {
-    padding: $btn-padding;
-    height: $btn-height;
-    line-height: $btn-lineHeight;
+    padding: 0 2rem;
+    height: 2rem;
+    line-height: 2rem;
     border-radius: $btn-border-rad;
     border-style:solid;
     border-color:#ffdc52;
     background-color:#ffdc52;
+    text-transform: uppercase;
+    font-weight:bold;
+    width:fit-content;
     display:inline-block;
 }
 
@@ -194,7 +200,6 @@ html {
     padding: 0;
     background-color: #000;
     border-radius: 0;
-
 }
 
 #select-images img {
@@ -501,6 +506,24 @@ nav a {
         box-shadow: 0 0 0 0.25rem rgba(150, 200, 224, 0.5);
 
     }
+}
+a.recipe-link {
+    display: inline-block;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 0 0.1rem 1px #bbb;
+    color: #000;
+
+    &:focus {
+        color: #fff;
+        background: #333;
+    }
+
+    &:hover {
+        color: #fff;
+        background: #333;
+    }
+
+    margin-bottom:1rem;
 }
 
 button {
@@ -1253,7 +1276,7 @@ div#recipes {
 }
 
 .summary {
-    margin-bottom: 2rem;
+    padding:2rem 0;
 }
 
 .dates {
@@ -2179,10 +2202,6 @@ form#update #ingredients>ul {
     margin-bottom: 2rem
 }
 
-a {
-    color: #fff;
-}
-
 .edit-page a#remove-recipe {
     right: 2rem;
     top: 5rem;
@@ -2547,25 +2566,7 @@ a {
 
     }
 
-    a.recipe-link {
-        display: inline-block;
-        padding: 0.75rem 1rem;
-        box-shadow: 0 0 0.1rem 1px #bbb;
-        color: #000;
-
-        &:focus {
-            color: #fff;
-            background: #333;
-        }
-
-        &:hover {
-            color: #fff;
-            background: #333;
-        }
-
-        margin-bottom:1rem;
-    }
-
+  
     .article .imageElement {
         padding: 0;
     }

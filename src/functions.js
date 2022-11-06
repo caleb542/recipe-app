@@ -37,7 +37,7 @@ const listDirections = (directions) => {
 
     let editDirectionsButtons = document.querySelectorAll(".direction-container a.edit-item")
     editDirectionsButtons.forEach(button => {
-        button.addEventListener( 'click', function(e){
+        button.addEventListener('click', function (e) {
             e.preventDefault()
             const id = button.getAttribute('dataId');
             editDirection(id)
@@ -45,9 +45,9 @@ const listDirections = (directions) => {
     })
     let removeDirectionsButtons = document.querySelectorAll(".direction-container a.remove")
     removeDirectionsButtons.forEach(button => {
-        button.addEventListener( 'click', function(e){
+        button.addEventListener('click', function (e) {
             e.preventDefault()
-            
+
             const id = e.target.getAttribute('dataId');
             const text = this.parentNode.firstChild.textContent;
             removeDirection(id, text)
@@ -56,20 +56,20 @@ const listDirections = (directions) => {
 
 
     const emptyBlock = document.createElement('div')
-    const directionsHeading = document.getElementById("directions-heading") 
+    const directionsHeading = document.getElementById("directions-heading")
     // directionsHeading.appendChild(emptyBlock)
 }
-const openDirectionsDialogue = async(id, text) => {
+const openDirectionsDialogue = async (id, text) => {
     const overlay = document.querySelector('.overlay')
-   // overlay.classList.add('hide');
+    // overlay.classList.add('hide');
     const modal = document.querySelector('#add-directions')
-    modal.setAttribute('open','');
-    modal.setAttribute('autofocus','');
+    modal.setAttribute('open', '');
+    modal.setAttribute('autofocus', '');
     //const form = document.createElement('div');
     let recipes = await loadRecipesFromLocalStorage()
     let recipeId = location.hash.substring(1);
     let recItem = recipes.find((recipe) => recipe.id === recipeId)
-    document.querySelector("#add-directions h2").textContent=`${recItem.name} Directions`
+    document.querySelector("#add-directions h2").textContent = `${recItem.name} Directions`
     // form.innerHTML = `<h2>${recItem.name} - Directions</h2><p>What's the next step?</p><form><fieldset><textarea placeholder="The next step is..." id="enter-next-step"></textarea></fieldset></form><button class="dialog-close-button">Done</button>`
 
     // const page = document.querySelector('.page-container')
@@ -82,9 +82,9 @@ const openDirectionsDialogue = async(id, text) => {
     // alert(`real id ${id}`)
     recipes = await loadRecipesFromLocalStorage()
     textBox.addEventListener('input', async function (e) {
-       console.log('running type listener')
+        console.log('running type listener')
         // load current recipes object from local store
-       
+
         // identify the right recipe from the id found in the url    
         let recipeId = location.hash.substring(1);
         let recItem = recipes.find((recipe) => recipe.id === recipeId)
@@ -110,18 +110,18 @@ const openDirectionsDialogue = async(id, text) => {
             // alert(recItem.name)
             let updatedDirections = recItem.directions
             const directionsList = document.getElementById("directions-list");
-            directionsList.innerHTML=''
+            directionsList.innerHTML = ''
             listDirections(updatedDirections)
         }
-      updateList()
+        updateList()
     })
-     
-       
+
+
     modal.querySelector('textarea').focus();
     modal.addEventListener('transitionend', (e) => {
         modal.querySelector('textarea').focus();
     });
-    
+
     const closeDialog = document.querySelector(".dialog-close-button")
 
     closeDialog.addEventListener('click', function (e) {
@@ -135,8 +135,8 @@ const openDirectionsDialogue = async(id, text) => {
     })
 
 }
- // Edit Direction Button
- const editDirection = async (id) => {
+// Edit Direction Button
+const editDirection = async (id) => {
     let recipes = await loadRecipesFromLocalStorage()
     let recipeId = location.hash.substring(1);
     let recItem = recipes.find(recipe => recipe.id === recipeId)
@@ -171,56 +171,56 @@ const openDirectionsDialogue = async(id, text) => {
 }
 
 
-   // Remove Directions Button
-    const removeDirection = async (itemID, text) => {
+// Remove Directions Button
+const removeDirection = async (itemID, text) => {
 
-        let recipes = await loadRecipesFromLocalStorage()
-        let recipeId = location.hash.substring(1);
-        let recItem = recipes.find((recipe) => recipe.id === recipeId)
+    let recipes = await loadRecipesFromLocalStorage()
+    let recipeId = location.hash.substring(1);
+    let recItem = recipes.find((recipe) => recipe.id === recipeId)
 
-        let arr = recItem.directions;
-        console.log(`argument id: ${itemID}`)
-        arr.forEach(item => console.log(item.id))
-        
-        const context = `Erase ${text}?`
-        if (confirm(context) == true) {
-           // continue
-        } else {
-            return
-        }
-        let item = arr.find(direction => direction.id === itemID)
-        let itemNum = (arr.indexOf(item))
-        const removerDir = () => {
-            if (itemNum === 0) {
+    let arr = recItem.directions;
+    console.log(`argument id: ${itemID}`)
+    arr.forEach(item => console.log(item.id))
 
-                alert(`shift ${itemNum}`)
-                arr.shift()
-            } else if ((itemNum + 1) === arr.length) {
-               
-                alert(`pop ${itemNum}`)
-                arr.pop()
-            } else {
-                alert(`splice ${itemNum}`)
-                arr.splice(itemNum, 1)
-            }
-
-            saveRecipes(recipes)
-            const updateList = async () => {
-                recipes = await loadRecipesFromLocalStorage()
-                recItem = recipes.find((recipe) => recipe.id === recipeId)
-
-                // initEdit(recipeId)
-                // alert(recItem.name)
-                let updatedDirections = recItem.directions
-                console.log(updatedDirections)
-                const directionsList = document.getElementById("directions-list");
-                directionsList.innerHTML=''
-                listDirections(updatedDirections)     
-            }
-          updateList()
-        }
-        removerDir()
+    const context = `Erase ${text}?`
+    if (confirm(context) == true) {
+        // continue
+    } else {
+        return
     }
+    let item = arr.find(direction => direction.id === itemID)
+    let itemNum = (arr.indexOf(item))
+    const removerDir = () => {
+        if (itemNum === 0) {
+
+            alert(`shift ${itemNum}`)
+            arr.shift()
+        } else if ((itemNum + 1) === arr.length) {
+
+            alert(`pop ${itemNum}`)
+            arr.pop()
+        } else {
+            alert(`splice ${itemNum}`)
+            arr.splice(itemNum, 1)
+        }
+
+        saveRecipes(recipes)
+        const updateList = async () => {
+            recipes = await loadRecipesFromLocalStorage()
+            recItem = recipes.find((recipe) => recipe.id === recipeId)
+
+            // initEdit(recipeId)
+            // alert(recItem.name)
+            let updatedDirections = recItem.directions
+            console.log(updatedDirections)
+            const directionsList = document.getElementById("directions-list");
+            directionsList.innerHTML = ''
+            listDirections(updatedDirections)
+        }
+        updateList()
+    }
+    removerDir()
+}
 
 
 const addIngredients = () => {
@@ -322,10 +322,10 @@ const loadRecipesFromLocalStorage = async () => {
     if (localStorage.getItem('recipes')) {
         const recipesJSON = localStorage.getItem('recipes')
         try {
-           if(recipesJSON) {
-            return await JSON.parse(recipesJSON)
-           }
-           
+            if (recipesJSON) {
+                return await JSON.parse(recipesJSON)
+            }
+
         } catch (e) {
             return []
         }
@@ -401,10 +401,10 @@ const updateRecipeInDatabase = async () => {
         let currentId = location.hash.substring(1)
 
         let theRecipe = recipes.find(recipe => recipe.id === currentId)
-        
+
         console.log("$(&*@#$(#*Q$&))")
         console.log(theRecipe)
-        delete theRecipe._id 
+        delete theRecipe._id
         console.log(theRecipe)
         console.log("$(&*@#$(#*Q$&))")
         // newRec = JSON.stringify(newRec)
@@ -419,6 +419,59 @@ const updateRecipeInDatabase = async () => {
         console.error("POST", error);
     }
 
+}
+const listeners = () => {
+
+    // const editRecipeButtons = document.querySelectorAll('.edit-ingredient');
+    // const removeRecipeButton = document.getElementById('remove-recipe');
+    // const remove = document.querySelectorAll('a.remove-ingredient');
+
+    // editRecipeButtons.forEach(button => {
+    //     button.addEventListener('click', function (e) {
+    //         alert('click')
+    //         e.preventDefault();
+    //         let dialogs = document.querySelector('#ingredient-modal');
+
+
+    //         button.classList.add('return-focus')
+
+    //         let ingredientId = e.target.getAttribute('data')
+    //         let item = recItem.ingredients.find((ingredient) => ingredient.id === ingredientId)
+    //         // alert('boogie')
+    //         editIngredient(item)
+    //     })
+    // })
+
+
+    // removeRecipeButton.addEventListener('click', function (e) {
+    //     const recipeId = location.hash.substring(1);
+    //     let text = "DELETE THE RECIPE\nAre You Sure?";
+    //     if (confirm(text) == true) {
+
+
+    //         removeRecipe(recipeId);
+    //     } else {
+    //         return
+    //     }
+
+    // })
+ 
+    // remove.forEach(x => {
+    //     x.addEventListener('click', function (e) {
+    //         let text = "You Sure?"
+    //         e.preventDefault();
+    //         let id = e.target.getAttribute('data');
+    //         if (confirm(text) == true) {
+    //             removeIngredient(id)
+    //         } else {
+
+    //         }
+
+    //     }, {
+    //         once: true
+    //     });
+
+    // })
 }
 const sendRecipes = async () => {
     const APP_ID = 'data-puyvo'
@@ -510,7 +563,7 @@ const renderImageSelector = (keyword, pageNumber) => {
             response.forEach(imageObject => {
 
                 const li = document.createElement('li')
-               
+
                 const fig = document.createElement('figure')
                 const img = document.createElement('img')
                 img.setAttribute('src', `${imageObject.urls.thumb}`)
@@ -560,7 +613,7 @@ const renderImageSelector = (keyword, pageNumber) => {
             const prev = document.createElement('button')
             const next = document.createElement('button')
             const modal = document.querySelector('dialog');
-           
+
 
             prev.setAttribute('id', 'prev-page');
             next.setAttribute('id', 'next-page');
@@ -589,7 +642,7 @@ const renderImageSelector = (keyword, pageNumber) => {
             selectImagesModal.querySelector('.next').focus();
             selectImagesModal.addEventListener('transitionend', (e) => {
                 selectImagesModal.querySelector('.btn').focus();
-              });
+            });
 
             /*
             3333333333333333333
@@ -667,7 +720,7 @@ const renderImageSelector = (keyword, pageNumber) => {
                 e.preventDefault()
                 if (pageNumber >= responseLength) {
                     //    this.setAttribute(disabled, true)
-                    console.error("something")
+                    // console.error("something")
                 } else {
                     pageNumber += 1
                     renderImageSelector(pageNumber)
@@ -754,5 +807,6 @@ export {
     toggleMenu,
     hamburger,
     updateRecipeInDatabase,
-    convertTimestamp
+    convertTimestamp,
+    listeners
 }

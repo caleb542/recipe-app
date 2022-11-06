@@ -37,7 +37,7 @@ pageContainer.style.left="120%"
 const stlCta = document.querySelector('.stl-cta')
 stlCta.addEventListener("click", function(e){
   firstLoad.style.opacity="0"
-
+  firstLoad.style.position="fixed"
   firstLoad.style.left="-120%"
   firstLoad.style.transition="all 0.8s ease-out"
   pageContainer.style.opacity="1"

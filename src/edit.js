@@ -19,7 +19,8 @@ import {
     renderImageSelector,
     toggleMenu,
     hamburger,
-    updateRecipeInDatabase
+    updateRecipeInDatabase,
+    listeners
 } from "./functions"
 import {
     updateRecipe,
@@ -243,10 +244,12 @@ const initEdit = async (recipeId) => {
     const recipeContainer = document.querySelector('#recipe ul.recipe')
     const ingredientsContainer = document.getElementById('ingredients');
     ingredientsContainer.classList.add('edit-ingredients')
-    const listIngredients = () => {
+    const listIngredients = async () => {
         const recipeContainer = document.querySelector('#recipe ul.recipe')
         recipeContainer.innerHTML = ''
-        
+        recipes = await loadRecipesFromLocalStorage()
+        recipeId = location.hash.substring(1); 
+        recItem = recipes.find(recipe => recipe.id === recipeId)
         recItem.ingredients.forEach(ingred => {
             
             let iUUID = ingred.id
@@ -264,12 +267,61 @@ const initEdit = async (recipeId) => {
             const subtitle = document.querySelector('.header__subtitle');
     
             subtitle.textContent = recItem.namerecipeDescription
-    
+            
             const recipeIngredients = document.createElement('li');
-            recipeIngredients.innerHTML = `<label ><a class="edit-item" href="#" data="${iUUID}"><span data="${iUUID}">${iAmount} ${iUnit} ${iName} </span><i class="fa fa-pencil" area-hidden="true"  data="${iUUID}" ></i><span class="hide-text">Edit</span></a></label>
-         <a href="#" class="remove" data="${iUUID}">Remove<span  data="${iUUID}">X</span></a>`
+            recipeIngredients.innerHTML = `<label ><a class="edit-ingredient" href="edit.html#${recipeId}" data="${iUUID}"><span data="${iUUID}">${iAmount} ${iUnit} ${iName} </span><i class="fa fa-pencil" area-hidden="true"  data="${iUUID}" ></i><span class="hide-text">Edit</span></a></label>
+         <a href="edit.html#${recipeId}" class="remove-ingredient" data="${iUUID}">Remove<span  data="${iUUID}">X</span></a>`
     
-            recipeContainer.appendChild(recipeIngredients)
+           recipeContainer.appendChild(recipeIngredients)
+           const editRecipeButtons = document.querySelectorAll('.edit-ingredient');
+           const removeRecipeButton = document.getElementById('remove-recipe');
+           const remove = document.querySelectorAll('a.remove-ingredient');
+       
+           editRecipeButtons.forEach(button => {
+               button.addEventListener('click', function (e) {
+                   e.preventDefault();
+                   let dialogs = document.querySelector('#ingredient-modal');
+       
+       
+                   button.classList.add('return-focus')
+       
+                   let ingredientId = e.target.getAttribute('data')
+                   let item = recItem.ingredients.find((ingredient) => ingredient.id === ingredientId)
+                   // alert('boogie')
+                   editIngredient(item)
+               })
+           })
+       
+       
+           removeRecipeButton.addEventListener('click', function (e) {
+               const recipeId = location.hash.substring(1);
+               let text = "DELETE THE RECIPE\nAre You Sure?";
+               if (confirm(text) == true) {
+       
+                   removeRecipe(recipeId);
+               } else {
+                   return
+               }
+       
+           })
+        
+           remove.forEach(x => {
+               x.addEventListener('click', function (e) {
+                   let text = "You Sure?"
+                   e.preventDefault();
+                   let id = e.target.getAttribute('data');
+                   if (confirm(text) == true) {
+                       removeIngredient(id)
+                   } else {
+       
+                   }
+       
+               }, {
+                   once: true
+               });
+       
+           })
+          
         })
     
     }
@@ -288,7 +340,14 @@ const initEdit = async (recipeId) => {
     })
    
     document.querySelector('#recipe-article').addEventListener('focus', () => {
-        const editor = CKEDITOR.replace( recipeArticle )
+        const editor = CKEDITOR.replace( recipeArticle, {
+              // Configure your file manager integration. This example uses CKFinder 3 for PHP.
+      filebrowserBrowseUrl: '../public/images',
+      filebrowserImageBrowseUrl: '../public/images',
+      filebrowserUploadUrl: '../public/images',
+      filebrowserImageUploadUrl: '../public/images'
+
+        } )
         editor.on('change', function( evt ) {
             // getData() returns CKEditor's HTML content.
             // console.log( 'Total bytes: ' + evt.editor.getData().length );
