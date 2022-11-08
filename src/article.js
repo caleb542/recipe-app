@@ -31,10 +31,17 @@ const createArticleDOM = (recipes) => {
         articleHeader.classList.add('article-header')
 
     const editButton = document.createElement('a')
+    const icon = document.createElement("i")
+    const span = document.createElement("span")
+    span.classList.add("hide-text")
+    icon.classList.add("fa-sharp","fa-solid","fa-pen-to-square")
         editButton.setAttribute('id','cta-update')
         editButton.setAttribute('href','./edit.html#'+recipeId)
-        editButton.textContent = "Update recipe"
+        editButton.setAttribute("title","Edit recipe")
         editButton.classList.add('cta-update','btn')
+    
+        editButton.appendChild(icon)
+        editButton.appendChild(span)
 
 
 
@@ -69,7 +76,7 @@ const createArticleDOM = (recipes) => {
     const recipeTitle = recItem.name;
     const directionsHeading = document.createElement('div')
     directionsHeading.classList.add('directions-heading')
-    directionsHeading.innerHTML =  `<h2>Directions:</h2>`;
+    directionsHeading.innerHTML =  `<h3>Directions:</h3>`;
   
 /* ----- */
   const directionsList = document.createElement('ol');
@@ -93,8 +100,8 @@ const createArticleDOM = (recipes) => {
     const photoURL = recItem.photoURL
     const createdAt = recItem.createdAt
     let updatedAt = recItem.updatedAt
-    let authorData = `by ${recItem.author}`
-    author.textContent = authorData
+    let authorData = `<p class="author">Recipe added by ${recItem.author}</p>`
+    author.innerHTML = authorData
     // console.log(recipeSubTitle)
     updatedAt ? updatedAt = createdAt:updatedAt = updatedAt
     updatedAt === createdAt ? dates.innerHTML = `<date>Created: ${createdAt[0]}</date>`: dates.innerHTML = `<date><strong>Created</strong>: ${createdAt[0]}</date>
@@ -109,23 +116,23 @@ const createArticleDOM = (recipes) => {
     const summaryContent=document.createElement('div');
     summaryContent.innerHTML = `${recItem.article}` 
     summary.appendChild(summaryContent);
-    
-
+    const articleSocialButtons = document.createElement("div")
+    articleSocialButtons.innerHTML = `<ul class="social-buttons">
+    <li class="like"><button><span class="hide-text">Like</span><i class="fa fa-solid fa-heart"></i></button></li>
+    <li class="share"><button><span class="hide-text">Share</span><i class="fa fa-solid fa-share"></i></button></li>
+    <li class="print"><button><span class="hide-text">Print</span><i class="fa fa-solid fa-print"></i></button></li></ul>`
     const descriptionText = document.createElement('p');
     descriptionText.classList.add('description,summary');
     descriptionText.innerHTML = recItem.description;
     articleHeader.appendChild(dates)
-    articleHeader.appendChild(author)
     articleHeader.appendChild(descriptionText)
-
-
+    articleHeader.appendChild(author)
+    articleHeader.appendChild(articleSocialButtons)
 
     // header.appendChild(title)
     // header.appendChild(subTitle)
     
 
-   
-   
     recipeBody.appendChild(card)
     card.appendChild(header)
     card.appendChild(articleHeader)
@@ -260,8 +267,18 @@ checkboxes.forEach(item => {
                 const mailto = document.createElement('a');
                 mailto.classList.add('mailto')
                 mailto.setAttribute('id','mail-list')
-                mailto.textContent = "Email Shopping List";
-                list.appendChild(mailto);
+                mailto.setAttribute("title","Email Shopping List");
+                
+                const span = document.createElement("span")
+                span.classList.add("hide-text")
+                const icon = document.createElement("i")
+                icon.classList.add("fa","fa-solid","fa-envelope")
+
+                list.appendChild(mailto)
+                mailto.appendChild(span)
+                mailto.appendChild(icon)
+
+                
             }
             const getHref = () => {
                 let bodyString  = "";

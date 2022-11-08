@@ -661,7 +661,8 @@ header#recipe-header {
     font-size: 2.25rem;
     text-align: center;
     width: auto;
-    padding: 2rem 2rem 0 2rem;
+    padding: 1rem;
+    margin: 2rem 0;
     position: relative;
     left: 50%;
     transform: translate(-50%, 0);
@@ -1295,7 +1296,7 @@ div#recipes {
 
 .article-header {
     position: relative;
-    padding-top: $padding2;
+    padding-top: 0;
     height: auto;
     margin-bottom: 1rem;
 
@@ -1312,14 +1313,16 @@ div#recipes {
     grid-template-columns: 1fr;
 }
 
-date {
 
-    font-family: "Poppins";
+date {
+    /* font-family: "Poppins"; */
     padding: 0;
     color: #000;
     background: transparent;
-    letter-spacing: 0.05em;
-
+    /* letter-spacing: 0.05em; */
+    margin: 1rem 0;
+    text-transform: capitalize;
+    font-weight: 600;
 }
 
 .cta-update {
@@ -1486,7 +1489,9 @@ p {
     }
 
     &.author {
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
+        font-weight:600;
+        font-size: 1rem;
     }
 
     &.count {
@@ -1499,7 +1504,58 @@ p {
         transform: translateX(-50%);
     }
 }
+.social-buttons{
+    width:50%;
+    padding:0;
+    display:grid;
+    grid-template-columns: repeat(3,1fr);
+   
+    & li button {
+        width:100%;
+        text-align: center;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        font-weight:600;
+        background-color:#92d8ad;
+        height:2rem;
+        padding:2rem 1rem;
+        border:0;
+        &:hover, &:focus{
+            background-color: #5edde1;
+        }
+       
+        & span{
+            opacity:1;
+            height:auto;
+            width:auto;
+            display: inline;
+            font-weight:600;
+         }
+         & i {
+            font-size:1.2rem;
+         }
+     }
+     & li:first-of-type button{
+        background-color:rgb(187, 28, 28);
+        color:#fff;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+        
+        &:hover, &:focus{
+            background-color: hotpink;
+            color:#2d2d2d;
+        }
+     }
+     & li:last-of-type button{
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+        border: 0;
+     }
 
+    
+    
+}
 article {
     width: 100%;
     height: inherit;
