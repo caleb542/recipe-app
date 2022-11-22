@@ -31,17 +31,19 @@ import * as Realm from "realm-web";
 
 const firstLoad = document.getElementById("static-landing-page");
 const pageContainer = document.querySelector('.page-container')
-pageContainer.style.opacity='0'
-pageContainer.style.left="120%"
+pageContainer.style.opacity='0.4'
+pageContainer.style.top="10%"
+firstLoad.style.opacity="1"
+firstLoad.style.zIndex="10"
 
 const stlCta = document.querySelector('.stl-cta')
 stlCta.addEventListener("click", function(e){
-  firstLoad.style.opacity="0"
-
-  firstLoad.style.left="-120%"
-  firstLoad.style.transition="all 0.8s ease-out"
+  firstLoad.style.opacity="0.5"
+  firstLoad.style.position="fixed"
+  firstLoad.style.top="-120%"
+  firstLoad.style.transition=" 0.8s ease-out"
   pageContainer.style.opacity="1"
-  pageContainer.style.left="0"
+  pageContainer.style.top="0"
   pageContainer.style.display="block"
   pageContainer.style.transition="all 0.8s ease-out"
 })
@@ -130,6 +132,7 @@ tags.forEach(tag => {
   tag.addEventListener('click', (e) => {
    
     e.preventDefault()
+
    
     if(e.target.getAttribute('sort') === "All"){
       setFilters({
@@ -162,3 +165,24 @@ window.addEventListener('storage', (e) => {
     //          updateTextElements(pageName);
   }
 })
+
+
+
+// const spins = document.querySelector(".spinning-wheel")
+// const box = document.body;
+
+
+// const updateDisplay = (event) => {
+ 
+//   let X = `${Math.round((event.pageX / 2) / window.innerWidth * 1000 )}px `
+//   let Y = `${Math.floor((event.pageY / 2)/ window.innerHeight * 1000)}px`
+//   spins.style.top="unset"
+//   spins.style.left="unset"
+//   spins.style.bottom=Y
+//   spins.style.right=X
+//   console.log(`spins top ${Y} left ${X}`)
+// }
+
+// box.addEventListener("mousemove", updateDisplay, false);
+// box.addEventListener("mouseenter", updateDisplay, false);
+// box.addEventListener("mouseleave", updateDisplay, false);
