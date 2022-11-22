@@ -132,6 +132,7 @@ tags.forEach(tag => {
   tag.addEventListener('click', (e) => {
    
     e.preventDefault()
+
    
     if(e.target.getAttribute('sort') === "All"){
       setFilters({
@@ -164,3 +165,24 @@ window.addEventListener('storage', (e) => {
     //          updateTextElements(pageName);
   }
 })
+
+
+
+// const spins = document.querySelector(".spinning-wheel")
+// const box = document.body;
+
+
+// const updateDisplay = (event) => {
+ 
+//   let X = `${Math.round((event.pageX / 2) / window.innerWidth * 1000 )}px `
+//   let Y = `${Math.floor((event.pageY / 2)/ window.innerHeight * 1000)}px`
+//   spins.style.top="unset"
+//   spins.style.left="unset"
+//   spins.style.bottom=Y
+//   spins.style.right=X
+//   console.log(`spins top ${Y} left ${X}`)
+// }
+
+// box.addEventListener("mousemove", updateDisplay, false);
+// box.addEventListener("mouseenter", updateDisplay, false);
+// box.addEventListener("mouseleave", updateDisplay, false);

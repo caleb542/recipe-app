@@ -1,0 +1,18 @@
+exports = function(arg){
+
+  
+    let collection = context.services.get("recipe-me-cluster").db("recipe-app").collection("recipe-app-2");
+    
+    if(arg === ""){
+   // collection.insertOne(arg);;
+    
+    return `${arg} ...is empty` //collection.find({});
+      
+    } else if (typeof arg === object || typeof arg === array) {
+      return `is ${typeof arg} `;
+    } else {
+      
+      return `${arg} ...is empty`;
+   
+    }
+};

@@ -300,7 +300,7 @@ const loadRecipes = async () => {
         const recipesJSON = localStorage.getItem('recipes')
         try {
 
-            recipesJSON ? console.log(JSON.parse(recipesJSON)) : console.log('NOJSON')
+            recipesJSON ? console.log('aokay') : console.log('NOJSON')
 
             return recipesJSON ? JSON.parse(recipesJSON) : console.log('NOJSON')
         } catch (e) {
@@ -787,6 +787,17 @@ const removeRecipe = async (recipeId) => {
     }
     removerRec()
 }
+const like = () => {
+    alert(`Thanks, we like you too! Unfortunately we don't have this button wired up yet, because USERS don't exist yet. `)
+}
+   
+const share = () => {
+    alert('location')
+}
+const print = () => {
+    window.print()
+}
+
 export {
     openDirectionsDialogue,
     listDirections,

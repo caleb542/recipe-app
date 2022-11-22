@@ -11,7 +11,7 @@ let listRecipes = async () => {
     saveRecipes(recipes)
     const filters = getFilters()
     recipes = sortRecipes(filters.sortBy, recipes)
-    console.log(recipes)
+    // console.log(recipes)
     // FILTER WITH SEARCH TXT
     recipes = recipes.filter(function (recipe) {
       
@@ -31,14 +31,14 @@ let listRecipes = async () => {
         let n = 0
           recipes.forEach(recipe => {
           let resaveCreatedDate = recipe.createdAt;
-          console.log( typeof resaveCreatedDate)
+          // console.log( typeof resaveCreatedDate)
           if (typeof resaveCreatedDate === 'string'){
             let unixTimestamp = moment(resaveCreatedDate, 'MMM Do, YYYY HH:mm').unix();
             recipe.createdAt = [resaveCreatedDate,unixTimestamp]
             saveRecipes(recipes)
           }
-          console.log(recipe)
-          console.log(n++)
+          // console.log(recipe)
+          // console.log(n++)
           let name = recipe.name
           let description = recipe.description
           let recipeID = recipe.id;
