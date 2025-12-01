@@ -31,6 +31,7 @@
     "@babel/preset-env": "^7.28.5",
     "babel-loader": "^8.2.5",
     "copy-webpack-plugin": "^13.0.1",
+    "crypto-browserify": "^3.12.1",
     "css-loader": "^6.7.1",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.9.0",
