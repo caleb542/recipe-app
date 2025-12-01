@@ -17,6 +17,8 @@
     "@toast-ui/editor": "^3.2.2",
     "dotenv": "^17.2.3",
     "imagekit-javascript": "^1.5.4",
+    "jsonwebtoken": "^9.0.2",
+    "jwks-rsa": "^3.2.0",
     "marked": "^17.0.0",
     "moment": "^2.29.4",
     "mongodb": "^6.2.0",
