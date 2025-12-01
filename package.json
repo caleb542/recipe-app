@@ -36,6 +36,7 @@
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.9.0",
     "netlify-cli": "^17.0.1",
+    "os-browserify": "^0.3.0",
     "sass": "^1.93.3",
     "sass-loader": "^13.3.2",
     "style-loader": "^3.3.1",
