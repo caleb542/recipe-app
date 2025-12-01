@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+.carousel-track {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+
+.carousel-track li {
+  flex: 0 0 100%; /* one slide fills viewport */
+  scroll-snap-align: center;
+    aspect-ratio:3/2;
+
+  max-width:600px;
+
+}
+.carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;   /* <-- adds easing */
+}
+
+.carousel-track li {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+}
+
+figure img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  cursor: pointer;
+  border: 4px solid transparent;
+  transition: border-color 0.2s;
+   aspect-ratio:3/2;
+object-fit:cover;
+  max-width:600px;
+
+}
+figure img.selected {
+  border-color: #0078d4;
+}
+
+    </style>
+</head>
+<body>
+<button id="openImageSelector">Open Image Selector</button>
+
+<dialog id="select-images" closedBy="any">
+  <div class="carousel">
+    <button class="arrow left" aria-label="Previous">&#9664;</button>
+    <ul class="carousel-track">
+      <!-- dynamically rendered <li><figure><img><figcaption> -->
+    </ul>
+    <button class="arrow right" aria-label="Next">&#9654;</button>
+  </div>
+  <menu>
+    <button value="cancel">Cancel</button>
+    <button id="confirmImage">Confirm</button>
+  </menu>
+</dialog>
+
+
+
+
+<script>
+    const modal = document.getElementById("select-images");
+const openBtn = document.getElementById("openImageSelector");
+
+const track = modal.querySelector(".carousel-track");
+let slides = track.querySelectorAll("li");
+let currentIndex = 0;
+let selectedImage = null;
+
+
+// Open modal when button is clicked
+openBtn.addEventListener("click", () => {
+  modal.showModal();
+});
+
+// Optional: close modal when Cancel button is clicked
+modal.addEventListener("close", () => {
+  console.log("Modal closed");
+});
+
+function updateCarousel(e) {
+
+    console.log(e)
+  track.scrollTo({ left: currentIndex * track.clientWidth, behavior: "smooth" });
+}
+
+// Arrow buttons
+modal.querySelector(".arrow.left").addEventListener("click", () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    updateCarousel(e);
+  }
+});
+modal.querySelector(".arrow.right").addEventListener("click", () => {
+  if (currentIndex < slides.length - 1) {
+    currentIndex++;
+    updateCarousel(e);
+  }
+});
+
+// Image click → select + center
+slides.forEach((slide, index) => {
+  const img = slide.querySelector("img");
+  img.addEventListener("click", () => {
+    track.querySelectorAll("img").forEach(i => i.classList.remove("selected"));
+    img.classList.add("selected");
+    selectedImage = img.src;
+    currentIndex = index;
+    updateCarousel(e);
+  });
+});
+// Button
+
+const prevBtn = modal.querySelector(".arrow.left");
+const nextBtn = modal.querySelector(".arrow.right");
+
+prevBtn.addEventListener("click", (e) => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    updateCarousel(e);
+  }
+});
+
+nextBtn.addEventListener("click", (e) => {
+  if (currentIndex < slides.length - 1) {
+    currentIndex++;
+    updateCarousel(e);
+  }
+});
+// Keyboard navigation
+modal.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft" && currentIndex > 0) {
+    currentIndex--;
+    updateCarousel(e);
+  }
+  if (e.key === "ArrowRight" && currentIndex < slides.length - 1) {
+    currentIndex++;
+    updateCarousel(e);
+  }
+  if (e.key === "Enter" && selectedImage) {
+    alert("Selected: " + selectedImage);
+    modal.close();
+  }
+});
+
+// Touch/mouse drag with snap
+let startX = 0;
+let scrollLeft = 0;
+
+track.addEventListener("mousedown", e => {
+  startX = e.pageX - track.offsetLeft;
+  scrollLeft = track.scrollLeft;
+  track.classList.add("dragging");
+});
+
+track.addEventListener("mouseup", () => {
+  track.classList.remove("dragging");
+  currentIndex = Math.round(track.scrollLeft / track.clientWidth);
+  updateCarousel();
+});
+
+track.addEventListener("mousemove", e => {
+  if (!track.classList.contains("dragging")) return;
+  const x = e.pageX - track.offsetLeft;
+  const walk = x - startX;
+  track.scrollLeft = scrollLeft - walk;
+});
+
+// Touch support
+track.addEventListener("touchstart", e => {
+  startX = e.touches[0].pageX - track.offsetLeft;
+  scrollLeft = track.scrollLeft;
+});
+
+track.addEventListener("touchend", () => {
+  currentIndex = Math.round(track.scrollLeft / track.clientWidth);
+  updateCarousel();
+});
+
+track.addEventListener("touchmove", e => {
+  const x = e.touches[0].pageX - track.offsetLeft;
+  const walk = x - startX;
+  track.scrollLeft = scrollLeft - walk;
+});
+
+
+const imagesFeed = [
+  {
+    src: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&auto=format&q=80",
+    alt: "Breakfast bowl with fruit and granola",
+    photographer: "Brooke Lark",
+    url: "https://unsplash.com/@brookelark"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200&auto=format&q=80",
+    alt: "Fresh salad with greens and tomatoes",
+    photographer: "Eaters Collective",
+    url: "https://unsplash.com/@eaterscollective"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=1200&auto=format&q=80",
+    alt: "Assorted donuts on a tray",
+    photographer: "Dan Gold",
+    url: "https://unsplash.com/@danielcgold"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1478144592103-25e218a04891?w=1200&auto=format&q=80",
+    alt: "Steak with herbs on a cutting board",
+    photographer: "Calum Lewis",
+    url: "https://unsplash.com/@calumlewis"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1473093226795-dc4c2b0f17ee?w=1200&auto=format&q=80",
+    alt: "Pancakes with berries and syrup",
+    photographer: "Jason Briscoe",
+    url: "https://unsplash.com/@jbriscoe"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1511690743698-7f89f6f30777?w=1200&auto=format&q=80",
+    alt: "Avocado halves on a plate",
+    photographer: "Joseph Gonzalez",
+    url: "https://unsplash.com/@joeszabo"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1543353071-873f17a7a5c0?w=1200&auto=format&q=80",
+    alt: "Vegetarian bowl with veggies",
+    photographer: "Ella Olsson",
+    url: "https://unsplash.com/@ellaolsson"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1506377555324-8cc0c3b0c9f3?w=1200&auto=format&q=80",
+    alt: "Pasta with tomato sauce",
+    photographer: "Bruna Branco",
+    url: "https://unsplash.com/@brunabranco"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1526318472351-c75fd1b37f16?w=1200&auto=format&q=80",
+    alt: "Toast with toppings on a plate",
+    photographer: "Heather Ford",
+    url: "https://unsplash.com/@heatherford"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=1200&auto=format&q=80",
+    alt: "Plant-based dish with greens",
+    photographer: "Edgar Castrejon",
+    url: "https://unsplash.com/@edgarcastrejon"
+  }
+];
+
+
+imagesFeed.forEach( (item) => {
+    let li = document.createElement('li');
+    let fig = document.createElement('figure');
+    let image = document.createElement('img');
+    let figCap = document.createElement('figcaption');
+
+    image.setAttribute('src', item.src);
+    image.setAttribute("alt", item.alt);
+    figCap.innerHTML=`<p><em>Source</em>: <strong>Unsplash</strong> by photographer<a href="${item.url}">${item.photographer}</a></p>` 
+    fig.appendChild(image);
+    fig.appendChild(figCap);
+    li.appendChild(fig);
+    track.appendChild(li);
+})
+</script>
+</body>
+</html>

@@ -1,380 +1,263 @@
 import "./style.scss";
-import { loadRecipes, addIngredients, loadRecipesFromLocalStorage, getTimestamp, toggleMenu, hamburger} from "./functions"
+import { loadRecipesFromLocalStorage, hamburger } from "./functions.js";
+import { marked } from "marked";
+import { setupShoppingList } from "./helpers/shoppingList.js";
 
-// import { list } from "unsplash-js/dist/methods/photos";
-
-
-const recipeId = location.hash.substring(1)
-
+const recipeId = location.hash.substring(1);
 let recipes;
 
-let fetchRecipes = async () => {
-    recipes = await loadRecipesFromLocalStorage()
-    createArticleDOM(recipes)
-    console.log(recipes)
+// Entry point
+async function fetchRecipes() {
+  recipes = await loadRecipesFromLocalStorage();
+  await hydrateArticle(recipes);
 }
+fetchRecipes();
 
-fetchRecipes()
+async function hydrateArticle(recipes) {
+  const recItem = Array.isArray(recipes)
+    ? recipes.find(recipe => recipe.id === recipeId)
+    : null;
 
-    
+  if (!recItem) {
+    location.assign("/index.html");
+    return;
+  }
 
+  // Load and insert template first
+  const res = await fetch("./partials/article-template.html");
+  const html = await res.text();
+  const container = document.querySelector(".template-container");
+  container.insertAdjacentHTML("beforeend", html);
 
-const createArticleDOM = (recipes) => {
-    // let recipes = loadRecipes()
-    // "recItem": find the recipe with the id passed in the hash
-    let recItem = recipes.find((recipe) => recipe.id === recipeId )
-    // console.error(recItem.directions.length)
-    if (!recItem) {
-        location.assign('/index.html')
-    }
-    
-    const articleHeader = document.createElement('div')
-        articleHeader.classList.add('article-header')
+  const template = document.getElementById("article-template");
+  const tpl = template.content.cloneNode(true);
 
-    const editButton = document.createElement('a')
-    const icon = document.createElement("i")
-    const span = document.createElement("span")
-    span.classList.add("hide-text")
-    icon.classList.add("fa-sharp","fa-solid","fa-pen-to-square")
-        editButton.setAttribute('id','cta-update')
-        editButton.setAttribute('href','./edit.html#'+recipeId)
-        editButton.setAttribute("title","Edit recipe")
-        editButton.classList.add('cta-update','btn')
-    
-        editButton.appendChild(icon)
-        editButton.appendChild(span)
+  // Hydrate fields safely
+  const articleTitle = tpl.querySelector(".article__title");
+  if (articleTitle) {
+    articleTitle.textContent = recItem.name;
+    document.title = `Recipe Me - ${recItem.name}`;
+  }
 
+  const d = tpl.querySelector(".dates");
+  if (d) d.innerHTML = `<date>${recItem.createdAt[0]}</date>`;
 
+  const a = tpl.querySelector(".author");
+  if (a) a.innerHTML = `by ${recItem.author}`;
 
-    const recipeBody = document.createElement('article')
-    const card = document.createElement('div')
-        card.classList.add('card')
-        card.classList.add('article')
-    const header = document.createElement('header')
-       
-    const title = document.querySelector('.article__title');
-    const subtitle = document.querySelector('.header__subtitle');
+  const pt = tpl.querySelector(".preptime");
+  if (pt) pt.innerHTML = `<p>${recItem.prepTime || ""}</p>`;
 
-    const summary = document.createElement('div')
-    summary.classList.add('summary')
-    const recipeLink = document.createElement('a')
-    recipeLink.classList.add('recipe-link');
-    recipeLink.setAttribute('href','#recipe');
-    recipeLink.textContent='Hurry to the recipe';
-    summary.appendChild(recipeLink);
-    const imageElement = document.createElement('div')
-    const photoInfo = document.createElement('p')
-    photoInfo.classList.add('photoInfo')
-    photoInfo.innerHTML = `Photo from Unsplash by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
+  const dsum = tpl.querySelector(".description.summary");
+  if (dsum) dsum.innerHTML = recItem.description;
 
-    const directionsElem = document.createElement('div')
-        directionsElem.classList.add('directions')
-
-    const dates = document.createElement('div')
-        dates.classList.add('dates')
-    const author = document.createElement('p')    
-        author.classList.add('author')
-    const recipeTitle = recItem.name;
-    const directionsHeading = document.createElement('div')
-    directionsHeading.classList.add('directions-heading')
-    directionsHeading.innerHTML =  `<h3>Directions:</h3>`;
-  
-/* ----- */
-  const directionsList = document.createElement('ol');
-    directionsElem.appendChild(directionsHeading);
-    directionsElem.appendChild(directionsList);
-    const listDirections = (directions) => {
-       
-        directions.forEach(step => {
-            const li = document.createElement('li')
-            li.innerHTML = `${step.text}`
-            directionsList.appendChild(li)
-        })
-    }
-    const recipeDirections = recItem.directions
-     listDirections(recipeDirections)
-    
-/* ------ */
-
-    const article = recItem.article;
-    
-    const photoURL = recItem.photoURL
-    const createdAt = recItem.createdAt
-    let updatedAt = recItem.updatedAt
-    let authorData = `<p class="author">Recipe added by ${recItem.author}</p>`
-    author.innerHTML = authorData
-    // console.log(recipeSubTitle)
-    updatedAt ? updatedAt = createdAt:updatedAt = updatedAt
-    updatedAt === createdAt ? dates.innerHTML = `<date>Created: ${createdAt[0]}</date>`: dates.innerHTML = `<date><strong>Created</strong>: ${createdAt[0]}</date>
-    <date><strong>Modified</strong>: ${updatedAt[0]}</date>`
-
-
-    imageElement.classList.add('imageElement')
-    imageElement.setAttribute('style',`background-image:url(${photoURL})`)
-
-    title.textContent = recipeTitle;
-    // subtitle.textContent = recipeSubTitle;
-    const summaryContent=document.createElement('div');
-    summaryContent.innerHTML = `${recItem.article}` 
-    summary.appendChild(summaryContent);
-    const articleSocialButtons = document.createElement("div")
-    articleSocialButtons.classList.add('social-buttons-container')
-    articleSocialButtons.innerHTML = `<ul class="social-buttons">
-    <li class="like"><button onclick="alert('Thanks! We like you too!')" id="like-button"><span class="hide-text">Like</span><i class="fa fa-solid fa-heart"></i></buttononclick=id=></li>
-    <li class="share"><button onclick="alert(location)"id="share-button"><span class="hide-text">Share</span><i class="fa fa-solid fa-share"></i></button></li>
-    <li class="print"><button onclick="window.print()"id="print-button"><span class="hide-text">Print</span><i class="fa fa-solid fa-print"></i></button></li></ul>`
-    const descriptionText = document.createElement('p');
-    descriptionText.classList.add('description,summary');
-    descriptionText.innerHTML = recItem.description;
-    articleHeader.appendChild(dates)
-    articleHeader.appendChild(descriptionText)
-    articleHeader.appendChild(author)
-    articleHeader.appendChild(articleSocialButtons)
-
-    // header.appendChild(title)
-    // header.appendChild(subTitle)
-
-    
-  
-
-    recipeBody.appendChild(card)
-    card.appendChild(header)
-    card.appendChild(articleHeader)
-    card.appendChild(imageElement)
-    imageElement.appendChild(photoInfo)
-    card.appendChild(summary)
-   
-         
-    const likeButton = document.getElementById("like-button")
-    const shareButton = document.getElementById("share-button")
-    const printButton = document.getElementById("print-button")
-
-  
-
-    document.querySelector('.container').innerHTML=''
-    document.querySelector('.container').appendChild(recipeBody)
-    document.title = `Recipe Me - ${recipeTitle}`
-    const lists = document.createElement('div');
-    lists.classList.add('lists')
-    const checkListCont = document.createElement('div')
-    checkListCont.classList.add("checklist-container")
-    const checklist = document.createElement('ul')
-    checklist.classList.add('checklist')
-    const checklistHeader = document.createElement('div')
-    checklistHeader.classList.add('checklistHeader');
-    checklistHeader.setAttribute('id','recipe')
-    const checklistTitle = document.createElement('h3')
-    checklistTitle.textContent = "Recipe";
-    const editRecipeButton = document.createElement('button')
-    editRecipeButton.setAttribute('id','edit-recipe');
-    editRecipeButton.textContent = 'Edit recipe'
-    checklistHeader.appendChild(checklistTitle)
-    // checklistHeader.appendChild(editRecipeButton)
-    
-    checkListCont.appendChild(checklistHeader)
-    checklistHeader.appendChild(editButton)
-    checkListCont.appendChild(checklist)
-
-  
-    const shoppingListCont = document.createElement('div')
-    shoppingListCont.classList.add("shoppinglist-container")
-    shoppingListCont.classList.add("hide")
-    const shoppingList = document.createElement('ul')
-    const shoppingListTitle = document.createElement('h3')
-    shoppingListTitle.textContent = "Shopping List"
-    shoppingListCont.appendChild(shoppingListTitle);
-    shoppingListCont.appendChild(shoppingList)
-    shoppingList.classList.add('shopping-list')
-
-    let ingredientsList = () => {
-        if(recItem.ingredients.length < 1){
-            const message = `Do you want to <a href="edit.html#${recipeId}">start adding some ingredients</a>?`
-            const warning = document.createElement("div");
-            warning.classList.add('warning');
-            warning.innerHTML = message
-            card.appendChild(lists)
-            checkListCont.appendChild(warning)
-            lists.appendChild(checkListCont)
-        }else{
-             recItem.ingredients.forEach(ingr => {
-           
-                let name = ingr.name;
-                let description = ingr.description
-                let amount = ingr.amount
-                let unit = ingr.unit
-                let measurementWord = ingr.measureWord
-                measurementWord != '' ? unit = measurementWord:unit=unit  
-            
-            if(ingr.alternatives.length > 0){
-                let alts = ingr.alternatives
-                    alts.forEach((alt) => {
-                    return alt
-                })
-            }
-            const ingredientsElem = document.createElement("div")
-                ingredientsElem.setAttribute("id","ingredients")
-            const checklistItem = document.createElement('li')
-            const label = document.createElement('label')
-            label.classList.add('article-checklist-items')
-
-            const amt = document.createElement('span')
-            const descr = document.createElement('span');
-            const checkbox = document.createElement('input')
-                checkbox.setAttribute('type', 'checkbox');
-            unit === '' ? unit = measurementWord : unit = unit
-            amt.textContent = `${amount} ${unit} ${name} ${description}`
-
-            label.appendChild(checkbox)
-            amt ? label.appendChild(amt):console.log('no amt')
-            descr ? label.appendChild(descr):console.log('no desc')
-            
-            checklistItem.appendChild(label)
-            checklist.appendChild(checklistItem)
-
-            let card = document.querySelector('.card')   
-            card.appendChild(lists)
-            lists.appendChild(checkListCont)
-            lists.appendChild(shoppingListCont)
-
+  // Rating stars
+  const ratingStars = tpl.getElementById?.("rating-stars") || tpl.querySelector("#rating-stars");
+  if (ratingStars) {
+    const maxStars = 5;
+    function renderStars(currentRating) {
+      ratingStars.innerHTML = "";
+      for (let i = 1; i <= maxStars; i++) {
+        const star = document.createElement("span");
+        star.classList.add("star");
+        star.textContent = i <= currentRating ? "★" : "☆";
+        star.setAttribute("role", "button");
+        star.setAttribute("tabindex", "0");
+        star.setAttribute("aria-label", `Rate ${i} out of ${maxStars}`);
+        star.addEventListener("click", () => {
+          recItem.rating = i;
+          updateLocalStorageRating(recipeId, i);
+          renderStars(i);
         });
-        }
-       
+        ratingStars.appendChild(star);
+      }
     }
+    renderStars(recItem.rating || 0);
+  }
+
+  // Persist rating
+  function updateLocalStorageRating(recipeId, rating) {
+    const recipes = JSON.parse(localStorage.getItem("recipes")) || [];
+    const index = recipes.findIndex(r => r.id === recipeId);
+    if (index > -1) {
+      recipes[index].rating = rating;
+      localStorage.setItem("recipes", JSON.stringify(recipes));
+    }
+  }
+
+  // Image + photo info
+  const imageElement = tpl.querySelector(".imageElement");
+  if (imageElement) imageElement.style.backgroundImage = `url(${recItem.photoURL})`;
+
+  const photoInfo = tpl.querySelector(".photoInfo");
+  if (photoInfo) {
+    photoInfo.innerHTML = `Photo from Unsplash by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
+  }
+
+  // Summary content
+  const summaryContent = tpl.querySelector(".summary-content");
+  if (summaryContent) summaryContent.innerHTML = marked.parse(recItem.article || "");
+
+  // Directions
+  const directionsList = tpl.querySelector(".directions-list");
+  if (directionsList) {
+    directionsList.innerHTML = "";
+    recItem.directions.forEach(step => {
+      const li = document.createElement("li");
+      li.textContent = step.text;
+      directionsList.appendChild(li);
+    });
+  }
+
+  // Ingredients checklist
+  const checklist = tpl.querySelector(".checklist");
+  if (checklist) {
+    checklist.innerHTML = "";
+    if (recItem.ingredients.length < 1) {
+      const warning = document.createElement("div");
+      warning.classList.add("warning");
+      warning.innerHTML = `Do you want to <a href="edit.html#${recipeId}">start adding some ingredients</a>?`;
+      tpl.querySelector(".checklist-container")?.appendChild(warning);
+    } else {
+      recItem.ingredients.forEach(ingr => {
+        const li = document.createElement("li");
+        const label = document.createElement("label");
+        label.classList.add("article-checklist-items");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        const amt = document.createElement("span");
+        amt.textContent = `${ingr.amount} ${ingr.unit || ingr.measureWord} ${ingr.name} ${ingr.description}`;
+        label.append(checkbox, amt);
+        li.appendChild(label);
+        checklist.appendChild(li);
+      });
+    }
+  }
+
+  // Edit button
+  const editButton = tpl.getElementById?.("cta-update") || tpl.querySelector("#cta-update");
+  if (editButton) {
+    editButton.href = `./edit.html#${recipeId}`;
+    editButton.title = "Edit recipe";
+  }
+
+  // Append hydrated fragment
+  container.appendChild(tpl);
+
+  // Wire shopping list helper
+  setupShoppingList(recItem, recipeId, "caleb542@gmail.com");
+
+  // Like button
+// const likeButton = container.querySelector("#like-button");
+
+// function applyLikeState(btn, data) {
+//   btn.setAttribute("aria-pressed", data.liked ? "true" : "false");
+//   btn.classList.toggle("liked", !!data.liked);
+// }
+
+// if (likeButton) {
+//   likeButton.addEventListener("click", async () => {
+//     // Check current state from aria-pressed
+//     const isLiked = likeButton.getAttribute("aria-pressed") === "true";
+//     const method = isLiked ? "DELETE" : "POST";
+
+   
+//     // Send toggle request
+//     await fetch(`/.netlify/functions/like?id=${recipeId}&user=demoUser`, { method });
+
     
-    ingredientsList()
-    card.appendChild(directionsElem)
-
-    const checkboxes = document.querySelectorAll('.checklist li input');
-    const shoppingListArr = []
-    const list = document.querySelector('.shopping-list');
-    let your_email = 'caleb542@gmail.com'
-    let n = 0;
+//     // Refresh like count and button state
+//     const res = await fetch(`/.netlify/functions/like?id=${recipeId}`);
+//     const data = await res.json();
 
     
 
-checkboxes.forEach(item => {
-    console.log(item.textContent)
-    item.addEventListener('change', function(e){
-        
-        if(item.checked){
-            const shop = document.querySelector('.shoppinglist-container') 
-            const checks = document.querySelector('.checklist-container')
-            shop.classList.remove('hide')
-            checks.classList.add('checked')
+//     const countEl = container.querySelector("#like-count");
+//     if (countEl) countEl.textContent = data.likes ?? 0;
 
-            let parent = item.parentNode;
-            const checkedItemText = parent.childNodes[1].textContent
-            shoppingListArr.push(checkedItemText)
+//     applyLikeState(likeButton, data);
 
-           
-            let dom;
-            shoppingListArr.forEach(one => {
-                dom = document.createElement('li');
-                dom.textContent = one
-            })
-            list.appendChild(dom)
-            if(!document.querySelector("a#mail-list")){
-                const mailto = document.createElement('a');
-                mailto.classList.add('mailto')
-                mailto.setAttribute('id','mail-list')
-                mailto.setAttribute("title","Email Shopping List");
-                
-                const span = document.createElement("span")
-                span.classList.add("hide-text")
-                const icon = document.createElement("i")
-                icon.classList.add("fa","fa-solid","fa-envelope")
+//     // Update button state and styling
+//     likeButton.setAttribute("aria-pressed", data.liked ? "true" : "false");
+//     likeButton.classList.toggle("liked", !!data.liked);
+//   });
+// }
 
-                list.appendChild(mailto)
-                mailto.appendChild(span)
-                mailto.appendChild(icon)
 
-                
-            }
-            const getHref = () => {
-                let bodyString  = "";
-                let name = recItem.name;
-                let n = 0;
+// async function refreshLikes(recipeId) {
+//   const res = await fetch(`/.netlify/functions/like?id=${recipeId}&user=${user}`);
+//   const data = await res.json();
+//   const likeCount = document.getElementById("like-count");
+//   if (likeCount) likeCount.textContent = data.likes ?? 0;
+//   const btn = document.getElementById("like-button");
+//   if (btn) {
+//     btn.setAttribute("aria-pressed", data.liked ? "true" : "false");
+//     btn.classList.toggle("liked", !!data.liked);
+//   }
+// }
+  
 
-               shoppingListArr.forEach(ingredient => {
-               n++;
-                    bodyString +=  `${ingredient}%0D%0A`
-                   document.querySelector("a#mail-list").setAttribute('href',`mailto:${your_email}?&subject="Shopping list for ${name}" &body=${bodyString}`);
-               })
-            }
-           getHref()
-    
-        } else if(!item.checked){
-           
-            parent = item.parentNode;
-            const uncheckedItemText = parent.childNodes[1].textContent
-            shoppingListArr.find(listItem => {
-                if(uncheckedItemText === listItem){
-                   let index = shoppingListArr.indexOf(listItem)
-                    shoppingListArr.splice(index, 1)
-                } 
-            })
-            console.log(shoppingListArr)
-            let dom;
-            const shop = document.querySelector('.shoppinglist-container');
-            const list = document.querySelector('.shopping-list');
-            const mailto = document.getElementById('mail-list');
-           
-            list.innerHTML = '';
-            let m = 0
-            shoppingListArr.forEach(one => {
-                m++
-                console.log
-                dom = document.createElement('li');
+  // Refresh likes after template is in DOM
+  // await refreshLikes(recipeId);
 
-                dom.textContent = one
-                list.appendChild(dom)
-                console.log(list)
-               
-                if(m === 0) {
-                    shop.classList.add('hide'),
-                    checks.classList.remove('checked')
-                }
-              })
-              
-              if(m === 0) {
-                mailto.remove()
-                shop.classList.add('hide')
-              } else{
-                list.appendChild(mailto)
-              }
-             
-               
-               const getHref = () => {
-                let bodyString  = "";
-                let name = recItem.name
-                n=0;
-               shoppingListArr.forEach(ingredient => {
-               n++;
-                   bodyString +=  `${ingredient}%0D%0A`
-                   mailto.setAttribute('href',`mailto:${your_email}?&subject="Shopping list for ${name}" &body=${bodyString}`);
-                   list.appendChild(mailto)
 
-               })
+  const likeButton = container.querySelector("#like-button");
+// const user = "demoUser";
+const user = "demoUser";
 
-            }
-          
-           getHref()
-            
-        }
-        
-    })
-})
+function applyLikeState(btn, data) {
+  btn.setAttribute("aria-pressed", data.liked ? "true" : "false");
+  btn.classList.toggle("liked", !!data.liked);
+}
 
+async function refreshLikes(recipeId) {
+  const res = await fetch(`/.netlify/functions/like?id=${recipeId}&user=${user}`);
+  const data = await res.json();
+
+  const countEl = document.getElementById("like-count");
+  if (countEl) countEl.textContent = data.likes ?? 0;
+
+  const btn = document.getElementById("like-button");
+  if (btn) applyLikeState(btn, data);
+}
+
+if (likeButton) {
+  likeButton.addEventListener("click", async () => {
+    const isLiked = likeButton.getAttribute("aria-pressed") === "true";
+    const method = isLiked ? "DELETE" : "POST";
+
+    try {
+      await fetch(`/.netlify/functions/like?id=${recipeId}&user=${user}`, { method });
+      await refreshLikes(recipeId); // ✅ reuse helper
+    } catch (err) {
+      console.error("Like toggle failed:", err);
+    }
+  });
+}
+
+// Hydrate on load
+await refreshLikes(recipeId);
 
 }
 
-
-
-hamburger() 
-window.addEventListener('storage',  (e) =>  {
-    if (e.key === 'recipes') {
-
-        fetchRecipes()
-        
+// Hamburger + storage listener
+  hamburger();
+  window.addEventListener("storage", e => {
+    if (e.key === "recipes") {
+      fetchRecipes();
     }
-})
+  });
+// Exported initArticle for external use
+// export function initArticle(container, recItem) {
+ 
+//   const titleEl = container.querySelector(".article__title");
+//   if (titleEl) titleEl.textContent = recItem.name;
+//   const likeBtn = container.querySelector("#like-button");
+//   if (likeBtn) {
+//     likeBtn.addEventListener("click", () => {
+//       refreshLikes()
+//     });
+//   }
+// }
+
+export { fetchRecipes };

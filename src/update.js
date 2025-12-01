@@ -3,7 +3,7 @@ import {
     saveRecipes,
     getTimestamp,
     loadRecipesFromLocalStorage
-} from './functions'
+} from './functions.js'
 
 let recipes = await loadRecipesFromLocalStorage()
 const updateRecipe = async function(id, update) {

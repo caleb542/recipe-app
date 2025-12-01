@@ -5,20 +5,19 @@ import {
 } from 'uuid';
 import {
   createApi
-} from 'unsplash-js'
+} from './unsplash.js'
 import {
   getFilters,
   setFilters
-} from './filters';
+} from './filters.js';
 import {
   sortRecipes,
   listRecipes
-} from './recipes'
+} from './recipes.js'
 import {
   unsplashme
-} from "./unsplash";
+} from "./unsplash.js";
 import {
-  getRecipesFromDatabase,
   loadRecipes,
   getTimestamp,
   saveRecipes,
@@ -26,31 +25,42 @@ import {
   hamburger,
   convertTimestamp,
   loadRecipesFromLocalStorage
-} from './functions'
-import * as Realm from "realm-web";
+} from './functions.js'
+import { getRecipesFromDatabase } from "./backend/getRecipesFromDatabase.js";
 
-const firstLoad = document.getElementById("static-landing-page");
-const pageContainer = document.querySelector('.page-container')
-pageContainer.style.opacity='0.4'
-pageContainer.style.top="10%"
-firstLoad.style.opacity="1"
-firstLoad.style.zIndex="10"
+
+const staticOverlay = document.getElementById("static-landing-page");
+const pageContainer = document.querySelector('.page-container');
+
+if(localStorage.getItem("firstTime") === null || localStorage.getItem("firstTime") === "true") {
+  localStorage.setItem("firstTime","true");
+  pageContainer.style.opacity='0.4'
+  pageContainer.style.top="10%"
+  staticOverlay.style.opacity="1"
+  staticOverlay.style.zIndex="10"
+  staticOverlay.classList.add('show');
+}
+
 
 const stlCta = document.querySelector('.stl-cta')
 stlCta.addEventListener("click", function(e){
-  firstLoad.style.opacity="0.5"
-  firstLoad.style.position="fixed"
-  firstLoad.style.top="-120%"
-  firstLoad.style.transition=" 0.8s ease-out"
+  
+  staticOverlay.style.opacity="0.5"
+  staticOverlay.style.position="fixed"
+  staticOverlay.style.top="-120%"
+  staticOverlay.style.transition=" 0.8s ease-out"
   pageContainer.style.opacity="1"
   pageContainer.style.top="0"
   pageContainer.style.display="block"
   pageContainer.style.transition="all 0.8s ease-out"
+
+  localStorage.setItem("firstTime","false");
+    staticOverlay.classList.remove('show');
 })
 
-await listRecipes(recipes)
 
-
+let recipes =  await loadRecipesFromLocalStorage()
+await listRecipes(recipes);
 
 // Event Listeners
 document.querySelector('#search-filter').addEventListener('input', (e) => {
@@ -72,117 +82,66 @@ document.querySelector('#filter-by').addEventListener('change', (e) => {
 
 
 const getCategories = async () => {
-  let recipes = await loadRecipesFromLocalStorage()
-  let categories = []
-  recipes.forEach((recipe) => {
-    recipe.categories.forEach(category => {
-      categories.push(category)
-    })
-  })
+  let categories = [];
 
-  //filter out duplicates
-  function uniq(categories) {
-    var seen = {};
-    return categories.filter(function(item) {
-        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+  if (Array.isArray(recipes)) {
+    recipes.forEach((recipe) => {
+      // Controlled category
+      const category = recipe.category || "Uncategorized";
+      categories.push(category);
+
+      // Optional: include tags if you want them in the cloud
+      if (Array.isArray(recipe.tags)) {
+        recipe.tags.forEach(tag => categories.push(tag));
+      }
     });
+  } else {
+    console.warn("Recipes not available yet:", recipes);
   }
- function uniq(cats) {
-  var seen = {};
-  return cats.filter(function(item) {
-      return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+
+  categories = [...new Set(categories)];
+  categories.unshift("All");
+
+  const categoriesCloud = document.querySelector("#categories-cloud section");
+  categoriesCloud.setAttribute("tabindex", "0");
+  categoriesCloud.setAttribute("role", "radiogroup");
+
+  categories.forEach((cat, index) => {
+    const label = document.createElement("label");
+    label.setAttribute("role", "radio");
+    label.setAttribute("for", `cat-${index}`);
+    label.textContent = cat;
+
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "category";
+    radio.id = `cat-${index}`;
+    radio.value = cat;
+    radio.classList.add("sort", "radio");
+
+    label.appendChild(radio);
+    categoriesCloud.appendChild(label);
   });
-}
-// add ALL
-
-categories = uniq(categories)
-
-categories.unshift("All")
-  const categoriesCloud = document.createElement("div")
-  categoriesCloud.setAttribute("id", "categories-cloud");
- 
-  categories.forEach(cat => {
+};
 
 
-    
-    const div = document.createElement('div')
-    const diva = document.createElement('a')
-    diva.classList.add('sort')
-    div.appendChild(diva)
-
-    diva.setAttribute('href','#')
-
-    diva.innerHTML = "<span></span><i class=''></i>"
-    diva.classList.add('cat-item')
-    diva.firstChild.textContent = cat
-    diva.setAttribute('sort', cat)
-    diva.firstChild.setAttribute('sort',cat)
-    diva.firstChild.nextSibling.setAttribute('sort',cat)
-
-    categoriesCloud.appendChild(div)
-  })
-  document.querySelector(".homepage-hero").appendChild(categoriesCloud);  
-  document.querySelector(".homepage-hero").style.position="relative";
-
-  
 // Event Listeners
-let tags = document.querySelectorAll('#categories-cloud a.sort')
+document.addEventListener("change", (e) => {
+  if (e.target.matches('#categories-cloud input[type="radio"]')) {
+    const selected = e.target.value;
+    setFilters({
+      searchText: selected === "All" ? "" : selected
+    });
+    listRecipes(recipes);
+  }
+});
 
-tags.forEach(tag => {
-  tag.addEventListener('click', (e) => {
-   
-    e.preventDefault()
 
-   
-    if(e.target.getAttribute('sort') === "All"){
-      setFilters({
-        searchText: " "
-
-      })
-      listRecipes(recipes)
-    } else {
-      setFilters({
-        searchText: e.target.getAttribute('sort')
-      })
-      listRecipes(recipes)
-    }
-  
-  
-  },{once:true})
-})
-}
-
-getCategories()
+await getCategories()
 hamburger()
-
-
       
 window.addEventListener('storage', (e) => {
   if (e.key === 'recipes') {
-    // const newRecipes = loadRecipes()
-    //  let pagename = index            
     listRecipes(recipes)
-    //          updateTextElements(pageName);
   }
 })
-
-
-
-// const spins = document.querySelector(".spinning-wheel")
-// const box = document.body;
-
-
-// const updateDisplay = (event) => {
- 
-//   let X = `${Math.round((event.pageX / 2) / window.innerWidth * 1000 )}px `
-//   let Y = `${Math.floor((event.pageY / 2)/ window.innerHeight * 1000)}px`
-//   spins.style.top="unset"
-//   spins.style.left="unset"
-//   spins.style.bottom=Y
-//   spins.style.right=X
-//   console.log(`spins top ${Y} left ${X}`)
-// }
-
-// box.addEventListener("mousemove", updateDisplay, false);
-// box.addEventListener("mouseenter", updateDisplay, false);
-// box.addEventListener("mouseleave", updateDisplay, false);

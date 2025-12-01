@@ -1,0 +1,15 @@
+[dev]
+command = "npm run dev"
+targetPort = 8888
+port = 8080
+functions = "netlify/functions"
+
+[functions]
+directory = "netlify/functions"
+node_bundler = "esbuild"
+
+[build]
+publish = "public"
+command = "npm run build"
+
+

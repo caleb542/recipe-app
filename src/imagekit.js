@@ -1,5 +1,5 @@
 import { javascript } from "webpack";
-import ImageKit from "imagekit-javascript"
+import ImageKit from "imagekit-javascript.js"
 
 
 // SDK initialization

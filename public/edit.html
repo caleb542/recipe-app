@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,12 +13,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Fugaz+One&family=Lato:wght@300;400;700&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/610bdb1969.js" crossorigin="anonymous"></script>
-    <!-- <script src="./scripts/ckeditor/ckeditor.js"></script> -->
-    <script src="./scripts/tinymce_6.2.0/tinymce/js/tinymce/tinymce.min.js"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/35.3.0/classic/ckeditor.js"></script>
 
-    <link href="./scripts/index.css" rel="stylesheet" media="screen" />
+ 
+    <script src="https://kit.fontawesome.com/610bdb1969.js" crossorigin="anonymous"></script>
+<link href="./scripts/index.css" rel="stylesheet" media="screen" />
+<link href="./scripts/edit.css" rel="stylesheet" media="screen" />
+
 
     <title>Recipe App - Edit</title>
 </head>
@@ -42,129 +41,221 @@
                             <a tabindex="-1" href="/index.html">Home</a>
                         </li>
                         <li>
-                            <a tabindex="-1" href="/mission.html">Mission Statement</a>
+                            <a tabindex="-1" href="#" id="update-one">Update Database</a>
                         </li>
-                        <li>
-                            <a tabindex="-1" href="/about.html">About Recipe Me</a>
-                        </li>
-                        <li>
-                            <a tabindex="-1" href="#" id="update-one">UpdateOne in Database</a>
-                        </li>
+                       
                     </ul>
                 </nav>
-
-                <div class="container">
-                    <h2 class="header__title">Edit recipe: <span class="header__subtitle">Lemonade Supremes</span></h2>
-                    <a id="remove-recipe" href="#">Remove recipe (forever)</a>
-                </div>
+              
             </header>
-
+  <div class="heading-h2-container edit-header">
+                    
+                    <h2>Editing: &nbsp;<span id="heading-name" class="header__subtitle"> </span></h2>
+                    <div class="edit-header__actions">
+                        <span id="statusBadge" class="status-badge status-staging">Staging</span>
+                        <button id="saveToDatabaseButton" class="save-button">Save to Database</button>
+                        <button id="remove-recipe" class="delete-recipe" >Delete Recipe</button>
+                    </div>
+                </div>
             <div class="container">
-                <div id="blah">
+              
+
+                
+                    
+                <div class="former form">
                     <div class="edit-form-list">
                         <div class="section-1">
-                            <label id="name">
-                                <div>Name</div>
+                            <div class="form-group">
+                                 <label for="recipe-name" id="recipe-name-label">
+                                <div>Name</div> </label>
                                     <input id="recipe-name" class="input" type="text"
-                                    placeholder="Recipe Name" name="text" value="Lemonade Supremes">
-                            </label>
-                            <label id="description">
-                                <div>Description</div><textarea id="recipe-description"
+                                    placeholder="Recipe Name" name="text" value="">
+                               
+                            </div>
+                            <div class="form-group">
+                                 <label id="description">
+                                <div>Description</div></label>
+                                <textarea id="recipe-description"
                                     placeholder="Recipe Description"></textarea>
                                     <!-- <button id="description-button" type="submit">Submit</button> -->
-                            </label>
-                            <label id="article">
-                                <div>Article</div><textarea id="recipe-article" placeholder="Recipe Article"></textarea>
-                                <!-- <button id="article-button" type="submit">Submit</button> -->
-                            </label>
-                            <label id="author">
-                                <div>Author</div><input id="recipe-author" class="input" type="text"
-                                    placeholder="Peter Peter pumpkin eater" name="text" value="Mister Sour Lemon">
-                            </label>
-                            <label id="directions-heading">
-                                <div>Directions</div>
-                                <ol id="directions-list" class="directions">
-
-                                </ol>
-                                <div id="add-container"><a id="add-step" href="#"><i class="fa fa-plus"
-                                    aria-hidden="true"></i><span class="hide-text">Add another step</span></a>
+                                
+                            </div>
+                            <div class="form-group">
+                                 <div id="article">
+                                <div>Article</div>
+                                <div id="editor"></div>
                                 </div>
-                            </label>
-                    
-                            <dialog id="add-directions">
-                                <h2>Directions</h2>
-                                <p></p>
-                                <form>
-                                    <fieldset>
-                                        <textarea placeholder="Add some directions" id="enter-next-step"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label id="author">
+                                    <div>Author</div>
+                                </label>
+                                <input id="recipe-author" class="input" type="text"
+                                    placeholder="Peter Peter pumpkin eater" name="text" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="recipe-prep-time">
+                                    <div>Prep Time</div>
+                                </label>
+                                <input id="recipe-prep-time" class="input" type="text" placeholder="e.g. 15 minutes">
+                            </div>
+                            
+                           
+                        <div class="form-group" id="tags">
+                            <h2 class="tags">Tags</h2>
+                            
+                            <!-- Input for adding tags -->
+                            <input type="text" id="tag-input" placeholder="Type a tag and press Enter">
+                            
+                            <!-- Container where pills will appear -->
+                            <div id="tags-container" class="tags-container"></div>
+                        </div>
 
-                                        <button class="dialog-close-button">Done</button>
-                                    </fieldset>
-                                </form>
-                            </dialog>
+                        <div class="form-group checklist">
+                            <h2>Categories</h2>
+                            <ul>
+                                <li>
+                                    <div class="form-group"><label class="checkbox" for="drinks">Drinks</label><input type="checkbox" name="category" id="drinks"></div>
+                                    </li>
+                                <li>
+                                    <div class="form-group">
+                                        <label class="checkbox"  for="desserts">Desserts</label><input type="checkbox" name="category" id="desserts" value="desserts">
+                                    </div></li>
+                                <li><div class="form-group">
+                                    <label class="checkbox"  for="appetizers">Appetizers</label><input  type="checkbox" name="category" id="appetizers" value="appetizers">
+                                </div></li>
+                                <li><div class="form-group"><label class="checkbox"  for="meals">Meals</label><input type="checkbox" name="category" id="meals" value="meals"></div></li>
+                                <li><div class="form-group"><label class="checkbox"  for="breakfast">Breakfast</label><input type="checkbox" name="category" id="breakfast" value="breakfast"></div></li>
+                                <li><div class="form-group"><label class="checkbox"  for="lunch">Lunch</label><input type="checkbox" name="category" id="lunch"></div></li>
+                                <li><div class="form-group"><label class="checkbox"  for="dinner">Dinner</label><input type="checkbox" name="category" id="dinner" value="dinner"></div></li>
+                            </ul>
+                        </div>
 
-                            <label id="categories">
-                                <div class="category">Categories</div><textarea placeholder="categories"
-                                    id="recipe-categories"></textarea>
-                            </label>
+                        <div class="form-group">
+                            <label for="#feature-keyword">Feature&nbsp;Image</label>
                             <fieldset id="image" class="feature-image">
-                                <legend>Feature Image</legend><input id="feature-keyword"
-                                    placeholder="Search for a photo"><button class="feature-image"
-                                    id="feature-image-button"><i class="fa fa-solid fa-magnifying-glass"
-                                        aria-hidden="true"></i></button>
-                                <figure class="image-preview"><img
-                                        src="https://images.unsplash.com/photo-1622597468473-84f65fdc3fc0?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwxMHx8TGVtb25hZGV8ZW58MHwwfHx8MTY2Njk3MTMzNA&amp;ixlib=rb-4.0.3&amp;q=80&amp;w=1080"
-                                        style="width:200px;aspect-ratio:16/9">
-                                    <figcaption>Unsplash photo by <a
-                                            href="https://unsplash.com/@jugoslocos">Jugoslocos</a></figcaption>
+                                <input id="feature-keyword"
+                                    placeholder="Search for a photo">
+                                    <button class="feature-image"
+                                    id="feature-image-button">
+                                        <i class="fa fa-solid fa-magnifying-glass"></i>
+                                    </button>
+                                <figure class="image-preview">
+                                        <img src="" style="width:200px;aspect-ratio:16/9">
+                                        <figcaption>Unsplash photo by 
+                                            <a href="https://unsplash.com/@jugoslocos"></a>
+                                        </figcaption>
                                 </figure>
                             </fieldset>
-                            <dialog open="" id="select-images">
-                                <textarea></textarea>
-                                <button>Close</button>
-                            </dialog>
-
                         </div>
-                        <div class="overlay"></div>
-                        <dialog id="ingredient-modal" class="ingredient-modal">
+                            <!-- Image selection </div>modal -->
+                            <dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
+                                <div class="carousel">
+                                    <!-- <button class="arrow left" aria-label="Previous">&#9664;</button> -->
+                                    <ul class="carousel-track">
+                                    <!-- Unsplash images -->
+                                    </ul>
+                                    <!-- <button class="arrow right" aria-label="Next">&#9654;</button> -->
+                                </div>
+                                </dialog>
+                        </div>
+                         <div class="form-group">
+                                    <article>
+                                      <header>
+                                           <h2 class="header__title">Directions</h2>
+                                    </header>
+
+                                    <ol id="directions-list" class="directions">
+
+                                    </ol>
+                                    <div id="add-container"><a id="add-step" href="#"><i class="fa fa-plus"
+                                        aria-hidden="true"></i><span class="hide-text">Add another step</span></a>
+                                    </div>
+                                    </article>
+                                    
                             
-                            <button class="close-ingredient-modal">Close</button>
+                                <dialog id="add-directions" class="modal-dialog direction-dialog" closedBy="any">
+                                    Edit or add step:
+                                        <textarea placeholder="Start by preheating the oven to 350 degrees fahrenheit." id="enter-next-step"></textarea>
+                                        <div class="button__footer">
+                                            <button class="dialog-close-button">Finished</button>
+                                        </div>
+                                </dialog>
+                              </div>   
+                        <!-- Ingredient Modal -->
+                        <dialog id="ingredient-modal"  class="modal-dialog ingredient-modal" closedBy="any">
+                            <ul id="ingredient">
+                                <li><label><div>Name:</div> <input  id="name"  /></label></li>
+                                <li><label><div>Description:</div> <input id="description"  /></label></li>
+                                <li><label><div>Amount:</div> <input id="amount" /></label></li>
+                                <li><label><div>Unit:</div> <input id="unit" /></label></li>
+                                <li><label><div>Measure Word (Optional):</div> <input id="measureWord" placeholder="i.e. a splash, a pinch, a dollop"  /></label></li>                          
+                                <div class="button__footer">
+                                    <button class="close-ingredient-modal" id="close-ingredient-modal">Close</button>
+                                </div>
+                                </ul>
                         </dialog>
+
+                        <div class="form-group">                        
                         <article id="recipe" class="article__recipe">
                             <header id="recipe-header">
-                                <h1 class="header__title">Recipe</h1>
+                                <h2 class="header__title">Recipe</h2>
                             </header>
-                            <button id="add-an-ingredient"><i class="fa fa-plus" aria-hidden="true"></i><span
-                                    class="hide-text">Add a new
-                                    ingredient</span>
-                            </button>
-                            <ul class="recipe">
+                           
+                            <ul class="recipe recipe-list">
                             </ul>
+                             
+                             <footer class="edit-form-ingredient-footer">
+                                    <div>
+                                        <button id="add-an-ingredient"><i class="fa fa-plus" aria-hidden="true"></i> Add an Ingredient
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button id="save-button">Save this recipe</button> 
+                                    </div>
+                             </footer>
                         </article>
                         <div id="ingredients" class="edit-ingredients">
                         </div>
-                        <a class="btn btn-large" id="done-editing" href="">Done</a>
+                        <a class="button button-large" href=""  id="preview-link">Preview Article</a>
+                        </div>
                     </div>
-                </div>
-                <!--container-->
-                <!--content wrap-->
+            </div>     
+                <!--container-->     
             </div>
-            <footer>
-                <p>© Caleb Hamilton 2022</p>
-            </footer>
+           <dialog id="preview-dialog" closedBy="any"></dialog>
 
+  
+            </div>
+            <footer class="page-footer">
+                <p>© Caleb Hamilton 2022 - current revisions underway 2025</p>
+            </footer>
             <!-- page container-->
         </div>
+        <script type="module">
+    async function loadTemplate() {
+      const res = await fetch("/partials/article-template.html");
+      const html = await res.text();
+      document.body.insertAdjacentHTML("beforeend", html);
+    }
+    await loadTemplate();
 
-        <script src="./scripts/edit-bundle.js"></script>
-        <script>
-        
-        </script>
+    document.getElementById("preview-btn").addEventListener("click", () => {
+      const tpl = document.getElementById("article-template").content.cloneNode(true);
 
+      // Fill with draft form data
+      tpl.querySelector(".article__title").textContent = document.getElementById("title-input").value;
+      tpl.querySelector(".description").textContent = document.getElementById("body-input").value;
+      tpl.querySelector(".dates").textContent = new Date().toLocaleDateString();
 
+      const dialog = document.getElementById("preview-dialog");
+      dialog.innerHTML = "";
+      dialog.appendChild(tpl);
+      dialog.showModal();
+    });
+  </script>
+        <script src="./scripts/edit-bundle.js" defer></script>
     </div>
-
-
-</body>
+ </body>
 
 </html>

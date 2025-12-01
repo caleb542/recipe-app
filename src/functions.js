@@ -3,11 +3,13 @@ import {
     stringify,
     v4 as uuidv4
 } from 'uuid';
-import * as Realm from "realm-web";
+// import * as Realm from "realm-web";
 import {
     getImageGroup
-} from './unsplash';
-
+} from './unsplash.js';
+import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
+import { updateRecipeInDatabase } from './backend/updateRecipeInDatabase.js';
+import { syncRecipeUpdate } from './helpers/syncRecipe.js'
 
 const convertTimestamp = (rDate) => {
     if (typeof rDate === 'object') {
@@ -21,17 +23,26 @@ const convertTimestamp = (rDate) => {
 const getTimestamp = () => {
     let timestamp = moment()
     let timestampValueOf = timestamp.valueOf()
-    let timestampLong = timestamp.format('MMM Do, YYYY HH:mm')
-    let timestampShort = timestamp.format('MMM Do, YYYY HH:mm')
+    let timestampLong = timestamp.format('MMM Do, YYYY')
+    let timestampShort = timestamp.format('MM-DD-YYYY')
     let unixTimestamp = moment(timestampShort, 'MMM Do, YYYY HH:mm').unix();
     return [timestampShort, unixTimestamp]
 }
+
 const listDirections = (directions) => {
     const directionsList = document.getElementById("directions-list");
 
     directions.forEach((step, index) => {
         const li = document.createElement('li')
-        li.innerHTML = `<div class="direction-container"><div>${step.text}</div><a class="edit-item" href="#" dataId="${step.id}"><span dataId="${step.id}"></span><i class="fa fa-pencil" area-hidden="true" dataId="${step.id}" aria-hidden="true"></i><span class="hide-text">Edit</span></a><a href="#" title="remove" class="remove" dataId="${step}"><span dataId="${step.id}">RemoveX</span></a></div>`
+        li.innerHTML = `<label for="${step.id}"></ <span>${step.text}</span></label> 
+
+      <button id="${step.id}" data-id="${step.id}" class="item-buttons edit-direction">
+        <i class="fa fa-pencil" aria-hidden="true"></i> Edit
+      </button> 
+
+      <button class="item-buttons remove-direction" data-name="${step.id}" data-id="${step.id}">
+        <i class="fa fa-trash-can"></i> Delete
+      </button>`
         directionsList.appendChild(li)
     })
 
@@ -59,175 +70,105 @@ const listDirections = (directions) => {
     const directionsHeading = document.getElementById("directions-heading")
     // directionsHeading.appendChild(emptyBlock)
 }
+
+
 const openDirectionsDialogue = async (id, text) => {
-    const overlay = document.querySelector('.overlay')
-    // overlay.classList.add('hide');
-    const modal = document.querySelector('#add-directions')
-    modal.setAttribute('open', '');
-    modal.setAttribute('autofocus', '');
-    //const form = document.createElement('div');
-    let recipes = await loadRecipesFromLocalStorage()
-    let recipeId = location.hash.substring(1);
-    let recItem = recipes.find((recipe) => recipe.id === recipeId)
-    document.querySelector("#add-directions h2").textContent = `${recItem.name} Directions`
-    // form.innerHTML = `<h2>${recItem.name} - Directions</h2><p>What's the next step?</p><form><fieldset><textarea placeholder="The next step is..." id="enter-next-step"></textarea></fieldset></form><button class="dialog-close-button">Done</button>`
+  const modal = document.querySelector('#add-directions');
+  modal.showModal();
 
-    // const page = document.querySelector('.page-container')
-    // page.appendChild(modal);
-    const textBox = document.getElementById("enter-next-step");
-    // Populate the textbox value, make sure if text is undefined it doesn't show up as undefined in the box, rather just an empty string like so ''
-    text === undefined ? text = '' : text = text
-    textBox.value = text
-    // listen for typing
-    // alert(`real id ${id}`)
-    recipes = await loadRecipesFromLocalStorage()
-    textBox.addEventListener('input', async function (e) {
-        console.log('running type listener')
-        // load current recipes object from local store
+  let recipes = await loadRecipesFromLocalStorage();
+  let recipeId = location.hash.substring(1);
+  let recItem = recipes.find((recipe) => recipe.id === recipeId);
+  if (recItem && recItem.name) {
 
-        // identify the right recipe from the id found in the url    
-        let recipeId = location.hash.substring(1);
-        let recItem = recipes.find((recipe) => recipe.id === recipeId)
-        // store the directions array as 'arr'
-        let arr = await recItem.directions;
-        // console.error(arr)// output the directions to the console 
+} else {
+    console.log("No name for this recipe yet")
+}
 
-        // set a variable 'stepItem' to identify the array item by id
-        // console.error(`id ${id}`)
-        const stepItem = arr.find((arrItem) => arrItem.id === id)
-        // console.error(stepItem)
-        stepItem.text = e.target.value
-        // console.error(stepItem)
+  const textBox = document.getElementById("enter-next-step");
+  textBox.value = text ?? '';
 
-        saveRecipes(recipes)
+  // Attach input listener ONCE
+  textBox.oninput = async function (e) {
+    const newText = e.target.value;
+    console.log("Input event fired:", newText);
 
-        const updateList = async () => {
-            recipes = await loadRecipesFromLocalStorage()
-            recItem = recipes.find((recipe) => recipe.id === recipeId)
-
-            //console.log(recItem)
-            // initEdit(recipeId)
-            // alert(recItem.name)
-            let updatedDirections = recItem.directions
-            const directionsList = document.getElementById("directions-list");
-            directionsList.innerHTML = ''
-            listDirections(updatedDirections)
-        }
-        updateList()
-    })
-
-
-    modal.querySelector('textarea').focus();
-    modal.addEventListener('transitionend', (e) => {
-        modal.querySelector('textarea').focus();
+    await syncRecipeUpdate(recipeId, recipe => {
+      recipe.directions = recipe.directions.map(d =>
+        d.id === id ? { ...d, text: newText } : d
+      );
     });
 
-    const closeDialog = document.querySelector(".dialog-close-button")
+    // Re-render directions list from updated localStorage
+    const updatedRecipes = await loadRecipesFromLocalStorage();
+    const updatedRec = updatedRecipes.find(r => r.id === recipeId);
+    if (updatedRec) {
+      const directionsList = document.getElementById("directions-list");
+      directionsList.innerHTML = '';
+      listDirections(updatedRec.directions);
+    }
+  };
 
-    closeDialog.addEventListener('click', function (e) {
-        e.preventDefault();
-        modal.removeAttribute("open")
-        modal.removeAttribute("autofocus")
+  modal.querySelector('textarea').focus();
+  modal.addEventListener('transitionend', () => {
+    modal.querySelector('textarea').focus();
+  });
 
+  const closeDialog = document.querySelector(".dialog-close-button");
+  closeDialog.addEventListener('click', function (e) {
+    e.preventDefault();
+    modal.close("Cancelled");
+    document.querySelector('#add-step').focus();
+  });
+};
 
-        document.querySelector('.overlay').classList.remove('show')
-        document.querySelector('#add-step').focus();
-    })
-
-}
 // Edit Direction Button
 const editDirection = async (id) => {
-    let recipes = await loadRecipesFromLocalStorage()
-    let recipeId = location.hash.substring(1);
-    let recItem = recipes.find(recipe => recipe.id === recipeId)
-    let arr = recItem.directions;
-    let stepItem = arr.find(direction => direction.id === id)
-    let text = stepItem.text
-    openDirectionsDialogue(id, text)
-    // const textBox = document.getElementById("enter-next-step");
-    // textBox.value = text;
-    // textBox.addEventListener('input', function (e) {
-    //     let recipeId = location.hash.substring(1);
-    //     let recItem = recipes.find((recipe) => recipe.id === recipeId)
-    //     let arr = recItem.directions;
-    //     let stepItem = arr.find(direction => direction.id === id)
-    //     stepItem.text = e.target.value
-    //     saveRecipes(recipes)
+  const recipes = await loadRecipesFromLocalStorage();
+  const recipeId = location.hash.substring(1);
+  const recItem = recipes.find(recipe => recipe.id === recipeId);
+  if (!recItem) return;
 
-    //     const updateList = async () => {
-    //         recipes = await loadRecipesFromLocalStorage()
-    //         recItem = recipes.find((recipe) => recipe.id === recipeId)
+  const stepItem = recItem.directions.find(direction => direction.id === id);
+  if (!stepItem) return;
 
-    //         console.log(recItem)
-    //         // initEdit(recipeId)
-    //         // alert(recItem.name)
-    //         let updatedDirections = recItem.directions
-    //         console.log(updatedDirections)
-    //         directionsList.innerHTML=''
-    //         listDirections(updatedDirections)     
-    //     }
-    //   updateList()
-    // })
-}
+  // Just open the dialogue — input listener is handled inside openDirectionsDialogue
+  openDirectionsDialogue(id, stepItem.text);
+};
+
+
+
 
 
 // Remove Directions Button
 const removeDirection = async (itemID, text) => {
+  const recipeId = location.hash.substring(1);
 
-    let recipes = await loadRecipesFromLocalStorage()
-    let recipeId = location.hash.substring(1);
-    let recItem = recipes.find((recipe) => recipe.id === recipeId)
+  // Optional: confirm before deleting
+  const confirmText = `Erase "${text}"?`;
+  if (!confirm(confirmText)) return;
 
-    let arr = recItem.directions;
-    console.log(`argument id: ${itemID}`)
-    arr.forEach(item => console.log(item.id))
+  // Persist via syncRecipeUpdate
+  await syncRecipeUpdate(recipeId, recipe => {
+    recipe.directions = recipe.directions.filter(d => d.id !== itemID);
+  });
 
-    const context = `Erase ${text}?`
-    if (confirm(context) == true) {
-        // continue
-    } else {
-        return
-    }
-    let item = arr.find(direction => direction.id === itemID)
-    let itemNum = (arr.indexOf(item))
-    const removerDir = () => {
-        if (itemNum === 0) {
-
-            alert(`shift ${itemNum}`)
-            arr.shift()
-        } else if ((itemNum + 1) === arr.length) {
-
-            alert(`pop ${itemNum}`)
-            arr.pop()
-        } else {
-            alert(`splice ${itemNum}`)
-            arr.splice(itemNum, 1)
-        }
-
-        saveRecipes(recipes)
-        const updateList = async () => {
-            recipes = await loadRecipesFromLocalStorage()
-            recItem = recipes.find((recipe) => recipe.id === recipeId)
-
-            // initEdit(recipeId)
-            // alert(recItem.name)
-            let updatedDirections = recItem.directions
-            console.log(updatedDirections)
-            const directionsList = document.getElementById("directions-list");
-            directionsList.innerHTML = ''
-            listDirections(updatedDirections)
-        }
-        updateList()
-    }
-    removerDir()
-}
+  // Re-render from fresh localStorage to avoid stale references
+  const updatedRecipes = await loadRecipesFromLocalStorage();
+  const updatedRec = updatedRecipes.find(r => r.id === recipeId);
+  if (updatedRec) {
+    const directionsList = document.getElementById("directions-list");
+    directionsList.innerHTML = '';
+    listDirections(updatedRec.directions);
+  }
+};
 
 
 const addIngredients = () => {
     const addIngredientsButton = document.querySelectorAll('.addIngredient');
     addIngredients.forEach(button => {
         button.addEventListener('click', function () {
-            console.log(newRecipe)
+            // console.log(newRecipe)
             newRecipe.ingredients.push({
                 name: "",
                 description: "",
@@ -241,82 +182,63 @@ const addIngredients = () => {
 
             newRecipe = loadNewRecipeFromLocalStorage()
             createForm(newRecipe)
-            //const elem = document.querySelector('.ingredient');
-            // const clone = elem.cloneNode(true);
-            // document.querySelector('#group2').appendChild(clone)
-            //  elem.after(clone)
+           
         })
     })
 }
 
 
 // Sort your notes by one of three ways
-const sortRecipes = function (sortBy, recipes) {
-    if (sortBy === 'byEdited') {
+const sortRecipes = (sortBy, recipes) => {
+  if (!Array.isArray(recipes)) {
+    console.warn('sortRecipes expected an array but got:', recipes);
+    return [];
+  }
 
-        return recipes.sort(function (a, b) {
+  const getTimestamp = (field) =>
+    Array.isArray(field) ? field[1] : 0;
 
-            if (a.updatedAt[1] > b.updatedAt[1]) {
-                return -1
-            } else if (a.updatedAt[1] < b.updatedAt[1]) {
-                return 1
-            } else {
-                return 0
-            }
-        })
-    } else if (sortBy === 'byCreated') {
+  switch (sortBy) {
+    case 'byEdited':
+      return recipes.sort((a, b) => getTimestamp(b.updatedAt) - getTimestamp(a.updatedAt));
+    case 'byCreated':
+      return recipes.sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt));
+    case 'alphabetical':
+      return recipes.sort((a, b) =>
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+      );
+    default:
+      return recipes;
+  }
+};
 
-        return recipes.sort(function (a, b) {
-            if (a.createdAt[1] > b.createdAt[1]) {
-                return -1
-            } else if (a.createdAt[1] < b.createdAt[1]) {
-                return 1
-            } else {
-                return 0
-            }
-        })
-    } else if (sortBy === 'alphabetical') {
-
-        return recipes.sort(function (a, b) {
-            if (a.name.toLowerCase() < b.name.toLowerCase()) {
-                return -1
-            } else if (a.name.toLowerCase() > b.name.toLowerCase()) {
-                return 1
-            } else {
-                return 0
-            }
-        })
-    } else {
-        return recipes
-    }
-}
 
 const loadRecipes = async () => {
+  const raw = localStorage.getItem('recipes');
 
-    let recs;
-    if (localStorage.getItem('recipes')) {
+  if (raw) {
+    console.log('📦 Getting recipes from localStorage');
 
-        console.log('getting from local storage')
-        const recipesJSON = localStorage.getItem('recipes')
-        try {
+    try {
+      const parsed = JSON.parse(raw);
 
-            recipesJSON ? console.log('aokay') : console.log('NOJSON')
-
-            return recipesJSON ? JSON.parse(recipesJSON) : console.log('NOJSON')
-        } catch (e) {
-
-            return []
-        }
-    } else {
-        console.error("fetching from database")
-        return await getRecipesFromDatabase()
-
-
+      if (Array.isArray(parsed)) {
+        console.log('✅ Parsed recipes successfully');
+        return parsed;
+      } else {
+        console.warn('⚠️ Parsed data is not an array:', parsed);
+        return [];
+      }
+    } catch (e) {
+      console.error('❌ Failed to parse recipes from localStorage:', e);
+      return [];
     }
+  }
 
+  console.log('🌐 Fetching recipes from database');
+  return await getRecipesFromDatabase();
+};
 
-
-}
 
 const loadRecipesFromLocalStorage = async () => {
     if (localStorage.getItem('recipes')) {
@@ -357,121 +279,10 @@ const saveNewRecipeToLocalStorage = (newRecipe) => {
 
 }
 
-const getRecipesFromDatabase = async () => {
-    // put this in a backebd-connect statement
-    const APP_ID = 'data-puyvo'
-    const app = new Realm.App({
-        id: APP_ID
-    });
-    const credentials = Realm.Credentials.anonymous();
 
-    let recs;
-    try {
-        // checkin with credentials
-        const user = await app.logIn(credentials);
-        //pull all the recipes from the database with custom serverside function
-        recs = await user.functions.getAllRecipes();
-
-        return recs;
-
-    } catch (error) {
-        console.error("Failed to log in", error);
-    }
-
-}
-const updateRecipeInDatabase = async () => {
-    //   alert("Yes this is the intended function ...")
-    // put this in a backebd-connect statement
-    const APP_ID = 'data-puyvo'
-    const app = new Realm.App({
-        id: APP_ID
-    });
-    const credentials = Realm.Credentials.anonymous();
-
-    let recipes = await loadRecipes()
-
-    try {
-        // checkin with credentials
-        const user = await app.logIn(credentials);
-        console.log(user)
-        //pull all the recipes from the database with custom serverside function
-        const updateRecipe = JSON.stringify(recipes[0])
-
-
-        let currentId = location.hash.substring(1)
-
-        let theRecipe = recipes.find(recipe => recipe.id === currentId)
-
-        console.log("$(&*@#$(#*Q$&))")
-        console.log(theRecipe)
-        delete theRecipe._id
-        console.log(theRecipe)
-        console.log("$(&*@#$(#*Q$&))")
-        // newRec = JSON.stringify(newRec)
-
-        user.functions.replaceOrInsert(theRecipe)
-            .then(result => console.log(`Successfully inserted item with _id: ${result}`))
-            .catch(err => console.error(`Failed to insert item: ${err}`))
-
-        // console.log(addRecipeToDb)        
-
-    } catch (error) {
-        console.error("POST", error);
-    }
-
-}
 const listeners = () => {
 
-    // const editRecipeButtons = document.querySelectorAll('.edit-ingredient');
-    // const removeRecipeButton = document.getElementById('remove-recipe');
-    // const remove = document.querySelectorAll('a.remove-ingredient');
-
-    // editRecipeButtons.forEach(button => {
-    //     button.addEventListener('click', function (e) {
-    //         alert('click')
-    //         e.preventDefault();
-    //         let dialogs = document.querySelector('#ingredient-modal');
-
-
-    //         button.classList.add('return-focus')
-
-    //         let ingredientId = e.target.getAttribute('data')
-    //         let item = recItem.ingredients.find((ingredient) => ingredient.id === ingredientId)
-    //         // alert('boogie')
-    //         editIngredient(item)
-    //     })
-    // })
-
-
-    // removeRecipeButton.addEventListener('click', function (e) {
-    //     const recipeId = location.hash.substring(1);
-    //     let text = "DELETE THE RECIPE\nAre You Sure?";
-    //     if (confirm(text) == true) {
-
-
-    //         removeRecipe(recipeId);
-    //     } else {
-    //         return
-    //     }
-
-    // })
- 
-    // remove.forEach(x => {
-    //     x.addEventListener('click', function (e) {
-    //         let text = "You Sure?"
-    //         e.preventDefault();
-    //         let id = e.target.getAttribute('data');
-    //         if (confirm(text) == true) {
-    //             removeIngredient(id)
-    //         } else {
-
-    //         }
-
-    //     }, {
-    //         once: true
-    //     });
-
-    // })
+  
 }
 const sendRecipes = async () => {
     const APP_ID = 'data-puyvo'
@@ -554,11 +365,15 @@ const renderImageSelector = (keyword, pageNumber) => {
             responseLength = response.length;
             console.log(responseLength)
             const selectImages = document.getElementById("select-images")
-            selectImages.classList.add('show')
-            selectImages.innerHTML = ''
-            const imageViewport = document.createElement('div')
-            imageViewport.classList.add('image-viewport')
-            const imageShow = document.createElement('ul')
+
+            // selectImages.classList.add('show')
+            selectImages.showModal();
+            
+            const imageViewport = document.querySelector('.carousel')
+            imageViewport.classList.add('image-viewport');
+            // const imageOverlay = document.createElement('div')
+            // imageOverlay.setAttribute('id','image-overlay')
+            const imageShow = document.querySelector('ul.carousel-track');
             imageShow.classList.add('image-show');
             response.forEach(imageObject => {
 
@@ -578,11 +393,12 @@ const renderImageSelector = (keyword, pageNumber) => {
                 fig.appendChild(img)
                 li.appendChild(fig)
                 fig.appendChild(caption);
-                imageViewport.appendChild(imageShow)
+                // imageViewport.appendChild(imageOverlay);
+               
                 imageShow.appendChild(li);
 
 
-                document.getElementById('select-images').appendChild(imageViewport);
+                // document.getElementById('select-images').appendChild(imageViewport);
 
 
                 images = document.querySelectorAll('.imageListItem');
@@ -613,6 +429,7 @@ const renderImageSelector = (keyword, pageNumber) => {
             const prev = document.createElement('button')
             const next = document.createElement('button')
             const modal = document.querySelector('dialog');
+            modal.setAttribute("closeBy","any");
 
 
             prev.setAttribute('id', 'prev-page');
@@ -644,9 +461,7 @@ const renderImageSelector = (keyword, pageNumber) => {
                 selectImagesModal.querySelector('.btn').focus();
             });
 
-            /*
-            3333333333333333333
-            */
+       
             const slider = document.querySelector('.image-show')
             let images = document.querySelectorAll('#select-images img')
 
@@ -729,17 +544,23 @@ const renderImageSelector = (keyword, pageNumber) => {
             })
 
             selectImage.addEventListener('click', async function (e) {
+
                 e.preventDefault()
+                console.log("selecting image")
                 const selected = images[slideNum - 1];
 
                 let recipeId = location.hash.substring(1);
                 recipes = await loadRecipes()
-                recItem = recItem = recipes.find((recipe) => recipe.id === recipeId)
+                recItem = recipes.find((recipe) => recipe.id === recipeId)
 
                 recItem.photographer = selected.getAttribute('dataName')
                 recItem.photographerLink = selected.getAttribute('dataLink')
                 recItem.photoURL = selected.getAttribute('dataURL')
                 recItem.updatedAt = getTimestamp();
+
+                console.log(recItem.photoURL);
+                console.log(recItem.photographer);
+                console.log(recItem.photographerLink);
 
                 saveRecipes(recipes)
                 document.querySelector('.image-preview img').setAttribute('src', recItem.photoURL);
@@ -755,9 +576,9 @@ const renderImageSelector = (keyword, pageNumber) => {
             const closeModal = document.querySelector('.close-image-modal')
             closeModal.addEventListener('click', function (e) {
                 e.preventDefault()
-                document.querySelector('.overlay').classList.remove('show')
                 const modal = document.getElementById('select-images')
-                modal.classList.remove('show');
+                modal.close("Cancelled")
+              
             })
 
         })
@@ -787,6 +608,32 @@ const removeRecipe = async (recipeId) => {
     }
     removerRec()
 }
+
+/**
+ * Update the currently editing recipe in localStorage.
+ * This ensures that any changes made in the editor are persisted.
+ */
+async function updateLocalStorage(recipeId, updates = {}) {
+  // Load all recipes
+  let recipes = await loadRecipes();
+  let recipe = recipes.find(r => r.id === recipeId);
+
+  if (!recipe) {
+    console.error(`❌ Recipe with ID ${recipeId} not found`);
+    return;
+  }
+
+  // Merge updates into the recipe object
+  Object.assign(recipe, updates);
+
+  // Save back to recipes array
+  saveRecipes(recipes);
+
+  // Update the "editingRecipe" cache
+  localStorage.setItem('editingRecipe', JSON.stringify(recipe));
+}
+
+
 const like = () => {
     alert(`Thanks, we like you too! Unfortunately we don't have this button wired up yet, because USERS don't exist yet. `)
 }
@@ -804,7 +651,7 @@ export {
     editDirection,
     removeDirection,
     removeRecipe,
-    getRecipesFromDatabase,
+    // getRecipesFromDatabase,
     addIngredients,
     addToExistingRecipes,
     sortRecipes,
@@ -817,7 +664,8 @@ export {
     renderImageSelector,
     toggleMenu,
     hamburger,
-    updateRecipeInDatabase,
+    // updateRecipeInDatabase,
     convertTimestamp,
-    listeners
+    listeners,
+    updateLocalStorage
 }

@@ -86,55 +86,44 @@
 
                     <ul>
                         <li><a tabindex="-1" class="add" href="/edit.html" title="add a recipe">Add a recipe</a></li>
-                        <li>
-                            <a tabindex="-1" href="/index.html">Home</a>
-                        </li>
-                        <li>
-                            <a tabindex="-1" href="/mission.html">Mission Statement</a>
-                        </li>
-                        <li>
-                            <a tabindex="-1" href="/about.html">About Recipe Me</a>
-                        </li>
+                       
 
                     </ul>
                 </nav>
-                <!-- <h2 class="header__subtitle">A Digital Recipe Index <span>.</span></h2> -->
                 <div class="homepage-hero">
-                    <!--  <div class="imageElement" alt="">-->
-                    <h2>Find a recipe</h2>
-                    <div class="search-filters grid">
-                        <fieldset>
-                            <legend>
-                                Filter recipes by title or author or category
-                            </legend>
-                            <input type="text" id="search-filter" placeholder="donuts / peter / seafood"
-                                class="search-field">
-                            <button class="search-button">
-                                <i class="fa fa-solid fa-magnifying-glass "></i>
-                            </button>
-                        </fieldset>
-                        <div class="select">
-                            <fieldset>
-                                <legend>Sort results</legend>
-                                <select class="dropdown" id="filter-by">
-                                    <option value="byEdited">Last modified</option>
-                                    <option value="byCreated">Created date</option>
-                                    <option value="alphabetical">Sort alphabetically</option>
-                                </select>
-                            </fieldset>
-
-                        </div>
-
-
-                        <!-- </div> -->
+                    <div class="hero-header">
+                        <h2>Find a recipe</h2>
                     </div>
-                    <!-- url(https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwyOXx8Y291bnRyeSUyMGtpdGNoZW4lMjBwYXJ0eXxlbnwwfDB8fHwxNjY0Mjg1MTY4&amp;ixlib=rb-1.2.1&amp;q=80&amp;w=1080)
-                    -->
+                    
+                   <div class="search-filters">
+                        <fieldset class="search-fieldset">
+                        <legend>Filter recipes by title or author or category</legend>
+                        <div class="search-wrapper">
+                        <input type="text" id="search-filter" placeholder="donuts / peter / seafood"
+                                class="search-field" aria-label="Search recipes">
+                            <i class="fa fa-search search-icon" aria-hidden="true"></i>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="sort-fieldset">
+                            <legend>Sort results</legend>
+                            <div class="select">
+                            <select class="dropdown" id="filter-by">
+                                <option value="byEdited">Last modified</option>
+                                <option value="byCreated">Created date</option>
+                                <option value="alphabetical">Sort alphabetically</option>
+                            </select>
+                            </div>
+                        </fieldset>
+                        </div>
+                </div>
+                <div id="categories-cloud">
+                     <h3>Categories</h3>
+                    <section  role="radiogroup">
+                    </section>
                 </div>
             </header>
             <div class="container">
-
-
                 <div id="recipes" class="cards">
                     <a href="article.html#c6c9d4be-6713-4965-a4f3-08a9a3a089dd" class="card home">
                         <article>
@@ -186,12 +175,12 @@
             <!--content wrap-->
         </div>
        
-        <footer>
+          <footer class="page-footer">
             <p>&copy; Caleb Hamilton 2022</p>
         </footer>
         <!--page container-->
     </div>
-    <script src="/scripts/index-bundle.js"></script>
+    <script type="module" src="/scripts/index-bundle.js"></script>
 
 </body>
 

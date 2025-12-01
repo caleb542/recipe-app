@@ -1,11 +1,10 @@
 import "./style.scss";
 import {stringify, v4 as uuidv4} from 'uuid';
-import { createApi } from 'unsplash-js'
+import { unsplashme, createApi } from './unsplash.js'
 
-import { unsplashme } from "./unsplash";
 //import { initEdit } from "../../notes-app/src/views";
-import { loadNewRecipeFromLocalStorage, saveNewRecipeToLocalStorage, getTimestamp, addToExistingRecipes } from './functions'
-import * as Realm from "realm-web";
+import { loadNewRecipeFromLocalStorage, saveNewRecipeToLocalStorage, getTimestamp, addToExistingRecipes } from './functions.js'
+// import * as Realm from "realm-web";
 
 
     let newRecipe = {

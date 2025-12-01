@@ -2,26 +2,53 @@ import moment, { unix } from 'moment'
 import {
     v4 as uuidv4
 } from 'uuid';
-import { getFilters } from './filters'
-import { loadRecipes, getRecipesFromDatabase, saveRecipes, sortRecipes} from './functions'
+import { getFilters } from './filters.js'
+import { loadRecipes, saveRecipes, sortRecipes} from './functions.js';
+import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js'
 
 
 let listRecipes = async () => {
-    let recipes = await loadRecipes()
+  let recipes = await getRecipesFromDatabase()
     saveRecipes(recipes)
+    recipes = await loadRecipes();
+
+    console.log('Loaded recipes:', recipes, Array.isArray(recipes));
+    // let recipes = await loadRecipes()
+    
+
+
+  
+    // saveRecipes(recipes)
     const filters = getFilters()
     recipes = sortRecipes(filters.sortBy, recipes)
-    // console.log(recipes)
+    console.log('recipe.js', recipes)
+
+
+
     // FILTER WITH SEARCH TXT
-    recipes = recipes.filter(function (recipe) {
+    // recipes = recipes.filter(function (recipe) {
       
-        const list = recipe.name.toLowerCase().includes(filters.searchText.toLowerCase())
-        const list2 = recipe.author.toLowerCase().includes(filters.searchText.toLowerCase())
-        const list3 = recipe.categories.join().toLowerCase().includes(filters.searchText.toLowerCase())
+    //     const list = recipe.name.toLowerCase().includes(filters.searchText.toLowerCase())
+    //     const list2 = recipe.author.toLowerCase().includes(filters.searchText.toLowerCase())
+    //     const list3 = recipe.categories.join().toLowerCase().includes(filters.searchText.toLowerCase())
         
-        return list + list2 + list3
-        // 
-    })
+    //     return list + list2 + list3
+    // })
+
+    recipes = recipes.filter(function (recipe) {
+      const search = filters.searchText.toLowerCase();
+      const matchName = recipe.name?.toLowerCase().includes(search);
+      const matchAuthor = recipe.author?.toLowerCase().includes(search);
+
+    // Handle both old categories and new category/tags
+    const matchCategories = Array.isArray(recipe.categories)
+      ? recipe.categories.join(" ").toLowerCase().includes(search)
+      : (recipe.categories || "").toLowerCase().includes(search);
+
+      return matchName || matchAuthor || matchCategories;
+    });
+
+
       // First - clear everything out
       const cardIndex = document.querySelector("#recipes");
       cardIndex.innerHTML=''
