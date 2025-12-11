@@ -357,232 +357,231 @@ const addToExistingRecipes = () => {
 
 let recipes = await loadRecipes()
 
-const renderImageSelector = (keyword, pageNumber) => {
-    let responseLength
-    let images;
-    getImageGroup(keyword, pageNumber)
-        .then(response => {
-            responseLength = response.length;
-            console.log(responseLength)
-            const selectImages = document.getElementById("select-images")
+const renderImageSelector = async (keyword, pageNumber = 1) => {
+  try {
+    const response = await getImageGroup(keyword, pageNumber);
+    
+    if (!response || response.length === 0) {
+      alert('No images found. Try a different keyword.');
+      return;
+    }
 
-            // selectImages.classList.add('show')
-            selectImages.showModal();
-            
-            const imageViewport = document.querySelector('.carousel')
-            imageViewport.classList.add('image-viewport');
-            // const imageOverlay = document.createElement('div')
-            // imageOverlay.setAttribute('id','image-overlay')
-            const imageShow = document.querySelector('ul.carousel-track');
-            imageShow.classList.add('image-show');
-            response.forEach(imageObject => {
-
-                const li = document.createElement('li')
-
-                const fig = document.createElement('figure')
-                const img = document.createElement('img')
-                img.setAttribute('src', `${imageObject.urls.thumb}`)
-                img.setAttribute('dataURL', `${imageObject.urls.regular}`)
-                img.setAttribute('dataName', `${imageObject.user.name}`)
-                img.setAttribute('dataLink', `${imageObject.user.links.html}`)
-                const caption = document.createElement('figcaption')
-                caption.innerHTML = `<p>${imageObject.user.name}</p>`
-
-                // fig.appendChild(imgAnchor);
-
-                fig.appendChild(img)
-                li.appendChild(fig)
-                fig.appendChild(caption);
-                // imageViewport.appendChild(imageOverlay);
-               
-                imageShow.appendChild(li);
-
-
-                // document.getElementById('select-images').appendChild(imageViewport);
-
-
-                images = document.querySelectorAll('.imageListItem');
-
-            })
-
-            let recItem = async () => {
-                let recipes = await loadRecipes()
-                let recipeId = location.hash.substring(1)
-                recItem = recipes.find((recipe) => recipe.id === recipeId)
-                return recItem
-            }
-
-            //   alert(e.target.getAttribute('dataName'))
-
-
-
-
-
-            const imageButtons = document.createElement('div');
-            imageButtons.classList.add('image-buttons')
-            imageButtons.innerHTML = `
-            <button disabled class="btn prev"><i class="fa fas-solid fa-angle-left"></i><span class="hide-text">previous image</span></button>
-            <button class="btn next"><i class="fa fas-solid fa-angle-right"></i><span class="hide-text">next image</span></button>`
-            const imageCount = document.createElement('p')
-            imageCount.classList.add('count')
-            imageCount.textContent = 'Viewing image 1'
-            const prev = document.createElement('button')
-            const next = document.createElement('button')
-            const modal = document.querySelector('dialog');
-            modal.setAttribute("closeBy","any");
-
-
-            prev.setAttribute('id', 'prev-page');
-            next.setAttribute('id', 'next-page');
-            prev.textContent = "Previous group";
-            next.textContent = "Next Group";
-            const selectImagesModal = document.getElementById('select-images')
-            selectImagesModal.appendChild(imageButtons);
-            selectImagesModal.appendChild(prev);
-            selectImagesModal.appendChild(next);
-            selectImagesModal.appendChild(imageCount);
-
-            const selectImage = document.createElement('button')
-            selectImage.setAttribute('id', 'select-image')
-            selectImage.textContent = 'Select this image';
-            selectImagesModal.appendChild(selectImage);
-
-            const closeImageModal = document.createElement('button')
-            closeImageModal.classList.add('close-image-modal')
-            closeImageModal.innerHTML = `<span class="hide-text">Close Modal</span><i class="fa fas-solid fa-times"></i>`
-            selectImagesModal.appendChild(closeImageModal)
-
-
-            const pagedown = document.getElementById('prev-page')
-            const pageup = document.getElementById('next-page')
-
-            selectImagesModal.querySelector('.next').focus();
-            selectImagesModal.addEventListener('transitionend', (e) => {
-                selectImagesModal.querySelector('.btn').focus();
-            });
-
-       
-            const slider = document.querySelector('.image-show')
-            let images = document.querySelectorAll('#select-images img')
-
-            let position = 0;
-            let transform = 0;
-            const decrementSlider = () => {
-                position++;
-                slider.style.transform = `translateX(${transform-=20}rem)`
-            }
-            const incrementSlider = () => {
-                position--;
-                slider.style.transform = `translateX(${transform+=20}rem)`
-            }
-
-
-            const previmage = document.querySelector('.prev');
-            const nextimage = document.querySelector('.next');
-
-            const total = responseLength;
-            let slideNum = 1;
-            let info;
-            let count = document.querySelector('.count')
-
-
-            previmage.addEventListener('click', function () {
-                if (slideNum !== 1) {
-
-
-                    slideNum -= 1;
-                    info = `Viewing image ${slideNum}/${total}`;
-                    count.textContent = info;
-                    incrementSlider()
-
-
-                }
-
-                slideNum === 1 ? previmage.disabled = true : previmage.disabled = false
-                slideNum === responseLength ? nextimage.disabled = true : nextimage.disabled = false
-            })
-            nextimage.addEventListener('click', function () {
-
-                if (slideNum !== responseLength) {
-
-                    slideNum += 1;
-                    info = `Viewing image ${slideNum}/${total}`;
-                    count.textContent = info;
-                    decrementSlider()
-                }
-
-                slideNum === 1 ? previmage.disabled = true : previmage.disabled = false
-                slideNum === responseLength ? nextimage.disabled = true : nextimage.disabled = false
-            })
-
-            slideNum === 1 ? previmage.disabled = true : previmage.disabled = false
-            slideNum === responseLength ? nextimage.disabled = true : nextimage.disabled = false
-
-            /*--------------*/
-            pagedown.addEventListener('click', function (e) {
-                e.preventDefault()
-                if (pageNumber === 0) {
-                    // this.setAttribute(disabled, true)
-
-                } else {
-
-                    pageNumber -= 1
-                    renderImageSelector(pageNumber)
-                    console.log(`page number ${pageNumber}`)
-                }
-            })
-            pageup.addEventListener('click', function (e) {
-                e.preventDefault()
-                if (pageNumber >= responseLength) {
-                    //    this.setAttribute(disabled, true)
-                    // console.error("something")
-                } else {
-                    pageNumber += 1
-                    renderImageSelector(pageNumber)
-                    console.log(`*page number ${pageNumber}`)
-                }
-            })
-
-            selectImage.addEventListener('click', async function (e) {
-
-                e.preventDefault()
-                console.log("selecting image")
-                const selected = images[slideNum - 1];
-
-                let recipeId = location.hash.substring(1);
-                recipes = await loadRecipes()
-                recItem = recipes.find((recipe) => recipe.id === recipeId)
-
-                recItem.photographer = selected.getAttribute('dataName')
-                recItem.photographerLink = selected.getAttribute('dataLink')
-                recItem.photoURL = selected.getAttribute('dataURL')
-                recItem.updatedAt = getTimestamp();
-
-                console.log(recItem.photoURL);
-                console.log(recItem.photographer);
-                console.log(recItem.photographerLink);
-
-                saveRecipes(recipes)
-                document.querySelector('.image-preview img').setAttribute('src', recItem.photoURL);
-                document.querySelector('.image-preview figcaption').innerHTML = `Unsplash photo by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
-            })
-
-            // const chooseImage = document.querySelectorAll(".imageListItem");
-            // chooseImage.forEach(imageAnchor => {
-            //     imageAnchor.addEventListener('keypress', function(e){
-            //         setAttribute(dataurl)
-            //     })
-            // })
-            const closeModal = document.querySelector('.close-image-modal')
-            closeModal.addEventListener('click', function (e) {
-                e.preventDefault()
-                const modal = document.getElementById('select-images')
-                modal.close("Cancelled")
-              
-            })
-
-        })
-}
+    // Get modal elements
+    const modal = document.getElementById("select-images");
+    const carousel = modal.querySelector('.carousel');
+    const imageTrack = modal.querySelector('.carousel-track');
+    
+    // ✅ Clear previous content
+    imageTrack.innerHTML = '';
+    
+    // Remove old controls if they exist
+modal.querySelectorAll('.image-buttons, .count, .close-image-modal, #prev-page, #next-page, #select-image').forEach(el => el.remove());
+    
+    // ✅ Add your class to carousel
+    carousel.classList.add('image-viewport');
+    imageTrack.classList.add('image-show');
+    
+    // ✅ Populate images
+    response.forEach((imageObject) => {
+      const li = document.createElement('li');
+      
+      const fig = document.createElement('figure');
+      const img = document.createElement('img');
+      
+      // Store data as data attributes
+      img.src = imageObject.urls.thumb;
+      img.dataset.url = imageObject.urls.regular;
+      img.dataset.photographer = imageObject.user.name;
+      img.dataset.link = imageObject.user.links.html;
+      img.alt = imageObject.alt_description || 'Unsplash photo';
+      
+      const caption = document.createElement('figcaption');
+      caption.textContent = imageObject.user.name;
+      
+      fig.appendChild(img);
+      fig.appendChild(caption);
+      li.appendChild(fig);
+      imageTrack.appendChild(li);
+    });
+    
+    const totalImages = response.length;
+    let currentSlide = 0;
+    
+    // ✅ Create navigation buttons (matching your structure)
+    const imageButtons = document.createElement('div');
+    imageButtons.className = 'image-buttons';
+    imageButtons.innerHTML = `
+      <button class="btn prev">
+        <i class="fa fa-angle-left"></i>
+        <span class="hide-text">previous image</span>
+      </button>
+      <button class="btn next">
+        <i class="fa fa-angle-right"></i>
+        <span class="hide-text">next image</span>
+      </button>
+    `;
+    
+    // ✅ Create count
+    const imageCount = document.createElement('p');
+    imageCount.className = 'count';
+    imageCount.textContent = `Viewing image 1 of ${totalImages}`;
+    
+    // ✅ Create page navigation buttons
+    const prevPageBtn = document.createElement('button');
+    prevPageBtn.id = 'prev-page';
+    prevPageBtn.textContent = 'Previous Group';
+    
+    const nextPageBtn = document.createElement('button');
+    nextPageBtn.id = 'next-page';
+    nextPageBtn.textContent = 'Next Group';
+    
+    // ✅ Create select button
+    const selectBtn = document.createElement('button');
+    selectBtn.id = 'select-image';
+    selectBtn.textContent = 'Select This Image';
+    
+    // ✅ Create close button
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'close-image-modal';
+    closeBtn.innerHTML = '<span class="hide-text">Close Modal</span><i class="fa fa-times"></i>';
+    
+    // ✅ Append all to modal
+    modal.appendChild(imageButtons);
+    modal.appendChild(prevPageBtn);
+    modal.appendChild(nextPageBtn);
+    modal.appendChild(imageCount);
+    modal.appendChild(selectBtn);
+    modal.appendChild(closeBtn);
+    
+    // Get button references
+    const prevBtn = imageButtons.querySelector('.prev');
+    const nextBtn = imageButtons.querySelector('.next');
+    
+    // ✅ Slider logic
+    let transform = 0;
+    const slideWidth = 80; // Based on your li width: 80%
+    
+const updateUI = () => {
+  imageCount.textContent = `Viewing image ${currentSlide + 1} of ${totalImages}`;
+  prevBtn.disabled = currentSlide === 0;
+  nextBtn.disabled = currentSlide === totalImages - 1;
+  
+  // Get the actual width of one slide
+  const slideWidth = imageTrack.querySelector('li')?.offsetWidth || 0;
+  transform = -currentSlide * slideWidth;
+  imageTrack.style.transform = `translateX(${transform}px)`;
+};
+    // ✅ Navigation
+    prevBtn.addEventListener('click', () => {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateUI();
+      }
+    });
+    
+    nextBtn.addEventListener('click', () => {
+      if (currentSlide < totalImages - 1) {
+        currentSlide++;
+        updateUI();
+      }
+    });
+    
+    // ✅ Keyboard navigation
+    const handleKeydown = (e) => {
+      if (e.key === 'ArrowLeft' && currentSlide > 0) {
+        currentSlide--;
+        updateUI();
+      } else if (e.key === 'ArrowRight' && currentSlide < totalImages - 1) {
+        currentSlide++;
+        updateUI();
+      }
+    };
+    modal.addEventListener('keydown', handleKeydown);
+    
+    // ✅ Page navigation
+    prevPageBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (pageNumber > 1) {
+        modal.removeEventListener('keydown', handleKeydown); // Cleanup
+        renderImageSelector(keyword, pageNumber - 1);
+      }
+    });
+    
+    nextPageBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.removeEventListener('keydown', handleKeydown); // Cleanup
+      renderImageSelector(keyword, pageNumber + 1);
+    });
+    
+    // Disable prev page on first page
+    if (pageNumber === 1) {
+      prevPageBtn.disabled = true;
+    }
+    
+    // ✅ Select image
+    selectBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      
+      const selectedImg = imageTrack.querySelectorAll('img')[currentSlide];
+      
+      if (!selectedImg) {
+        alert('No image selected');
+        return;
+      }
+      
+      // Get current recipe ID from hash
+      const recipeId = location.hash.substring(1);
+      const recipes = await loadRecipes();
+      const recipe = recipes.find(r => r.id === recipeId);
+      
+      if (!recipe) {
+        alert('Recipe not found. Please refresh the page.');
+        return;
+      }
+      
+      // Update recipe with image data
+      recipe.photographer = selectedImg.dataset.photographer;
+      recipe.photographerLink = selectedImg.dataset.link;
+      recipe.photoURL = selectedImg.dataset.url;
+      recipe.updatedAt = getTimestamp();
+      
+      await saveRecipes(recipes);
+      
+      // Update preview in the form
+      const previewImg = document.querySelector('.image-preview img');
+      const previewCaption = document.querySelector('.image-preview figcaption');
+      
+      if (previewImg) previewImg.src = recipe.photoURL;
+      if (previewCaption) {
+        previewCaption.innerHTML = `Unsplash photo by <a href="${recipe.photographerLink}" target="_blank" rel="noopener">${recipe.photographer}</a>`;
+      }
+      
+      console.log('Image selected:', recipe.photoURL);
+      
+      // Cleanup and close
+      modal.removeEventListener('keydown', handleKeydown);
+      modal.close();
+    });
+    
+    // ✅ Close modal
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.removeEventListener('keydown', handleKeydown); // Cleanup
+      modal.close();
+    });
+    
+    // ✅ Initial state
+    updateUI();
+    
+    // ✅ Show modal and focus
+    modal.showModal();
+    nextBtn.focus();
+    
+  } catch (error) {
+    console.error('Error loading images:', error);
+    alert('Failed to load images. Please try again.');
+  }
+};
 
 const removeRecipe = async (recipeId) => {
     let recipes = await loadRecipes()

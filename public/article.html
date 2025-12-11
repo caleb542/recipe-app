@@ -22,37 +22,51 @@
 
     <div class="page-container">
         <header>
-            <div class="header-top">
-                <h1 class="site__title"><a href="/">Recipe Me</a></h1>
-                <a href="#" id="menu-toggle" aria-expanded="false" aria-controls="nav" class="menu-toggle" aria-label="Open the menu">
-                    <i class="fa fa-bars" aria-hidden="true"></i>
-                </a>
-            </div>
-           
-            <nav id="nav" class="hide">
-                <ul>
-                    <li>
-                        <a tabindex="-1" href="/index.html">Home</a>
-                    </li>
-                </ul>
-            </nav>
+             <div class="header-top">
+                    <h1 class="site__title"><a href="/">Recipe Me</a></h1>
+                    
+                    <!-- Auth section -->
+                    <div class="auth-section">
+                        <button id="login-btn" style="display: none;">Login</button>
+                        <div id="user-info" style="display: none;">
+                            <span id="user-name"></span>
+                            <button id="logout-btn">Logout</button>
+                        </div>
+                    </div>
+                    
+                    <div class="avatar">
+                    </div>
+                    
+                    <a href="#" id="menu-toggle" aria-expanded="false" aria-controls="nav" class="menu-toggle"
+                        aria-label="Open the menu">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
+                    </a>
+                </div>
+
+                <nav id="nav" class="hide">
+                    <ul>
+                        <li><a tabindex="-1" class="add" href="/edit.html" title="add a recipe">Add a recipe</a></li>
+                    </ul>
+                </nav>
         </header>
       
         <div class="content-wrap">
             <div class="container template-container">
+                
 
                    <!--  // Load article-template in here --> 
             </div>
+
         </div>
         <footer class="page-footer">
-            <p>&copy; Caleb Hamilton 2022</p>
+            <p>&copy; Original Recipe Site by Caleb Hamilton &copy;2022 expanded and rereleased 2025</p>
       </footer>
         <!--page-container-->
     </div>
     
    <script type="module">
     // import {initArticle} from './scripts/article-bundle.js'
-  async function loadTemplate(recItem) {
+    async function loadTemplate(recItem) {
     // Load template file
     const res = await fetch("./partials/article-template.html");
     const html = await res.text();
@@ -71,7 +85,8 @@
     tpl.querySelector(".article__title").textContent = recItem.title;
     tpl.querySelector(".author").textContent = recItem.author;
     tpl.querySelector(".dates").textContent = new Date(recItem.createdAt).toLocaleDateString();
-    tpl.querySelector(".preptime").textContent = recItem.prepTime;
+    tpl.querySelector(".prep-time-value").textContent = recItem.prepTime;
+    tpl.querySelector(".total-time-value").textContent = recItem.totalTime;
     tpl.querySelector(".description").textContent = recItem.description;
     tpl.querySelector(".directions-list").innerHTML =
       recItem.directions.map(d => `<li>${d}</li>`).join("");
@@ -79,16 +94,7 @@
     // Append hydrated fragment
     container.appendChild(tpl);
 
-   
   }
-
-//  
-
-
-
-
-
-
 
 // initArticle(container, recItem)
 //   loadTemplate();

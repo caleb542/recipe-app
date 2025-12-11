@@ -38,7 +38,7 @@ let listRecipes = async () => {
     recipes = recipes.filter(function (recipe) {
       const search = filters.searchText.toLowerCase();
       const matchName = recipe.name?.toLowerCase().includes(search);
-      const matchAuthor = recipe.author?.toLowerCase().includes(search);
+      const matchAuthor = recipe.author.name?.toLowerCase().includes(search);
 
     // Handle both old categories and new category/tags
     const matchCategories = Array.isArray(recipe.categories)

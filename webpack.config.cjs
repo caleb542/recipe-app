@@ -1,3 +1,7 @@
+const webpack = require("webpack");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -31,22 +35,20 @@ module.exports = (env, argv) => {
 
     entry: {
       index: "./src/index.js",
+      // auth: "./src/auth/index.js",   // ← use a bootstrap entry
       edit: "./src/edit.js",
       article: "./src/article.js",
       addRecipe: "./src/addRecipe.js",
       icons: "./src/icons.js"
     },
-
     output: {
       path: path.resolve(__dirname, "public/scripts"),
       filename: "[name]-bundle.js",
       clean: true,
-      library: {
-        type: "module"   // ✅ ensures ES module output with named exports
-      }
+      library: { type: "module" }
     },
-   experiments: {
-     topLevelAwait: true,
+    experiments: {
+      topLevelAwait: true,
       outputModule: true
     },
     plugins: [
@@ -55,9 +57,14 @@ module.exports = (env, argv) => {
       new CopyWebpackPlugin({
         patterns: [
         { from: "src/partials", to: "../partials" },
-         { from: "src/login", to: "../login" }
+       
       ]
-      })
+      }),
+      new webpack.DefinePlugin({
+        "process.env.AUTH0_DOMAIN": JSON.stringify(process.env.AUTH0_DOMAIN),
+        "process.env.AUTH0_CLIENT_ID": JSON.stringify(process.env.AUTH0_CLIENT_ID),
+         "process.env.AUTH0_AUDIENCE": JSON.stringify(process.env.AUTH0_AUDIENCE),
+      }),
     ],
     module: {
   rules: [

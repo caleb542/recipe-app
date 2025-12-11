@@ -2,18 +2,46 @@ import "./style.scss";
 import { loadRecipesFromLocalStorage, hamburger } from "./functions.js";
 import { marked } from "marked";
 import { setupShoppingList } from "./helpers/shoppingList.js";
+import { initAuth0, getToken, isAuthenticated, getUser } from './auth/auth0.js';
+import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
+import { RatingDisplay } from './components/RatingDisplay.js';
+import { CommunityNotes } from './components/CommunityNotes.js';
+
 
 const recipeId = location.hash.substring(1);
 let recipes;
+let likesInitialized = false; // ✅ Prevent multiple initializations
+let articleHydrated = false;
+
+
+// Initialize Auth0
+await initAuth0();
+await updateAuthUI();
+setupAuthListeners();
+
+// ✅ Add storage listener ONCE at top level
+
+window.addEventListener("storage", e => {
+  if (e.key === "recipes") {
+    fetchRecipes();
+  }
+});
 
 // Entry point
 async function fetchRecipes() {
   recipes = await loadRecipesFromLocalStorage();
   await hydrateArticle(recipes);
 }
+
 fetchRecipes();
 
 async function hydrateArticle(recipes) {
+
+  // Prevent multiple hydrations
+  if (articleHydrated) {
+    console.log('Article already hydrated, skipping...');
+    return;
+  }
   const recItem = Array.isArray(recipes)
     ? recipes.find(recipe => recipe.id === recipeId)
     : null;
@@ -43,47 +71,23 @@ async function hydrateArticle(recipes) {
   if (d) d.innerHTML = `<date>${recItem.createdAt[0]}</date>`;
 
   const a = tpl.querySelector(".author");
-  if (a) a.innerHTML = `by ${recItem.author}`;
+  if (a) {
+    const authorName = recItem.displayAuthor || recItem.author?.name || "Anonymous";
+    a.innerHTML = `by ${authorName}`;
+  }
 
-  const pt = tpl.querySelector(".preptime");
-  if (pt) pt.innerHTML = `<p>${recItem.prepTime || ""}</p>`;
+  // ✅ Add prep time
+  const pt = tpl.querySelector(".prep-time-value");
+  if (pt) pt.textContent = recItem.prepTime || "Not specified";
+
+  // ✅ Add total time
+  const tt = tpl.querySelector(".total-time-value");
+  if (tt) tt.textContent = recItem.totalTime || "Not specified";
 
   const dsum = tpl.querySelector(".description.summary");
   if (dsum) dsum.innerHTML = recItem.description;
 
-  // Rating stars
-  const ratingStars = tpl.getElementById?.("rating-stars") || tpl.querySelector("#rating-stars");
-  if (ratingStars) {
-    const maxStars = 5;
-    function renderStars(currentRating) {
-      ratingStars.innerHTML = "";
-      for (let i = 1; i <= maxStars; i++) {
-        const star = document.createElement("span");
-        star.classList.add("star");
-        star.textContent = i <= currentRating ? "★" : "☆";
-        star.setAttribute("role", "button");
-        star.setAttribute("tabindex", "0");
-        star.setAttribute("aria-label", `Rate ${i} out of ${maxStars}`);
-        star.addEventListener("click", () => {
-          recItem.rating = i;
-          updateLocalStorageRating(recipeId, i);
-          renderStars(i);
-        });
-        ratingStars.appendChild(star);
-      }
-    }
-    renderStars(recItem.rating || 0);
-  }
-
-  // Persist rating
-  function updateLocalStorageRating(recipeId, rating) {
-    const recipes = JSON.parse(localStorage.getItem("recipes")) || [];
-    const index = recipes.findIndex(r => r.id === recipeId);
-    if (index > -1) {
-      recipes[index].rating = rating;
-      localStorage.setItem("recipes", JSON.stringify(recipes));
-    }
-  }
+ 
 
   // Image + photo info
   const imageElement = tpl.querySelector(".imageElement");
@@ -137,127 +141,171 @@ async function hydrateArticle(recipes) {
   // Edit button
   const editButton = tpl.getElementById?.("cta-update") || tpl.querySelector("#cta-update");
   if (editButton) {
-    editButton.href = `./edit.html#${recipeId}`;
-    editButton.title = "Edit recipe";
+    const authenticated = await isAuthenticated();
+
+    if (authenticated) {
+      const currentUser = await getUser();
+      const isAuthor = recItem.author?.auth0Id === currentUser.sub;
+      const isLegacy = !recItem.author || recItem.author.name === "Legacy User";
+      
+      if (isAuthor || isLegacy) {
+        editButton.href = `./edit.html#${recipeId}`;
+        editButton.title = isLegacy ? "Claim and edit recipe" : "Edit recipe";
+        editButton.style.display = 'inline-block';
+      } else {
+        editButton.style.display = 'none';
+      }
+    } else {
+      editButton.style.display = 'none';
+    }
   }
 
   // Append hydrated fragment
   container.appendChild(tpl);
 
+ // Initialize the rating component
+const ratingDisplayContainer = document.getElementById("rating-display");
+if (ratingDisplayContainer) {
+  new RatingDisplay(ratingDisplayContainer, recipeId, {
+    showStarsVisual: true  // Shows ★★★★☆ 4 Stars (2 reviews)
+  });
+}
+
+// Bottom: Full interactive community notes
+const notesContainer = document.getElementById("community-notes");
+if (notesContainer) {
+  new CommunityNotes(notesContainer, recipeId);
+}
   // Wire shopping list helper
   setupShoppingList(recItem, recipeId, "caleb542@gmail.com");
 
-  // Like button
-// const likeButton = container.querySelector("#like-button");
+  // ✅ Only initialize likes once
+  if (!likesInitialized) {
+    await initializeLikes(recipeId, container);
+    likesInitialized = true;
+  }
 
-// function applyLikeState(btn, data) {
-//   btn.setAttribute("aria-pressed", data.liked ? "true" : "false");
-//   btn.classList.toggle("liked", !!data.liked);
-// }
-
-// if (likeButton) {
-//   likeButton.addEventListener("click", async () => {
-//     // Check current state from aria-pressed
-//     const isLiked = likeButton.getAttribute("aria-pressed") === "true";
-//     const method = isLiked ? "DELETE" : "POST";
-
-   
-//     // Send toggle request
-//     await fetch(`/.netlify/functions/like?id=${recipeId}&user=demoUser`, { method });
-
-    
-//     // Refresh like count and button state
-//     const res = await fetch(`/.netlify/functions/like?id=${recipeId}`);
-//     const data = await res.json();
-
-    
-
-//     const countEl = container.querySelector("#like-count");
-//     if (countEl) countEl.textContent = data.likes ?? 0;
-
-//     applyLikeState(likeButton, data);
-
-//     // Update button state and styling
-//     likeButton.setAttribute("aria-pressed", data.liked ? "true" : "false");
-//     likeButton.classList.toggle("liked", !!data.liked);
-//   });
-// }
-
-
-// async function refreshLikes(recipeId) {
-//   const res = await fetch(`/.netlify/functions/like?id=${recipeId}&user=${user}`);
-//   const data = await res.json();
-//   const likeCount = document.getElementById("like-count");
-//   if (likeCount) likeCount.textContent = data.likes ?? 0;
-//   const btn = document.getElementById("like-button");
-//   if (btn) {
-//     btn.setAttribute("aria-pressed", data.liked ? "true" : "false");
-//     btn.classList.toggle("liked", !!data.liked);
-//   }
-// }
-  
-
-  // Refresh likes after template is in DOM
-  // await refreshLikes(recipeId);
-
-
-  const likeButton = container.querySelector("#like-button");
-// const user = "demoUser";
-const user = "demoUser";
-
-function applyLikeState(btn, data) {
-  btn.setAttribute("aria-pressed", data.liked ? "true" : "false");
-  btn.classList.toggle("liked", !!data.liked);
-}
-
-async function refreshLikes(recipeId) {
-  const res = await fetch(`/.netlify/functions/like?id=${recipeId}&user=${user}`);
-  const data = await res.json();
-
-  const countEl = document.getElementById("like-count");
-  if (countEl) countEl.textContent = data.likes ?? 0;
-
-  const btn = document.getElementById("like-button");
-  if (btn) applyLikeState(btn, data);
-}
-
-if (likeButton) {
-  likeButton.addEventListener("click", async () => {
-    const isLiked = likeButton.getAttribute("aria-pressed") === "true";
-    const method = isLiked ? "DELETE" : "POST";
-
-    try {
-      await fetch(`/.netlify/functions/like?id=${recipeId}&user=${user}`, { method });
-      await refreshLikes(recipeId); // ✅ reuse helper
-    } catch (err) {
-      console.error("Like toggle failed:", err);
-    }
-  });
-}
-
-// Hydrate on load
-await refreshLikes(recipeId);
-
-}
-
-// Hamburger + storage listener
+  // Hamburger + storage listener
   hamburger();
-  window.addEventListener("storage", e => {
-    if (e.key === "recipes") {
-      fetchRecipes();
-    }
-  });
-// Exported initArticle for external use
-// export function initArticle(container, recItem) {
+
+   articleHydrated = true;
  
-//   const titleEl = container.querySelector(".article__title");
-//   if (titleEl) titleEl.textContent = recItem.name;
-//   const likeBtn = container.querySelector("#like-button");
-//   if (likeBtn) {
-//     likeBtn.addEventListener("click", () => {
-//       refreshLikes()
-//     });
-//   }
-// }
+}
+
+// Like functionality
+async function initializeLikes(recipeId, container) {
+  const likeButton = container.querySelector("#like-button");
+
+  function applyLikeState(btn, data) {
+    btn.setAttribute("aria-pressed", data.liked ? "true" : "false");
+    btn.classList.toggle("liked", !!data.liked);
+  }
+
+  async function refreshLikes(recipeId) {
+    //  console.trace('🔍 HEY!!!  refreshLikes called from:'); // trace
+    try {
+      const authenticated = await isAuthenticated();
+      
+      if (!authenticated) {
+        // Fetch public like count without auth
+        try {
+          const res = await fetch(`/.netlify/functions/like?id=${recipeId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+          if (res.ok) {
+            const data = await res.json();
+            const countEl = document.getElementById("like-count");
+          }
+        } catch (err) {
+          console.log('Could not fetch public like count:', err);
+        }
+        
+        // Disable like button for logged out users
+        const btn = document.getElementById("like-button");
+        if (btn) {
+          btn.disabled = true;
+          btn.title = "Log in to like this recipe";
+        }
+        return;
+      }
+
+      // Authenticated - fetch with token
+      const token = await getToken();
+      
+      const res = await fetch(`/.netlify/functions/like?id=${recipeId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Failed to fetch likes: ${res.status}`);
+      }
+      
+      const data = await res.json();
+
+      // Update like count
+      let likesText = data.likes === 1 ? ` ${data.likes} Like`:` ${data.likes} Likes`;
+      const countEl = document.getElementById("like-count");
+
+      if (countEl) countEl.textContent = likesText ?? 0;
+
+      // Update button state
+      const btn = document.getElementById("like-button");
+      if (btn) {
+        applyLikeState(btn, data);
+        btn.disabled = false;
+      }
+    } catch (err) {
+      console.error("Failed to load likes:", err);
+      
+      const btn = document.getElementById("like-button");
+      if (btn) {
+        btn.disabled = true;
+        btn.title = "Unable to load likes";
+      }
+    }
+  }
+
+  // Like button click handler
+  if (likeButton) {
+    likeButton.addEventListener("click", async () => {
+      const authenticated = await isAuthenticated();
+      if (!authenticated) {
+        if (confirm('You need to log in to like recipes. Log in now?')) {
+          window.location.href = '/index.html';
+        }
+        return;
+      }
+
+      const isLiked = likeButton.getAttribute("aria-pressed") === "true";
+      const method = isLiked ? "DELETE" : "POST";
+
+      try {
+        const token = await getToken();
+        
+        await fetch(`/.netlify/functions/like?id=${recipeId}`, { 
+          method,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        await refreshLikes(recipeId);
+      } catch (err) {
+        console.error("Like toggle failed:", err);
+        alert('Failed to update like. Please try again.');
+      }
+    });
+  }
+
+  // Initial load of likes
+  await refreshLikes(recipeId);
+}
 
 export { fetchRecipes };

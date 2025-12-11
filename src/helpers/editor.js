@@ -9,7 +9,7 @@ function setupEditor(recipeId, rawHTML) {
 
   const toastEditor = new Editor({
     el: document.querySelector('#editor'),
-    height: '400px',
+    height: '230px',
     initialEditType: 'markdown',
     previewStyle: 'vertical',
     initialValue: markdown,

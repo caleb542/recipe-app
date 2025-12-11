@@ -33,20 +33,17 @@ function setupSaveButton(recipe) {
   if (!saveBtn) return;
 
   saveBtn.addEventListener('click', async () => {
-
-
-
     let recipe = await JSON.parse(localStorage.getItem('editingRecipe'));
-
       const updates = {
-
           name: recipe.name || '',
           article: recipe.article || '',
           createdAt: recipe.createdAt || '',
           author: recipe.author || '',
+          displayAuthor:recipe.displayAuthor || '',
           description: recipe.description || '',
           tags: recipe.tags || '',
           prepTime: recipe.prepTime || '',
+          totalTime: recipe.totalTime || '',
           categories: recipe.categories || '',
           ingredients: recipe.ingredients || '',
           directions: recipe.directions || '',
@@ -68,7 +65,7 @@ function setupSaveButton(recipe) {
       notyf.success("Recipe updated!");
 
       setTimeout(() => {
-        window.location.href = '/'; // or refresh recipe list
+        window.location.href = `/article.html#${recipe.id}`; // or refresh recipe list
       }, 2000);
     } catch (err) {
       console.error("❌ Update failed:", err);
