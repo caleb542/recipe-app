@@ -14,6 +14,7 @@ export const handler = async (event) => {
   const client = await getMongoClient();
   const db = client.db('recipe-me-db'); // ✅ Correct database name
   const ratingsCollection = db.collection('ratings');
+  const usersCollection = db.collection('users');
 
   // Get user ID (either from auth token or anonymous)
   let userId = 'anonymous';
@@ -23,7 +24,20 @@ export const handler = async (event) => {
     try {
       const decoded = await verifyToken(token);
       userId = decoded.sub;
-      userName = decoded.name || decoded.email || 'User';
+      
+      // Fetch user's display name from users collection
+      const userProfile = await usersCollection.findOne({ auth0Id: userId });
+      if (userProfile) {
+        userName = userProfile.profile.displayName;
+      } else {
+        // Fallback: try to get from token (for users who haven't set up profile yet)
+        userName = decoded.name 
+          || decoded.nickname 
+          || decoded.email 
+          || 'User';
+        
+        console.log('⚠️ No user profile found for:', userId);
+      }
     } catch (err) {
       // If token is invalid, treat as anonymous
       userId = 'anonymous';
@@ -88,21 +102,32 @@ export const handler = async (event) => {
       // Get comments if requested
       let comments = [];
       if (includeComments) {
-        comments = await ratingsCollection
+        const ratingsWithComments = await ratingsCollection
           .find({ 
             recipeId,
             comment: { $exists: true, $nin: [null, ''] }
           })
           .sort({ createdAt: -1 })
           .limit(50) // Limit to 50 most recent comments
-          .project({
-            rating: 1,
-            comment: 1,
-            userName: 1,
-            createdAt: 1,
-            updatedAt: 1
-          })
           .toArray();
+
+        // Enrich comments with username from users collection
+        comments = await Promise.all(ratingsWithComments.map(async (rating) => {
+          let username = null;
+          if (rating.userId && rating.userId !== 'anonymous') {
+            const userProfile = await usersCollection.findOne({ auth0Id: rating.userId });
+            username = userProfile?.username || null;
+          }
+
+          return {
+            rating: rating.rating,
+            comment: rating.comment,
+            userName: rating.userName,
+            username: username,  // Add username for profile links
+            createdAt: rating.createdAt,
+            updatedAt: rating.updatedAt
+          };
+        }));
       }
 
       const result = stats.length > 0 ? {

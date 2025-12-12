@@ -19,7 +19,7 @@ await initAuth0();
 await updateAuthUI();
 setupAuthListeners();
 
-// ✅ Add storage listener ONCE at top level
+// Add storage listener ONCE at top level
 
 window.addEventListener("storage", e => {
   if (e.key === "recipes") {

@@ -21,7 +21,14 @@ export class CommunityNotes {
 
   async loadNotes() {
     try {
-      const token = await getToken();
+      let token = null;
+      try {
+        token = await getToken();
+      } catch (error) {
+        // User not logged in - continue as anonymous
+        console.log('No token available, loading as anonymous');
+      }
+      
       const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
 
       const response = await fetch(
@@ -84,22 +91,7 @@ export class CommunityNotes {
     const userRating = this.stats.userRating?.rating || 0;
     const userNote = this.stats.userRating?.comment || '';
 
-    if (userNote) {
-      // User already left a note
-      return `
-        <div class="your-note-card">
-          <div class="note-card-header">
-            <span class="note-badge">Your Note</span>
-            <button class="edit-note-btn" data-action="edit">Edit</button>
-          </div>
-          <div class="your-note-content">
-            <div class="note-rating">${'⭐'.repeat(userRating)}</div>
-            <p class="note-text">${this.escapeHtml(userNote)}</p>
-          </div>
-        </div>
-      `;
-    }
-
+    // Priority 1: If editing (showAddNote), show the form
     if (this.showAddNote) {
       return `
         <div class="add-note-card">
@@ -108,7 +100,7 @@ export class CommunityNotes {
               How would you rate this recipe?
               <div class="rating-input" id="note-rating">
                 ${[1,2,3,4,5].map(i => `
-                  <button type="button" class="star-btn" data-rating="${i}" aria-label="Rate ${i} stars">
+                  <button type="button" class="star-btn ${i <= this.selectedRating ? 'selected' : ''}" data-rating="${i}" aria-label="Rate ${i} stars">
                     ⭐
                   </button>
                 `).join('')}
@@ -124,18 +116,37 @@ export class CommunityNotes {
                 rows="4"
                 maxlength="1000"
               >${this.currentNote}</textarea>
-              <span class="char-count"><span id="char-count">0</span>/1000</span>
+              <span class="char-count"><span id="char-count">${this.currentNote.length}</span>/1000</span>
             </label>
 
             <div class="form-actions">
               <button class="btn-secondary" data-action="cancel">Cancel</button>
-              <button class="btn-primary" data-action="submit" disabled>Share Note</button>
+              <button class="btn-primary" data-action="submit" ${!this.selectedRating || !this.currentNote.trim() ? 'disabled' : ''}>
+                ${userNote ? 'Update' : 'Share'} Note
+              </button>
             </div>
           </div>
         </div>
       `;
     }
 
+    // Priority 2: If user already has a note, show it with edit button
+    if (userNote) {
+      return `
+        <div class="your-note-card">
+          <div class="note-card-header">
+            <span class="note-badge">Your Note</span>
+            <button class="edit-note-btn" data-action="edit">Edit</button>
+          </div>
+          <div class="your-note-content">
+            <div class="note-rating">${'⭐'.repeat(userRating)}</div>
+            <p class="note-text">${this.escapeHtml(userNote)}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Priority 3: Show "add note" button
     return `
       <button class="add-note-btn" data-action="show-form">
         <span class="btn-icon">✏️</span>
@@ -155,13 +166,18 @@ export class CommunityNotes {
       const isHelpful = comment.rating >= 4;
       const needsTweaks = comment.rating === 3;
 
+      // Make username clickable if we have the username field
+      const userNameDisplay = comment.username 
+        ? `<a href="/profile.html?username=${encodeURIComponent(comment.username)}" class="author-name-link">${this.escapeHtml(comment.userName || 'Anonymous Cook')}</a>`
+        : `<div class="author-name">${this.escapeHtml(comment.userName || 'Anonymous Cook')}</div>`;
+
       return `
         <article class="note-card">
           <div class="note-header">
             <div class="note-author">
               <div class="author-avatar">${this.getInitials(comment.userName)}</div>
               <div class="author-info">
-                <div class="author-name">${this.escapeHtml(comment.userName || 'Anonymous Cook')}</div>
+                ${userNameDisplay}
                 <div class="note-meta">
                   <span class="note-date">${date}</span>
                   <span class="note-separator">•</span>
@@ -246,11 +262,22 @@ export class CommunityNotes {
     const editBtn = this.container.querySelector('[data-action="edit"]');
     if (editBtn) {
       editBtn.addEventListener('click', () => {
+        console.log('✏️ Edit button clicked');
+        console.log('Current stats:', this.stats);
+        
+        if (!this.stats.userRating) {
+          console.error('No user rating found to edit');
+          return;
+        }
+        
         this.selectedRating = this.stats.userRating.rating;
-        this.currentNote = this.stats.userRating.comment;
+        this.currentNote = this.stats.userRating.comment || '';
         this.showAddNote = true;
+        console.log('Setting up edit form with rating:', this.selectedRating);
         this.render();
       });
+    } else {
+      console.log('⚠️ Edit button not found in DOM');
     }
   }
 
@@ -266,7 +293,14 @@ export class CommunityNotes {
 
   async submitNote() {
     try {
-      const token = await getToken();
+      let token = null;
+      try {
+        token = await getToken();
+      } catch (error) {
+        alert('Please log in to share your notes');
+        return;
+      }
+
       if (!token) {
         alert('Please log in to share your notes');
         return;
@@ -583,6 +617,20 @@ export class CommunityNotes {
         font-weight: 600;
         color: #111827;
         margin-bottom: 0.25rem;
+      }
+
+      .author-name-link {
+        font-weight: 600;
+        color: #111827;
+        text-decoration: none;
+        margin-bottom: 0.25rem;
+        display: inline-block;
+        transition: color 0.2s;
+      }
+
+      .author-name-link:hover {
+        color: #f59e0b;
+        text-decoration: underline;
       }
 
       .note-meta {

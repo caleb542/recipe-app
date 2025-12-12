@@ -8,6 +8,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 
 module.exports = (env, argv) => {
+  
   return {
     resolve: {
       extensions: [".js"],
@@ -35,9 +36,9 @@ module.exports = (env, argv) => {
 
     entry: {
       index: "./src/index.js",
-      // auth: "./src/auth/index.js",   // ← use a bootstrap entry
       edit: "./src/edit.js",
       article: "./src/article.js",
+      profile: "./src/profile.js",
       addRecipe: "./src/addRecipe.js",
       icons: "./src/icons.js"
     },
@@ -56,60 +57,84 @@ module.exports = (env, argv) => {
       new MiniCssExtractPlugin({ filename: "[name].css" }),
       new CopyWebpackPlugin({
         patterns: [
-        { from: "src/partials", to: "../partials" },
-       
-      ]
+          { from: "src/partials", to: "../partials" },
+        ]
       }),
       new webpack.DefinePlugin({
         "process.env.AUTH0_DOMAIN": JSON.stringify(process.env.AUTH0_DOMAIN),
         "process.env.AUTH0_CLIENT_ID": JSON.stringify(process.env.AUTH0_CLIENT_ID),
-         "process.env.AUTH0_AUDIENCE": JSON.stringify(process.env.AUTH0_AUDIENCE),
+        "process.env.AUTH0_AUDIENCE": JSON.stringify(process.env.AUTH0_AUDIENCE),
       }),
     ],
     module: {
-  rules: [
-    {
-      test: /\.js$/,
-      exclude: /node_modules/,
-      use: {
-        loader: "babel-loader",
-        options: { presets: ["@babel/preset-env"] }
-      }
-    },
-    {
-      test: /\.scss$/i,
-      use: [
-        MiniCssExtractPlugin.loader,
-        "css-loader",
+      rules: [
         {
-          loader: "sass-loader",
-          options: {
-            implementation: require("sass"),
-            sassOptions: { quietDeps: true }
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: {
+            loader: "babel-loader",
+            options: { presets: ["@babel/preset-env"] }
           }
+        },
+        {
+          test: /\.scss$/i,
+          use: [
+            MiniCssExtractPlugin.loader,
+            "css-loader",
+            {
+              loader: "sass-loader",
+              options: {
+                implementation: require("sass"),
+                sassOptions: { quietDeps: true }
+              }
+            }
+          ]
+        },
+        {
+          test: /\.css$/i,
+          use: [
+            MiniCssExtractPlugin.loader,
+            "css-loader"
+          ]
         }
       ]
     },
-    {
-      test: /\.css$/i,
-      use: [
-        MiniCssExtractPlugin.loader,
-        "css-loader"
-      ]
-    }
-  ]
-},
-
+    watchOptions: {
+      ignored: [
+        '**/node_modules/**',
+        '**/public/**',  // ← CRITICAL: Don't watch output directory
+      ],
+      aggregateTimeout: 300,
+      poll: false
+    },
     devServer: {
-      static: { directory: path.join(__dirname, "public") },
+      static: {
+        directory: path.join(__dirname, "public"),
+        watch: {
+          ignored: [
+            path.resolve(__dirname, 'public/scripts/**'),  // ← Don't watch bundles
+            path.resolve(__dirname, 'public/partials/**'), // ← Don't watch copied partials
+          ]
+        }
+      },
       devMiddleware: { publicPath: "/scripts/" },
       hot: true,
       liveReload: true,
       historyApiFallback: true,
       open: false,
-      port: 8888
+      port: 8888,
+      watchFiles: {
+        paths: [
+          'src/**/*.js',              // ← Watch SOURCE JS
+          'src/**/*.scss',            // ← Watch SOURCE SCSS
+          'src/partials/**/*.html',   // ← Watch SOURCE partials (not output!)
+          'public/*.html'             // ← Watch root HTML files
+        ],
+        options: {
+          ignored: ['**/node_modules/**']
+        }
+      },
     },
-
     devtool: argv.mode === "development" ? "eval-source-map" : "source-map",
     mode: argv.mode
   };
