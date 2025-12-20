@@ -28,6 +28,13 @@
             <header class="">
                 <div class="header-top">
                     <h1 class="site__title"><a href="/">Recipe Me</a></h1>
+                     <div id="auth-buttons">
+                        <button id="login-btn" style="display: none;">Login</button>
+                        <div id="user-info" style="display: none;">
+                            <span id="user-name"></span>
+                            <button id="logout-btn">Logout</button>
+                        </div>
+                    </div>
                     <a href="#" id="menu-toggle" aria-expanded="false" aria-controls="nav" class="menu-toggle"
                         aria-label="Open the menu">
                         <i class="fa fa-bars" aria-hidden="true"></i>
@@ -46,6 +53,7 @@
                     </ul>
                 </nav>
               
+                         
             </header>
             <div class="heading-h2-container edit-header">
                     <div class="edit-header__actions">
@@ -91,34 +99,130 @@
                                     placeholder="Recipe Description"></textarea>
                             </div>
                
-                             <!-- Image selection modal -->
-                            <div class="form-group">
-                            <label for="feature-keyword">Feature&nbsp;Image</label>
-                            <fieldset id="image" class="feature-image">
-                                <input id="feature-keyword"
-                                    placeholder="Search for a photo">
-                                    <button class="feature-image"
-                                    id="feature-image-button">
-                                        <i class="fa fa-solid fa-magnifying-glass"></i>
-                                    </button>
-                                <figure class="image-preview">
-                                    <img src="" style="width:200px;aspect-ratio:16/9">
-                                    <figcaption>Unsplash photo by 
-                                        <a href="https://unsplash.com/@jugoslocos"></a>
-                                    </figcaption>
-                                </figure>
-                            </fieldset>
-                        </div>
+                            <!-- UPDATED: Image selection with Cloudinary upload + Unsplash search -->
+                           <!-- Image Gallery Management -->
+<div class="form-group">
+    <label>Recipe Images</label>
+    
+    <!-- Upload/Search Section -->
+    <div class="image-upload-section">
+        <!-- Cloudinary Upload -->
+        <div class="upload-option">
+            <h3>Upload Your Photo</h3>
+            <label for="cloudinary-upload" class="upload-button">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                Add Image
+            </label>
+            <input 
+                type="file" 
+                id="cloudinary-upload" 
+                accept="image/*"
+                style="display: none;"
+            />
+            <div id="upload-status"></div>
+        </div>
+        
+        <div class="upload-divider">
+            <span>OR</span>
+        </div>
+        
+        <!-- Unsplash Search -->
+        <div class="search-option">
+            <h3>Search Stock Photos</h3>
+            <fieldset id="image" class="feature-image">
+                <input id="feature-keyword" placeholder="Search for a photo">
+                <button class="feature-image" id="feature-image-button" type="button">
+                    <i class="fa fa-solid fa-magnifying-glass"></i>
+                </button>
+            </fieldset>
+        </div>
+    </div>
+    
+    <!-- Image Gallery (sortable list) -->
+    <div id="image-gallery" class="image-gallery">
+        <p class="no-images" style="display: none;">No images yet. Upload or search to add images.</p>
+        <!-- Images will be rendered here -->
+    </div>
+</div>
+
+<!-- Unsplash Modal (keep existing) -->
+<dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
+    <div class="carousel">
+        <ul class="carousel-track">
+        <!-- Unsplash images -->
+        </ul>
+    </div>
+</dialog>
                              
-                            <dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
-                                <div class="carousel">
-                                    <!-- <button class="arrow left" aria-label="Previous">&#9664;</button> -->
-                                    <ul class="carousel-track">
-                                    <!-- Unsplash images -->
+<!-- EXISTING: Unsplash modal -->
+<dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
+    <div class="carousel">
+        <!-- <button class="arrow left" aria-label="Previous">&#9664;</button> -->
+        <ul class="carousel-track">
+        <!-- Unsplash images -->
+        </ul>
+        <!-- <button class="arrow right" aria-label="Next">&#9654;</button> -->
+    </div>
+</dialog>
+                        <!-- Video Section -->
+                        <div class="form-group video-section">
+                        <details>
+                            <summary>
+                                <label>Recipe Video (Optional)</label>
+                            </summary>
+                       
+                            <div class="video-helper-card">
+                                <div class="video-icon">📹</div>
+                                
+                                <div class="video-content">
+                                <h4>Add a Recipe Video</h4>
+                                
+                                <div class="video-benefits">
+                                    <p><strong>Why use YouTube?</strong></p>
+                                    <ul>
+                                    <li>✅ Free unlimited storage</li>
+                                    <li>✅ You keep copyright and ad revenue</li>
+                                    <li>✅ Build your audience</li>
+                                    <li>✅ Professional video player</li>
                                     </ul>
-                                    <!-- <button class="arrow right" aria-label="Next">&#9654;</button> -->
                                 </div>
-                            </dialog>
+                                
+                                <div class="video-instructions">
+                                    <p><strong>How to add a video:</strong></p>
+                                    <ol>
+                                    <li>Record your recipe video</li>
+                                    <li>Upload to <a href="https://youtube.com/upload" target="_blank" rel="noopener">YouTube</a> or <a href="https://vimeo.com/upload" target="_blank" rel="noopener">Vimeo</a></li>
+                                    <li>Copy the video link</li>
+                                    <li>Paste it anywhere in your article below</li>
+                                    </ol>
+                                    <p class="note">💡 <strong>Pro tip:</strong> Just paste the URL in your article text. It will automatically become an embedded video!</p>
+                                </div>
+                                
+                                <div class="video-quick-add">
+                                    <label for="quick-video-url">Quick Add Video:</label>
+                                    <div class="video-input-group">
+                                    <input 
+                                        type="url" 
+                                        id="quick-video-url" 
+                                        placeholder="https://youtube.com/watch?v=..." 
+                                        class="video-url-input"
+                                    />
+                                    <button 
+                                        type="button" 
+                                        id="add-video-btn" 
+                                        class="btn-add-video"
+                                    >
+                                        <i class="fa-solid fa-plus"></i> Add to Article
+                                    </button>
+                                    </div>
+                                    <small>Supports YouTube and Vimeo links</small>
+                                </div>
+                                </div>
+                            </div>
+                        </details>   
+                       
+                        </div>
+                        <!-- end video -->
                             <div class="form-group">
                                  <div id="article">
                                 <div>Article</div>

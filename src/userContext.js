@@ -7,7 +7,7 @@ import { ProfileSetupModal } from './components/ProfileSetupModal.js';
 let currentUserProfile = null;
 
 // Load user profile from API
-export async function loadUserProfile() {
+export async function loadUserProfile(skipFetch = false) {
   try {
     const authenticated = await isAuthenticated();
     if (!authenticated) {
@@ -21,8 +21,13 @@ export async function loadUserProfile() {
     if (cached) {
       currentUserProfile = JSON.parse(cached);
     }
-
+ // ✅ Skip fetch if requested or if we have cache
+    if (skipFetch || cached) {
+      console.log("!!!!!!!!!! Should be returning currentUserProfile")
+      return currentUserProfile;
+    }
     // Fetch fresh profile from API
+     console.log("???????????????  FUUUUCK looking for tokern")
     const token = await getToken();
     const response = await fetch('/.netlify/functions/user-profile', {
       headers: {

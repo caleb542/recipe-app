@@ -1,6 +1,41 @@
 import { getMongoClient } from "./utils/mongoClient.js";
 import { verifyToken, getTokenFromHeader, headers } from './utils/verifyAuth.js';
 
+/**
+ * Migrate old recipe format to new images array format
+ */
+function migrateRecipeImages(recipe) {
+  // If already has images array, nothing to migrate
+  if (recipe.images && Array.isArray(recipe.images)) {
+    return recipe;
+  }
+
+  // Create images array
+  recipe.images = [];
+
+  // If old photoURL exists, migrate it
+  if (recipe.photoURL) {
+    const migratedImage = {
+      id: `legacy-${Date.now()}`, // Generate ID for legacy image
+      url: recipe.photoURL,
+      source: recipe.imageSource || 'unsplash', // Assume unsplash if not specified
+      isFeatured: true,
+      order: 0,
+      cloudinaryPublicId: null, // Legacy images don't have publicId
+      attribution: recipe.photographer ? {
+        photographer: recipe.photographer,
+        photographerUrl: recipe.photographerLink || null,
+        requiresAttribution: true,
+        canEdit: false // Assume can't edit legacy attribution
+      } : null
+    };
+
+    recipe.images.push(migratedImage);
+  }
+
+  return recipe;
+}
+
 export async function handler(event) {
   // CORS preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -23,32 +58,17 @@ export async function handler(event) {
         const decoded = await verifyToken(token);
         auth0Id = decoded.sub;
       } catch (err) {
-        // Invalid token, but that's okay for public endpoint
         console.log("Token verification failed, showing public only");
       }
     }
 
-    // let recipes;
-    
-    // if (auth0Id) {
-    //   // Authenticated: show user's recipes + public recipes
-    //   recipes = await collection.find({
-    //     $or: [
-    //       { 'author.auth0Id': auth0Id },
-    //       { isPublic: true }
-    //     ]
-    //   }).toArray();
-    // } else {
-    //   // Not authenticated: show only public recipes
-    //   recipes = await collection.find({ 
-    //     isPublic: true 
-    //   }).toArray();
-    // }
-
     // TEMPORARILY: Get ALL recipes to see what's there
-    const recipes = await collection.find({}).toArray();
+    let recipes = await collection.find({}).toArray();
 
     console.log("Found recipes:", recipes.length);
+
+    // ✅ MIGRATE old format to new format on-the-fly
+    recipes = recipes.map(recipe => migrateRecipeImages(recipe));
 
     return {
       statusCode: 200,

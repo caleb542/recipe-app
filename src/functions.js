@@ -10,7 +10,7 @@ import {
 import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
 import { updateRecipeInDatabase } from './backend/updateRecipeInDatabase.js';
 import { syncRecipeUpdate } from './helpers/syncRecipe.js'
-
+const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 const convertTimestamp = (rDate) => {
     if (typeof rDate === 'object') {
         // do nothing
@@ -28,6 +28,9 @@ const getTimestamp = () => {
     let unixTimestamp = moment(timestampShort, 'MMM Do, YYYY HH:mm').unix();
     return [timestampShort, unixTimestamp]
 }
+
+
+
 
 const listDirections = (directions) => {
     const directionsList = document.getElementById("directions-list");
@@ -213,6 +216,42 @@ const sortRecipes = (sortBy, recipes) => {
 };
 
 
+
+/**
+ * Migrate old recipe format to new images array format
+ */
+function migrateRecipeImages(recipe) {
+  // If already has images array, nothing to migrate
+  if (recipe.images && Array.isArray(recipe.images)) {
+    return recipe;
+  }
+
+  // Create images array
+  recipe.images = [];
+
+  // If old photoURL exists, migrate it
+  if (recipe.photoURL) {
+    const migratedImage = {
+      id: uuidv4(),
+      url: recipe.photoURL,
+      source: recipe.imageSource || 'unsplash',
+      isFeatured: true,
+      order: 0,
+      cloudinaryPublicId: null,
+      attribution: recipe.photographer ? {
+        photographer: recipe.photographer,
+        photographerUrl: recipe.photographerLink || null,
+        requiresAttribution: true,
+        canEdit: false
+      } : null
+    };
+
+    recipe.images.push(migratedImage);
+  }
+
+  return recipe;
+}
+
 const loadRecipes = async () => {
   const raw = localStorage.getItem('recipes');
 
@@ -220,10 +259,17 @@ const loadRecipes = async () => {
     console.log('📦 Getting recipes from localStorage');
 
     try {
-      const parsed = JSON.parse(raw);
+      let parsed = JSON.parse(raw);
 
       if (Array.isArray(parsed)) {
         console.log('✅ Parsed recipes successfully');
+        
+        // ✅ Migrate recipes to new format
+        parsed = parsed.map(recipe => migrateRecipeImages(recipe));
+        
+        // Save migrated recipes back to localStorage
+        localStorage.setItem('recipes', JSON.stringify(parsed));
+        
         return parsed;
       } else {
         console.warn('⚠️ Parsed data is not an array:', parsed);
@@ -236,8 +282,13 @@ const loadRecipes = async () => {
   }
 
   console.log('🌐 Fetching recipes from database');
-  return await getRecipesFromDatabase();
+  const recipes = await getRecipesFromDatabase();
+  
+  // ✅ Recipes are already migrated by the backend
+  return recipes;
 };
+
+export { loadRecipes };
 
 
 const loadRecipesFromLocalStorage = async () => {
@@ -357,231 +408,86 @@ const addToExistingRecipes = () => {
 
 let recipes = await loadRecipes()
 
-const renderImageSelector = async (keyword, pageNumber = 1) => {
+// In unsplash images
+
+import { selectUnsplashImageForGallery } from './helpers/featureImage.js';
+
+export async function renderImageSelector(keyword, pageNumber, recipeId) {
+  const modal = document.getElementById('select-images');
+  const carouselTrack = modal?.querySelector('.carousel-track');
+  
+  if (!carouselTrack) return;
+
+  // Show loading
+  carouselTrack.innerHTML = '<li class="loading">Searching Unsplash...</li>';
+  modal.showModal();
+
   try {
-    const response = await getImageGroup(keyword, pageNumber);
-    
-    if (!response || response.length === 0) {
-      alert('No images found. Try a different keyword.');
+    const response = await fetch(
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(keyword)}&page=${pageNumber}&per_page=20&orientation=landscape`,
+      {
+        headers: {
+          'Authorization': `Client-ID ${UNSPLASH_ACCESS_KEY}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!data.results || data.results.length === 0) {
+      carouselTrack.innerHTML = '<li class="no-results">No images found.</li>';
       return;
     }
 
-    // Get modal elements
-    const modal = document.getElementById("select-images");
-    const carousel = modal.querySelector('.carousel');
-    const imageTrack = modal.querySelector('.carousel-track');
-    
-    // ✅ Clear previous content
-    imageTrack.innerHTML = '';
-    
-    // Remove old controls if they exist
-modal.querySelectorAll('.image-buttons, .count, .close-image-modal, #prev-page, #next-page, #select-image').forEach(el => el.remove());
-    
-    // ✅ Add your class to carousel
-    carousel.classList.add('image-viewport');
-    imageTrack.classList.add('image-show');
-    
-    // ✅ Populate images
-    response.forEach((imageObject) => {
-      const li = document.createElement('li');
-      
-      const fig = document.createElement('figure');
-      const img = document.createElement('img');
-      
-      // Store data as data attributes
-      img.src = imageObject.urls.thumb;
-      img.dataset.url = imageObject.urls.regular;
-      img.dataset.photographer = imageObject.user.name;
-      img.dataset.link = imageObject.user.links.html;
-      img.alt = imageObject.alt_description || 'Unsplash photo';
-      
-      const caption = document.createElement('figcaption');
-      caption.textContent = imageObject.user.name;
-      
-      fig.appendChild(img);
-      fig.appendChild(caption);
-      li.appendChild(fig);
-      imageTrack.appendChild(li);
+    // Render results with UTM parameters for Unsplash compliance
+    carouselTrack.innerHTML = data.results.map(photo => `
+      <li class="carousel-item">
+        <div class="unsplash-photo">
+          <img src="${photo.urls.small}" alt="${photo.alt_description || ''}" />
+          <div class="photo-info">
+            <div class="photo-credit">
+              Photo by <a href="${photo.user.links.html}?utm_source=recipe_me&utm_medium=referral" target="_blank" rel="noopener">${photo.user.name}</a>
+            </div>
+            <button 
+              class="select-photo-btn"
+              data-url="${photo.urls.regular}"
+              data-photographer="${photo.user.name}"
+              data-photographer-link="${photo.user.links.html}?utm_source=recipe_me&utm_medium=referral"
+            >
+              <i class="fa-solid fa-plus"></i> Add to Recipe
+            </button>
+          </div>
+        </div>
+      </li>
+    `).join('');
+
+    // Add click handlers
+    const selectButtons = carouselTrack.querySelectorAll('.select-photo-btn');
+    selectButtons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        await selectUnsplashImageForGallery(
+          recipeId,
+          button.dataset.url,
+          button.dataset.photographer,
+          button.dataset.photographerLink // Now includes UTM params
+        );
+        
+        // Close modal
+        modal.close();
+        
+        // Clear search input
+        const searchInput = document.getElementById('feature-keyword');
+        if (searchInput) searchInput.value = '';
+      });
     });
-    
-    const totalImages = response.length;
-    let currentSlide = 0;
-    
-    // ✅ Create navigation buttons (matching your structure)
-    const imageButtons = document.createElement('div');
-    imageButtons.className = 'image-buttons';
-    imageButtons.innerHTML = `
-      <button class="btn prev">
-        <i class="fa fa-angle-left"></i>
-        <span class="hide-text">previous image</span>
-      </button>
-      <button class="btn next">
-        <i class="fa fa-angle-right"></i>
-        <span class="hide-text">next image</span>
-      </button>
-    `;
-    
-    // ✅ Create count
-    const imageCount = document.createElement('p');
-    imageCount.className = 'count';
-    imageCount.textContent = `Viewing image 1 of ${totalImages}`;
-    
-    // ✅ Create page navigation buttons
-    const prevPageBtn = document.createElement('button');
-    prevPageBtn.id = 'prev-page';
-    prevPageBtn.textContent = 'Previous Group';
-    
-    const nextPageBtn = document.createElement('button');
-    nextPageBtn.id = 'next-page';
-    nextPageBtn.textContent = 'Next Group';
-    
-    // ✅ Create select button
-    const selectBtn = document.createElement('button');
-    selectBtn.id = 'select-image';
-    selectBtn.textContent = 'Select This Image';
-    
-    // ✅ Create close button
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'close-image-modal';
-    closeBtn.innerHTML = '<span class="hide-text">Close Modal</span><i class="fa fa-times"></i>';
-    
-    // ✅ Append all to modal
-    modal.appendChild(imageButtons);
-    modal.appendChild(prevPageBtn);
-    modal.appendChild(nextPageBtn);
-    modal.appendChild(imageCount);
-    modal.appendChild(selectBtn);
-    modal.appendChild(closeBtn);
-    
-    // Get button references
-    const prevBtn = imageButtons.querySelector('.prev');
-    const nextBtn = imageButtons.querySelector('.next');
-    
-    // ✅ Slider logic
-    let transform = 0;
-    const slideWidth = 80; // Based on your li width: 80%
-    
-const updateUI = () => {
-  imageCount.textContent = `Viewing image ${currentSlide + 1} of ${totalImages}`;
-  prevBtn.disabled = currentSlide === 0;
-  nextBtn.disabled = currentSlide === totalImages - 1;
-  
-  // Get the actual width of one slide
-  const slideWidth = imageTrack.querySelector('li')?.offsetWidth || 0;
-  transform = -currentSlide * slideWidth;
-  imageTrack.style.transform = `translateX(${transform}px)`;
-};
-    // ✅ Navigation
-    prevBtn.addEventListener('click', () => {
-      if (currentSlide > 0) {
-        currentSlide--;
-        updateUI();
-      }
-    });
-    
-    nextBtn.addEventListener('click', () => {
-      if (currentSlide < totalImages - 1) {
-        currentSlide++;
-        updateUI();
-      }
-    });
-    
-    // ✅ Keyboard navigation
-    const handleKeydown = (e) => {
-      if (e.key === 'ArrowLeft' && currentSlide > 0) {
-        currentSlide--;
-        updateUI();
-      } else if (e.key === 'ArrowRight' && currentSlide < totalImages - 1) {
-        currentSlide++;
-        updateUI();
-      }
-    };
-    modal.addEventListener('keydown', handleKeydown);
-    
-    // ✅ Page navigation
-    prevPageBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (pageNumber > 1) {
-        modal.removeEventListener('keydown', handleKeydown); // Cleanup
-        renderImageSelector(keyword, pageNumber - 1);
-      }
-    });
-    
-    nextPageBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      modal.removeEventListener('keydown', handleKeydown); // Cleanup
-      renderImageSelector(keyword, pageNumber + 1);
-    });
-    
-    // Disable prev page on first page
-    if (pageNumber === 1) {
-      prevPageBtn.disabled = true;
-    }
-    
-    // ✅ Select image
-    selectBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      
-      const selectedImg = imageTrack.querySelectorAll('img')[currentSlide];
-      
-      if (!selectedImg) {
-        alert('No image selected');
-        return;
-      }
-      
-      // Get current recipe ID from hash
-      const recipeId = location.hash.substring(1);
-      const recipes = await loadRecipes();
-      const recipe = recipes.find(r => r.id === recipeId);
-      
-      if (!recipe) {
-        alert('Recipe not found. Please refresh the page.');
-        return;
-      }
-      
-      // Update recipe with image data
-      recipe.photographer = selectedImg.dataset.photographer;
-      recipe.photographerLink = selectedImg.dataset.link;
-      recipe.photoURL = selectedImg.dataset.url;
-      recipe.updatedAt = getTimestamp();
-      
-      await saveRecipes(recipes);
-      
-      // Update preview in the form
-      const previewImg = document.querySelector('.image-preview img');
-      const previewCaption = document.querySelector('.image-preview figcaption');
-      
-      if (previewImg) previewImg.src = recipe.photoURL;
-      if (previewCaption) {
-        previewCaption.innerHTML = `Unsplash photo by <a href="${recipe.photographerLink}" target="_blank" rel="noopener">${recipe.photographer}</a>`;
-      }
-      
-      console.log('Image selected:', recipe.photoURL);
-      
-      // Cleanup and close
-      modal.removeEventListener('keydown', handleKeydown);
-      modal.close();
-    });
-    
-    // ✅ Close modal
-    closeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      modal.removeEventListener('keydown', handleKeydown); // Cleanup
-      modal.close();
-    });
-    
-    // ✅ Initial state
-    updateUI();
-    
-    // ✅ Show modal and focus
-    modal.showModal();
-    nextBtn.focus();
-    
+
   } catch (error) {
-    console.error('Error loading images:', error);
-    alert('Failed to load images. Please try again.');
+    console.error('Unsplash search error:', error);
+    carouselTrack.innerHTML = '<li class="error">Search failed. Please try again.</li>';
   }
-};
+}
 
 const removeRecipe = async (recipeId) => {
     let recipes = await loadRecipes()
@@ -636,7 +542,60 @@ async function updateLocalStorage(recipeId, updates = {}) {
 const like = () => {
     alert(`Thanks, we like you too! Unfortunately we don't have this button wired up yet, because USERS don't exist yet. `)
 }
-   
+/**
+ * Get the featured image for a recipe (backward compatible)
+ */
+export function getFeaturedImage(recipe) {
+  // New format (images array)
+  if (recipe.images && recipe.images.length > 0) {
+    const featured = recipe.images.find(img => img.isFeatured);
+    return featured || recipe.images[0];
+  }
+  
+  // Old format (single photoURL) - backward compatibility
+  if (recipe.photoURL) {
+    return {
+      id: 'legacy',
+      url: recipe.photoURL,
+      source: recipe.imageSource || 'unsplash',
+      isFeatured: true,
+      order: 0,
+      attribution: recipe.photographer ? {
+        photographer: recipe.photographer,
+        photographerUrl: recipe.photographerLink
+      } : null
+    };
+  }
+  
+  return null;
+}
+
+/**
+ * Get all images for a recipe (backward compatible)
+ */
+export function getAllImages(recipe) {
+  // New format
+  if (recipe.images && recipe.images.length > 0) {
+    return recipe.images.sort((a, b) => a.order - b.order);
+  }
+  
+  // Old format - return as single-item array
+  if (recipe.photoURL) {
+    return [{
+      id: 'legacy',
+      url: recipe.photoURL,
+      source: recipe.imageSource || 'unsplash',
+      isFeatured: true,
+      order: 0,
+      attribution: recipe.photographer ? {
+        photographer: recipe.photographer,
+        photographerUrl: recipe.photographerLink
+      } : null
+    }];
+  }
+  
+  return [];
+}   
 const share = () => {
     alert('location')
 }
@@ -654,13 +613,12 @@ export {
     addIngredients,
     addToExistingRecipes,
     sortRecipes,
-    loadRecipes,
     saveRecipes,
     getTimestamp,
     loadRecipesFromLocalStorage,
     loadNewRecipeFromLocalStorage,
     saveNewRecipeToLocalStorage,
-    renderImageSelector,
+    
     toggleMenu,
     hamburger,
     // updateRecipeInDatabase,

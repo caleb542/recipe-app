@@ -1,26 +1,30 @@
 import "./style.scss";
-import { loadRecipesFromLocalStorage, hamburger } from "./functions.js";
+import { loadRecipesFromLocalStorage, hamburger, getFeaturedImage, getAllImages } from "./functions.js";
 import { marked } from "marked";
 import { setupShoppingList } from "./helpers/shoppingList.js";
 import { initAuth0, getToken, isAuthenticated, getUser } from './auth/auth0.js';
 import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
 import { RatingDisplay } from './components/RatingDisplay.js';
 import { CommunityNotes } from './components/CommunityNotes.js';
-
+import { loadUserProfile, getUserProfile } from './userContext.js';
+import { autoEmbedVideos } from './helpers/youtubeEmbed.js';
 
 const recipeId = location.hash.substring(1);
 let recipes;
-let likesInitialized = false; // ✅ Prevent multiple initializations
+let likesInitialized = false;
 let articleHydrated = false;
-
 
 // Initialize Auth0
 await initAuth0();
+const authenticated = await isAuthenticated();
+if (authenticated) {
+  await loadUserProfile(true);
+}
+
 await updateAuthUI();
 setupAuthListeners();
 
-// Add storage listener ONCE at top level
-
+// Add storage listener
 window.addEventListener("storage", e => {
   if (e.key === "recipes") {
     fetchRecipes();
@@ -36,12 +40,12 @@ async function fetchRecipes() {
 fetchRecipes();
 
 async function hydrateArticle(recipes) {
-
   // Prevent multiple hydrations
   if (articleHydrated) {
     console.log('Article already hydrated, skipping...');
     return;
   }
+  
   const recItem = Array.isArray(recipes)
     ? recipes.find(recipe => recipe.id === recipeId)
     : null;
@@ -76,31 +80,86 @@ async function hydrateArticle(recipes) {
     a.innerHTML = `by ${authorName}`;
   }
 
-  // ✅ Add prep time
   const pt = tpl.querySelector(".prep-time-value");
   if (pt) pt.textContent = recItem.prepTime || "Not specified";
 
-  // ✅ Add total time
   const tt = tpl.querySelector(".total-time-value");
   if (tt) tt.textContent = recItem.totalTime || "Not specified";
 
   const dsum = tpl.querySelector(".description.summary");
   if (dsum) dsum.innerHTML = recItem.description;
 
- 
-
-  // Image + photo info
+  // ✅ NEW: Handle multiple images from images array
   const imageElement = tpl.querySelector(".imageElement");
-  if (imageElement) imageElement.style.backgroundImage = `url(${recItem.photoURL})`;
-
   const photoInfo = tpl.querySelector(".photoInfo");
-  if (photoInfo) {
-    photoInfo.innerHTML = `Photo from Unsplash by <a href="${recItem.photographerLink}">${recItem.photographer}</a>`;
+  
+  if (imageElement) {
+    const featuredImage = getFeaturedImage(recItem);
+    
+    if (featuredImage) {
+      // Display featured image
+      imageElement.style.backgroundImage = `url(${featuredImage.url})`;
+      
+      // Show attribution if exists
+      if (photoInfo && featuredImage.attribution) {
+        if (featuredImage.source === 'unsplash') {
+          photoInfo.innerHTML = `Photo by <a href="${featuredImage.attribution.photographerUrl}" target="_blank" rel="noopener">${featuredImage.attribution.photographer}</a> on <a href="https://unsplash.com/?utm_source=recipe_me&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a>`;
+        } else {
+          // User-added attribution
+          const attr = featuredImage.attribution;
+          if (attr.customCredit) {
+            photoInfo.innerHTML = attr.customCredit;
+          } else if (attr.photographerUrl) {
+            photoInfo.innerHTML = `Photo by <a href="${attr.photographerUrl}" target="_blank" rel="noopener">${attr.photographer}</a>`;
+          } else {
+            photoInfo.innerHTML = `Photo by ${attr.photographer}`;
+          }
+        }
+      } else if (photoInfo) {
+        photoInfo.innerHTML = ''; // No attribution needed
+      }
+    }
+  }
+
+  // ✅ NEW: Display image gallery (all images)
+  const imageGalleryContainer = tpl.querySelector(".recipe-image-gallery");
+  if (imageGalleryContainer) {
+    const allImages = getAllImages(recItem);
+    
+    if (allImages.length > 0) {
+      imageGalleryContainer.innerHTML = `
+        <div class="recipe-images-grid">
+          ${allImages.map((img, index) => `
+            <figure class="recipe-image-item ${img.isFeatured ? 'featured-image' : ''}">
+              ${img.resourceType === 'video' ? `
+                <video controls>
+                  <source src="${img.url}" type="video/mp4">
+                  Your browser does not support video.
+                </video>
+              ` : `
+                <img src="${img.url}" alt="Recipe image ${index + 1}" loading="lazy">
+              `}
+              ${img.attribution ? `
+                <figcaption class="image-attribution">
+                  ${formatImageAttribution(img)}
+                </figcaption>
+              ` : ''}
+            </figure>
+          `).join('')}
+        </div>
+      `;
+    }
   }
 
   // Summary content
+  
   const summaryContent = tpl.querySelector(".summary-content");
-  if (summaryContent) summaryContent.innerHTML = marked.parse(recItem.article || "");
+  
+  if (summaryContent) {
+    let html = marked.parse(recItem.article || "");
+    html = autoEmbedVideos(html); // ✅ Auto-embed YouTube/Vimeo
+    summaryContent.innerHTML = html;
+  }
 
   // Directions
   const directionsList = tpl.querySelector(".directions-list");
@@ -139,8 +198,8 @@ async function hydrateArticle(recipes) {
   }
 
   // Edit button
-  const editButton = tpl.getElementById?.("cta-update") || tpl.querySelector("#cta-update");
-  if (editButton) {
+  const editBtn = tpl.getElementById?.('edit-recipe-btn') || tpl.querySelector("#edit-recipe-btn");
+  if (editBtn) {
     const authenticated = await isAuthenticated();
 
     if (authenticated) {
@@ -149,37 +208,30 @@ async function hydrateArticle(recipes) {
       const isLegacy = !recItem.author || recItem.author.name === "Legacy User";
       
       if (isAuthor || isLegacy) {
-        editButton.href = `./edit.html#${recipeId}`;
-        editButton.title = isLegacy ? "Claim and edit recipe" : "Edit recipe";
-        editButton.style.display = 'inline-block';
+        editBtn.href = `./edit.html#${recipeId}`;
+        editBtn.title = isLegacy ? "Claim and edit recipe" : "Edit recipe";
+        editBtn.style.display = 'inline-block';
       } else {
-        editButton.style.display = 'none';
+        editBtn.style.display = 'none';
       }
     } else {
-      editButton.style.display = 'none';
+      editBtn.style.display = 'none';
     }
   }
 
   // Append hydrated fragment
   container.appendChild(tpl);
 
- // Initialize the rating component
-const ratingDisplayContainer = document.getElementById("rating-display");
-if (ratingDisplayContainer) {
-  new RatingDisplay(ratingDisplayContainer, recipeId, {
-    showStarsVisual: true  // Shows ★★★★☆ 4 Stars (2 reviews)
-  });
-}
+  // Community notes
+  const notesContainer = document.getElementById("community-notes");
+  if (notesContainer) {
+    new CommunityNotes(notesContainer, recipeId);
+  }
 
-// Bottom: Full interactive community notes
-const notesContainer = document.getElementById("community-notes");
-if (notesContainer) {
-  new CommunityNotes(notesContainer, recipeId);
-}
   // Wire shopping list helper
   setupShoppingList(recItem, recipeId, "caleb542@gmail.com");
 
-  // ✅ Only initialize likes once
+  // Initialize likes once
   if (!likesInitialized) {
     await initializeLikes(recipeId, container);
     likesInitialized = true;
@@ -187,12 +239,35 @@ if (notesContainer) {
 
   // Hamburger + storage listener
   hamburger();
-
-   articleHydrated = true;
- 
+  articleHydrated = true;
 }
 
-// Like functionality
+/**
+ * Format image attribution for display
+ */
+function formatImageAttribution(image) {
+  if (!image.attribution) return '';
+  
+  const attr = image.attribution;
+  
+  // Unsplash format
+  if (image.source === 'unsplash') {
+    return `Photo by <a href="${attr.photographerUrl}" target="_blank" rel="noopener">${attr.photographer}</a> on <a href="https://unsplash.com/?utm_source=recipe_me&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a>`;
+  }
+  
+  // User attribution format
+  if (attr.customCredit) {
+    return attr.customCredit;
+  }
+  
+  if (attr.photographerUrl) {
+    return `<a href="${attr.photographerUrl}" target="_blank" rel="noopener">${attr.photographer}</a>`;
+  }
+  
+  return attr.photographer;
+}
+
+// Like functionality (unchanged)
 async function initializeLikes(recipeId, container) {
   const likeButton = container.querySelector("#like-button");
 
@@ -202,12 +277,10 @@ async function initializeLikes(recipeId, container) {
   }
 
   async function refreshLikes(recipeId) {
-    //  console.trace('🔍 HEY!!!  refreshLikes called from:'); // trace
     try {
       const authenticated = await isAuthenticated();
       
       if (!authenticated) {
-        // Fetch public like count without auth
         try {
           const res = await fetch(`/.netlify/functions/like?id=${recipeId}`, {
             method: 'GET',
@@ -222,7 +295,6 @@ async function initializeLikes(recipeId, container) {
           console.log('Could not fetch public like count:', err);
         }
         
-        // Disable like button for logged out users
         const btn = document.getElementById("like-button");
         if (btn) {
           btn.disabled = true;
@@ -231,7 +303,6 @@ async function initializeLikes(recipeId, container) {
         return;
       }
 
-      // Authenticated - fetch with token
       const token = await getToken();
       
       const res = await fetch(`/.netlify/functions/like?id=${recipeId}`, {
@@ -248,13 +319,11 @@ async function initializeLikes(recipeId, container) {
       
       const data = await res.json();
 
-      // Update like count
-      let likesText = data.likes === 1 ? ` ${data.likes} Like`:` ${data.likes} Likes`;
+      let likesText = data.likes === 1 ? ` ${data.likes} Like` : ` ${data.likes} Likes`;
       const countEl = document.getElementById("like-count");
 
       if (countEl) countEl.textContent = likesText ?? 0;
 
-      // Update button state
       const btn = document.getElementById("like-button");
       if (btn) {
         applyLikeState(btn, data);
@@ -271,7 +340,6 @@ async function initializeLikes(recipeId, container) {
     }
   }
 
-  // Like button click handler
   if (likeButton) {
     likeButton.addEventListener("click", async () => {
       const authenticated = await isAuthenticated();
@@ -304,7 +372,6 @@ async function initializeLikes(recipeId, container) {
     });
   }
 
-  // Initial load of likes
   await refreshLikes(recipeId);
 }
 

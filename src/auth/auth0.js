@@ -65,11 +65,11 @@ const updateUI = async () => {
     if (userProfile) userProfile.textContent = `Welcome, ${user.name}`;
     
     // Get token for API calls
-    const token = await getToken();
-    if (token) {
-      // You can now make authenticated API calls
-      console.log('User authenticated with token');
-    }
+    // const token = await getToken();
+    // if (token) {
+    //   // You can now make authenticated API calls
+    //   console.log('User authenticated with token');
+    // }
   } else {
     // User is not logged in
     const loginBtn = document.getElementById('login-btn');
@@ -89,7 +89,8 @@ export const login = async () => {
   }
   await auth0.loginWithRedirect({
     authorizationParams: {
-      redirect_uri: window.location.href  // ← Return to current page (including hash)
+      redirect_uri: window.location.href,
+      scope: 'openid profile email'  // ← Return to current page (including hash)
     }
   });
 };

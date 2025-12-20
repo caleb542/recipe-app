@@ -30,9 +30,11 @@ import { getRecipesFromDatabase } from "./backend/getRecipesFromDatabase.js";
 
 import { initAuth0, login, isAuthenticated } from './auth/auth0.js';
 import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
+import { loadUserProfile, getUserProfile } from './userContext.js';
 
 // Initialize auth
 await initAuth0();
+await loadUserProfile(); 
 await updateAuthUI();
 setupAuthListeners();
 
@@ -155,8 +157,8 @@ document.addEventListener("change", (e) => {
 await getCategories()
 hamburger()
       
-window.addEventListener('storage', (e) => {
-  if (e.key === 'recipes') {
-    listRecipes(recipes)
-  }
-})
+// window.addEventListener('storage', (e) => {
+//   if (e.key === 'recipes') {
+//     listRecipes(recipes)
+//   }
+// })

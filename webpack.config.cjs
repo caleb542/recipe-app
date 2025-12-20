@@ -8,8 +8,25 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 
 module.exports = (env, argv) => {
+  const isDevelopment = argv.mode === 'development';
   
   return {
+    mode: argv.mode,
+    
+    // Enable watch mode for development
+    watch: isDevelopment,
+    
+    // UNCOMMENT AND FIX WATCH OPTIONS
+    watchOptions: {
+      ignored: [
+        '**/node_modules/**',
+        '**/public/scripts/**',  // Don't watch webpack output!
+        '**/public/partials/**', // Don't watch copied files
+      ],
+      aggregateTimeout: 300,
+      poll: 1000  // CHANGED from false to 1000 - helps with detection
+    },
+    
     resolve: {
       extensions: [".js"],
       fallback: {
@@ -31,7 +48,8 @@ module.exports = (env, argv) => {
     ignoreWarnings: [/legacy JS API/],
 
     experiments: {
-      topLevelAwait: true
+      topLevelAwait: true,
+      outputModule: true
     },
 
     entry: {
@@ -42,19 +60,22 @@ module.exports = (env, argv) => {
       addRecipe: "./src/addRecipe.js",
       icons: "./src/icons.js"
     },
+    
     output: {
       path: path.resolve(__dirname, "public/scripts"),
-      filename: "[name]-bundle.js",
+      filename: "[name]-bundle.js?[contenthash]",
       clean: true,
       library: { type: "module" }
     },
-    experiments: {
-      topLevelAwait: true,
-      outputModule: true
-    },
+    
     plugins: [
-      new HtmlWebpackPlugin({ template: "./public/index.html" }),
-      new MiniCssExtractPlugin({ filename: "[name].css" }),
+      new HtmlWebpackPlugin({ 
+        template: "./public/index.html",
+        inject: false // Don't auto-inject scripts (you handle manually)
+      }),
+      new MiniCssExtractPlugin({ 
+        filename: "[name].css" 
+      }),
       new CopyWebpackPlugin({
         patterns: [
           { from: "src/partials", to: "../partials" },
@@ -64,8 +85,10 @@ module.exports = (env, argv) => {
         "process.env.AUTH0_DOMAIN": JSON.stringify(process.env.AUTH0_DOMAIN),
         "process.env.AUTH0_CLIENT_ID": JSON.stringify(process.env.AUTH0_CLIENT_ID),
         "process.env.AUTH0_AUDIENCE": JSON.stringify(process.env.AUTH0_AUDIENCE),
+        "process.env.UNSPLASH_ACCESS_KEY": JSON.stringify(process.env.UNSPLASH_ACCESS_KEY),
       }),
     ],
+    
     module: {
       rules: [
         {
@@ -99,43 +122,57 @@ module.exports = (env, argv) => {
         }
       ]
     },
-    watchOptions: {
-      ignored: [
-        '**/node_modules/**',
-        '**/public/**',  // ← CRITICAL: Don't watch output directory
-      ],
-      aggregateTimeout: 300,
-      poll: false
-    },
+    
     devServer: {
-      static: {
-        directory: path.join(__dirname, "public"),
-        watch: {
-          ignored: [
-            path.resolve(__dirname, 'public/scripts/**'),  // ← Don't watch bundles
-            path.resolve(__dirname, 'public/partials/**'), // ← Don't watch copied partials
-          ]
-        }
-      },
-      devMiddleware: { publicPath: "/scripts/" },
-      hot: true,
-      liveReload: true,
-      historyApiFallback: true,
-      open: false,
-      port: 8888,
-      watchFiles: {
-        paths: [
-          'src/**/*.js',              // ← Watch SOURCE JS
-          'src/**/*.scss',            // ← Watch SOURCE SCSS
-          'src/partials/**/*.html',   // ← Watch SOURCE partials (not output!)
-          'public/*.html'             // ← Watch root HTML files
-        ],
-        options: {
-          ignored: ['**/node_modules/**']
-        }
-      },
+  static: {
+    directory: path.join(__dirname, "public"),
+    watch: {
+      ignored: [
+        path.resolve(__dirname, 'public/scripts/**'),
+        path.resolve(__dirname, 'public/partials/**'),
+      ]
+    }
+  },
+  allowedHosts: 'all',
+  
+  devMiddleware: { 
+    publicPath: "/scripts/",
+    writeToDisk: true,
+    // ADD THIS - disable all caching in dev
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    }
+  },
+  
+  hot: false,
+  liveReload: false,
+  historyApiFallback: true,
+  open: false,
+  port: 8888,
+  
+  // ADD THIS TOO
+  client: {
+    overlay: {
+      errors: true,
+      warnings: false,
     },
-    devtool: argv.mode === "development" ? "eval-source-map" : "source-map",
-    mode: argv.mode
+  },
+  
+  watchFiles: {
+    paths: [
+      'src/**/*.js',
+      'src/**/*.scss',
+      'src/partials/**/*.html',
+      'public/*.html'
+    ],
+    options: {
+      ignored: ['**/node_modules/**']
+    }
+  },
+},
+    
+    devtool: isDevelopment ? "eval-source-map" : "source-map"
   };
 };

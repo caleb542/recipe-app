@@ -98,7 +98,6 @@ export class ProfileSetupModal {
 
     document.body.insertAdjacentHTML('beforeend', dialogHTML);
     this.dialog = document.getElementById('profile-setup-dialog');
-    this.injectCSS();
   }
 
   show() {
@@ -297,7 +296,7 @@ export class ProfileSetupModal {
 
       // Success - close and reload
       this.close();
-      window.location.reload();
+      window.location.href = `/profile.html?username=${user.username}`;
 
     } catch (error) {
       console.error('Profile setup error:', error);

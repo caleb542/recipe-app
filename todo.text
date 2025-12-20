@@ -1,0 +1,13 @@
+TODO
+1. The image used for Profile is over 800Kb
+There may be some difficulty detecting duplicates between Profile Pics and others
+
+Profile images do not check for duplication
+Todo - inline images do not check for duplication, or perhaps they will once all the new images are uploaded...?
+Delete all user uploaded images and re-try
+
+2.  If there is 1 image, it's the feature image.  Only show feature image on article page once.  Don't re-use it.
+
+
+
+

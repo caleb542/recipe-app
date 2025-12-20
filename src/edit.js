@@ -13,17 +13,19 @@ import { setupEditor } from './helpers/editor.js';
 import { setupRecipeDeletion, setupSaveButton, setupUpdateDatabase } from './helpers/actions.js';
 import { setupAccessibility } from './helpers/accessibility.js';
 import { hamburger } from './functions.js'; // menu toggle
-
+import { setupImageGallery, renderImageGallery } from './helpers/imageGallery.js';
 
 import { initAuth0, isAuthenticated, getUser } from './auth/auth0.js';
 import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
+import { loadUserProfile } from './userContext.js';
+
 import { setupPreview } from './helpers/preview.js'
 import { initStatusToggle, getCurrentPublishedState } from './helpers/statusToggle.js'
-
-
+import { setupVideoHelper } from './helpers/setupVideoHelper.js';
 
 // Initialize auth
 await initAuth0();
+await loadUserProfile();
 await updateAuthUI();
 setupAuthListeners();
 
@@ -33,6 +35,7 @@ if (!authenticated) {
   alert('Please log in to edit recipes');
   window.location.href = '/index.html';
 }
+
 /**
  * Initialize editing for an existing recipe
  */
@@ -49,11 +52,11 @@ export async function initEdit(recipeId) {
     return;
   }
 
-// Get current user (already authenticated at top of file)
+  // Get current user (already authenticated at top of file)
   const currentUser = await getUser();
   const currentUserId = currentUser.sub;
 
-   // ✅ Check ownership (matching your article.js logic)
+  // ✅ Check ownership (matching your article.js logic)
   const isAuthor = recipe.author?.auth0Id === currentUserId;
   const isLegacy = !recipe.author || recipe.author?.name === "Legacy User";
 
@@ -65,20 +68,20 @@ export async function initEdit(recipeId) {
   }
 
   // ✅ If legacy recipe, claim it
- if (isLegacy) {
-
-  console.log('📝 Claiming legacy recipe for user:', currentUserId);
-  recipe.author = {
-    auth0Id: currentUserId,
-    name: currentUser.name,
-    email: currentUser.email
-  };
-  
-  // ✅ Keep existing displayAuthor if it exists, otherwise use Auth0 name
-  if (!recipe.displayAuthor) {
-    recipe.displayAuthor = recipe.author?.name || currentUser.name;
+  if (isLegacy) {
+    console.log('📝 Claiming legacy recipe for user:', currentUserId);
+    recipe.author = {
+      auth0Id: currentUserId,
+      name: currentUser.name,
+      email: currentUser.email
+    };
+    
+    // ✅ Keep existing displayAuthor if it exists, otherwise use Auth0 name
+    if (!recipe.displayAuthor) {
+      recipe.displayAuthor = recipe.author?.name || currentUser.name;
+    }
   }
-}
+  
   // Save current recipe to localStorage for editing
   localStorage.setItem('editingRecipe', JSON.stringify(recipe));
 
@@ -104,9 +107,14 @@ export async function initEdit(recipeId) {
   }
 
   setupFeatureImage(recipe);
+    setupImageGallery(recipeId);
+  // setupCloudinaryUpload(recipeId); // NEW - Cloudinary upload
+  // initImagePreview(recipe);         // NEW - Initialize preview
 
   // Pass both recipeId and article content into editor
   setupEditor(recipeId, recipe.article || recipe.articleHTML || '');
+  const editorInstance = window.editorInstance; // If you're storing it globally
+  setupVideoHelper(editorInstance);
 
   setupRecipeDeletion(recipe);
   setupSaveButton(recipe);
@@ -115,8 +123,8 @@ export async function initEdit(recipeId) {
   setupAccessibility();
   hamburger(); // menu toggle
 
-      setupPreview(recipeId);
-      initStatusToggle()
+  setupPreview(recipeId);
+  initStatusToggle();
 }
 
 /**
@@ -126,6 +134,11 @@ export async function initCreate() {
   const currentUser = await getUser();
   
   const recipes = await loadRecipes();
+
+  setupEditor(newRecipe.id, newRecipe.article || '');
+  // ✅ NEW: Setup video helper
+const editorInstance = window.editorInstance;
+setupVideoHelper(editorInstance);
 
   const newRecipe = {
     id: uuidv4(),
@@ -138,16 +151,23 @@ export async function initCreate() {
       name: currentUser.name,
       email: currentUser.email
     },
-    displayAuthor: currentUser.name, // ✅ Default to Auth0 name, but editable
+    displayAuthor: currentUser.name,
     isPublic: false,
     directions: [],
     tags: [],
     categories: [],
     article: "",
     ingredients: [],
-    photoURL: "",
-    photographer: "",
-    photographerLink: "",
+    
+    // NEW: Use images array instead of single photoURL
+    images: [], // Start with empty array
+    
+    // REMOVE these old fields:
+    // photoURL: "",
+    // photographer: "",
+    // photographerLink: "",
+    // imageSource: "",
+    
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -157,9 +177,6 @@ export async function initCreate() {
   saveRecipes(recipes);
   localStorage.setItem('editingRecipe', JSON.stringify(newRecipe));
 
-  // ... rest of your initialization
-
-
   // Orchestration: call helpers
   populateFields(newRecipe);
   wireFieldListeners(newRecipe.id);
@@ -167,13 +184,11 @@ export async function initCreate() {
   listDirections(newRecipe.directions);
   setupDirections(newRecipe.id);
 
-
-
   await listIngredients(newRecipe.id);
   setupIngredientDelegation(newRecipe.id);
 
   setupFeatureImage(newRecipe);
-  
+  setupImageGallery(newRecipe.id);
 
   // Pass both recipeId and article content into editor
   setupEditor(newRecipe.id, newRecipe.article || '');
@@ -184,18 +199,12 @@ export async function initCreate() {
 
   setupAccessibility();
   hamburger(); // menu toggle
-
-
 }
 
-
 const previewButton = document.getElementById('preview-link');
-// previewButton.setAttribute('href',`article.html#${recipeId}`);
  
 if (recipeId) {
   initEdit(recipeId);
 } else {
   initCreate();
 }
-
-

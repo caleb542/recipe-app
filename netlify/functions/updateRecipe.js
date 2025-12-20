@@ -1,6 +1,47 @@
 import { getMongoClient } from "./utils/mongoClient.js";
 import { verifyToken, getTokenFromHeader, headers } from './utils/auth.js';
 
+/**
+ * Ensure recipe has images array format
+ */
+function ensureImagesArray(updates) {
+  // If images array provided, use it
+  if (updates.images && Array.isArray(updates.images)) {
+    return updates;
+  }
+
+  // If old format provided, convert it
+  if (updates.photoURL) {
+    updates.images = [{
+      id: `legacy-${Date.now()}`,
+      url: updates.photoURL,
+      source: updates.imageSource || 'unsplash',
+      isFeatured: true,
+      order: 0,
+      cloudinaryPublicId: null,
+      attribution: updates.photographer ? {
+        photographer: updates.photographer,
+        photographerUrl: updates.photographerLink || null,
+        requiresAttribution: true,
+        canEdit: false
+      } : null
+    }];
+
+    // Remove old fields from updates
+    delete updates.photoURL;
+    delete updates.photographer;
+    delete updates.photographerLink;
+    delete updates.imageSource;
+  }
+
+  // Ensure images array exists (even if empty)
+  if (!updates.images) {
+    updates.images = [];
+  }
+
+  return updates;
+}
+
 export async function handler(event) {
   // CORS preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -28,8 +69,14 @@ export async function handler(event) {
 
     const decoded = await verifyToken(token);
     const auth0Id = decoded.sub;
+    const email = decoded.email;
+    const name = decoded.name;
 
     const { id, updates, version, updatedAt } = JSON.parse(event.body);
+
+    console.log('📥 Backend:', decoded);
+    console.log('📥 Backend received updates:', updates);
+    console.log('📥 Backend received author:', updates.author);
 
     if (!id || !updates) {
       return {
@@ -51,7 +98,7 @@ export async function handler(event) {
                        !existing.author.auth0Id || 
                        existing.author.name === "Legacy User";
       
-      // ✅ UPDATE: Verify ownership (but allow legacy recipes)
+      // ✅ Verify ownership (but allow legacy recipes)
       if (!isLegacy && existing.author?.auth0Id && existing.author.auth0Id !== auth0Id) {
         return {
           statusCode: 403,
@@ -79,26 +126,33 @@ export async function handler(event) {
 
       const newVersion = (existing?.version || version || 1) + 1;
       
+      // ✅ Ensure images array format
+      const processedUpdates = ensureImagesArray({ ...updates });
+      
       // Build update object
       const updateFields = {
-        ...updates,
+        ...processedUpdates,
+        author: processedUpdates.author || {
+          auth0Id: decoded.sub,
+          name: decoded.name,
+          email: decoded.email
+        },
         version: newVersion,
         updatedAt: updatedAt || new Date().toISOString(),
       };
 
-      // ✅ If legacy recipe, claim it by adding proper author
-      if (isLegacy) {
-        updateFields.author = {
-          auth0Id: decoded.sub,
-          name: decoded.name,
-          email: decoded.email
-        };
-        
-        // Preserve old author name as displayAuthor if it exists
-        if (existing.author?.name && existing.author.name !== "Legacy User") {
-          updateFields.displayAuthor = existing.author.name;
-        }
+      // ✅ ALWAYS use frontend author if provided
+      if (updates.author) {
+        updateFields.author = updates.author;
       }
+
+      // ✅ For legacy recipes being claimed, preserve old displayAuthor
+      if (isLegacy && existing.author?.name && existing.author.name !== "Legacy User") {
+        updateFields.displayAuthor = existing.author.name;
+      }
+
+      console.log('💾 About to save to MongoDB:', updateFields.author);
+      console.log('💾 Images being saved:', updateFields.images);
 
       const result = await collection.updateOne(
         { id },
@@ -117,21 +171,26 @@ export async function handler(event) {
       };
 
     } else {
-      // ✅ INSERT (upsert for new recipe): Add author automatically
+      // ✅ INSERT (upsert for new recipe)
+      const processedUpdates = ensureImagesArray({ ...updates });
+
       const newRecipe = {
         id,
-        ...updates,
-        author: {
+        ...processedUpdates,
+        author: processedUpdates.author || {
           auth0Id: decoded.sub,
-          name: decoded.name,
-          email: decoded.email
+          name: name,
+          email: email
         },
-        displayAuthor: updates.displayAuthor || decoded.name, // Use displayAuthor if provided
-        isPublic: updates.isPublic !== undefined ? updates.isPublic : true,
+        displayAuthor: processedUpdates.displayAuthor || decoded.name,
+        isPublic: processedUpdates.isPublic !== undefined ? processedUpdates.isPublic : true,
+        images: processedUpdates.images || [], // Ensure images array
         version: 1,
         createdAt: new Date().toISOString(),
         updatedAt: updatedAt || new Date().toISOString(),
       };
+
+      console.log('💾 Creating new recipe with images:', newRecipe.images);
 
       const result = await collection.insertOne(newRecipe);
 

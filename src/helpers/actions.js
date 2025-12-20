@@ -34,24 +34,29 @@ function setupSaveButton(recipe) {
 
   saveBtn.addEventListener('click', async () => {
     let recipe = await JSON.parse(localStorage.getItem('editingRecipe'));
-      const updates = {
-          name: recipe.name || '',
-          article: recipe.article || '',
-          createdAt: recipe.createdAt || '',
-          author: recipe.author || '',
-          displayAuthor:recipe.displayAuthor || '',
-          description: recipe.description || '',
-          tags: recipe.tags || '',
-          prepTime: recipe.prepTime || '',
-          totalTime: recipe.totalTime || '',
-          categories: recipe.categories || '',
-          ingredients: recipe.ingredients || '',
-          directions: recipe.directions || '',
-          photoURL: recipe.photoURL || '',
-          photographer: recipe.photographer || '',
-          photographerLink: recipe.photographerLink || ''
-          
-        };
+    
+    const updates = {
+      name: recipe.name || '',
+      article: recipe.article || '',
+      createdAt: recipe.createdAt || '',
+      author: recipe.author || '',
+      displayAuthor: recipe.displayAuthor || '',
+      description: recipe.description || '',
+      tags: recipe.tags || [],
+      prepTime: recipe.prepTime || '',
+      totalTime: recipe.totalTime || '',
+      categories: recipe.categories || [],
+      ingredients: recipe.ingredients || [],
+      directions: recipe.directions || [],
+      
+      // NEW: Save images array instead of single photoURL
+      images: recipe.images || [],
+      
+      // REMOVE old single-image fields:
+      // photoURL: recipe.photoURL || '',
+      // photographer: recipe.photographer || '',
+      // photographerLink: recipe.photographerLink || ''
+    };
 
     if (!recipe || !recipe.id) {
       notyf.error("Recipe not ready to save.");
@@ -65,7 +70,7 @@ function setupSaveButton(recipe) {
       notyf.success("Recipe updated!");
 
       setTimeout(() => {
-        window.location.href = `/article.html#${recipe.id}`; // or refresh recipe list
+        window.location.href = `/article.html#${recipe.id}`;
       }, 2000);
     } catch (err) {
       console.error("❌ Update failed:", err);
@@ -93,9 +98,8 @@ function setupUpdateDatabase() {
   });
 }
 
-
 export {
-    setupRecipeDeletion,
-    setupSaveButton,
-    setupUpdateDatabase
+  setupRecipeDeletion,
+  setupSaveButton,
+  setupUpdateDatabase
 }

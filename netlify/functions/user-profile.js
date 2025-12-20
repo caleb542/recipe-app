@@ -106,9 +106,9 @@ export const handler = async (event) => {
 
       // Create new user profile
       const newUser = {
-        auth0Id,
-        username,
-        email,
+        auth0Id: auth0Id,
+        username: username.toLowerCase(),
+        email: email || null,
         profile: {
           displayName: body.displayName.trim(),
           bio: '',

@@ -25,59 +25,52 @@
 
 <body class="home-page">
     <div id="static-landing-page" class="splash-overlay">
-         <div id="wheel-a" class="spinning-wheel">
-                <i class="fas fa-pepper-hot"></i>
-                <i class="fas fa-cheese"></i>
-                <i class="fas fa-hamburger"></i>
-                <i class="fas fa-drumstick-bite"></i>
-                <i class="fas fa-bread-slice"></i>
-                <i class="fas fa-pizza-slice"></i>
-                <i class="fas fa-hotdog"></i>
-                <i class="fas fa-ice-cream"></i>
-                
-              
-            </div>
-            <div id="wheel-b" class="spinning-wheel">
-                
-                <i class="fas fa-cheese"></i>
-                <i class="fas fa-ice-cream"></i>
-                <i class="fas fa-bread-slice"></i>
-                <i class="fas fa-pizza-slice"></i>
-                <i class="fas fa-hamburger"></i>
-                <i class="fas fa-pepper-hot"></i>
-                <i class="fas fa-hotdog"></i>
-                <i class="fas fa-drumstick-bite"></i>
-                <i class="fas fa-pepper-hot small"></i>
-            </div>
-            <div id="wheel-c" class="spinning-wheel">
-                <i class="fas fa-hamburger"></i>
-                <i class="fas fa-cheese"></i>
-                <i class="fas fa-pizza-slice"></i>
-                <i class="fas fa-hotdog"></i>
-                <i class="fas fa-pepper-hot"></i>
-                <i class="fas fa-ice-cream"></i>
-                <i class="fas fa-bread-slice"></i>
-                <i class="fas fa-drumstick-bite"></i>
-              
-            </div>
-        <div class="centered-title ">
-            <div class="splash-content">
-                <h1 class="splash-logo">RECIPE ME</h1>
-                <p class="splash-tagline">Publish your recipes to the web</p>
-                
-                <div class="splash-actions">
-                    <button id="browse-btn" class="btn-primary .stl-cta">Browse Recipes</button>
-                    <button id="splash-login-btn" class="btn-secondary">Login to Create</button>
-                </div>
-                </div>
-            </div>
+        <div id="wheel-a" class="spinning-wheel">
+            <i class="fas fa-pepper-hot"></i>
+            <i class="fas fa-cheese"></i>
+            <i class="fas fa-hamburger"></i>
+            <i class="fas fa-drumstick-bite"></i>
+            <i class="fas fa-bread-slice"></i>
+            <i class="fas fa-pizza-slice"></i>
+            <i class="fas fa-hotdog"></i>
+            <i class="fas fa-ice-cream"></i>
         </div>
-      
-           
-   
-      
+        <div id="wheel-b" class="spinning-wheel">
+            <i class="fas fa-cheese"></i>
+            <i class="fas fa-ice-cream"></i>
+            <i class="fas fa-bread-slice"></i>
+            <i class="fas fa-pizza-slice"></i>
+            <i class="fas fa-hamburger"></i>
+            <i class="fas fa-pepper-hot"></i>
+            <i class="fas fa-hotdog"></i>
+            <i class="fas fa-drumstick-bite"></i>
+            <i class="fas fa-pepper-hot small"></i>
+        </div>
+        <div id="wheel-c" class="spinning-wheel">
+                <i class="fas fa-hamburger"></i>
+                <i class="fas fa-cheese"></i>
+                <i class="fas fa-pizza-slice"></i>
+                <i class="fas fa-hotdog"></i>
+                <i class="fas fa-pepper-hot"></i>
+                <i class="fas fa-ice-cream"></i>
+                <i class="fas fa-bread-slice"></i>
+                <i class="fas fa-drumstick-bite"></i>              
+        </div>
+        <!-- splash page center text -->
+        <div class="centered-title ">
+                <div class="splash-content">
+                    <h1 class="splash-logo">RECIPE ME</h1>
+                    <p class="splash-tagline">Publish your recipes to the web</p>
+                    
+                    <div class="splash-actions">
+                        <button id="browse-btn" class="btn-primary .stl-cta">Browse Recipes</button>
+                        <button id="splash-login-btn" class="btn-secondary">Login to Create</button>
+                    </div>
+                    </div>
+                </div>
+        </div>
+    </div><!-- End splash page -->
 
-    </div>
     <div class="page-container">
         <div class="content-wrap">
            
@@ -102,19 +95,7 @@
                         <i class="fa fa-bars" aria-hidden="true"></i>
                     </a>
                 </div>
-
-                <nav id="nav" class="hide">
-                    <ul>
-                        <li><a tabindex="-1" class="add" href="/edit.html" title="add a recipe">Add a recipe</a></li>
-                    </ul>
-                </nav>
-
-                <div class="homepage-hero">
-                    <div class="hero-header">
-                        <h2>Find a recipe</h2>
-                    </div>
-                    
-                   <div class="search-filters">
+                <div class="search-filters">
                         <fieldset class="search-fieldset">
                         <legend>Filter recipes by title or author or category</legend>
                         <div class="search-wrapper">
@@ -134,10 +115,21 @@
                             </select>
                             </div>
                         </fieldset>
-                        </div>
+                    </div>
+
+                <nav id="nav" class="hide">
+                    <ul>
+                        <li><a tabindex="-1" class="add" href="/edit.html" title="add a recipe">Add a recipe</a></li>
+                    </ul>
+                </nav>
+
+                <div class="homepage-hero">
+                    <div class="hero-header">
+                        <h2>Find a recipe</h2>
+                    </div>
                 </div>
-                <div id="categories-cloud">
-                     <h3>Categories</h3>
+                <div id="categories-cloud"><!-- these are tags now, not categories -->
+                     <h3>Tags</h3>
                     <section  role="radiogroup">
                     </section>
                 </div>
