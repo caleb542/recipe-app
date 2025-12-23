@@ -1,0 +1,5 @@
+# Recipe pages
+/@:username/:slug  /article.html?user=:username&slug=:slug  200
+
+# Profile pages
+/@:username        /profile.html?username=:username         200

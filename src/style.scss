@@ -5665,3 +5665,162 @@ button:has(.fa-heart) {
     width: 100%;
   }
 }
+
+/* Profile css */
+
+/* Section Note */
+.profile-page  {
+
+
+.section-note {
+  background: #fff3cd;
+  border-left: 4px solid #f39c12;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #856404;
+}
+.recipe-card {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 1rem;
+
+}
+.section-note i {
+  margin-right: 0.5rem;
+}
+
+/* Draft Recipe Card */
+.recipe-card-draft {
+  position: relative;
+  opacity: 0.9;
+  border: 2px dashed #f39c12;
+}
+
+.recipe-card-draft:hover {
+  opacity: 1;
+  border-color: #e67e22;
+}
+
+.recipe-card-status {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 10;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.draft-badge {
+  background: rgba(243, 156, 18, 0.95);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.recipe-action {
+  color: #3498db;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.recipe-action i {
+  margin-right: 0.25rem;
+}
+
+/* Section Header Icons */
+.section-header h2 i {
+  margin-right: 0.5rem;
+}
+
+.recipe-grid {
+    display: flex;
+    flex-direction: column;
+    gap:1rem;
+
+
+    img {
+        width:220px;
+        
+    }
+
+    a {
+        text-decoration: none;
+        color: #333;
+    }
+}
+}
+
+/* Slug Editor */
+.slug-editor {
+  margin: 1rem 0;
+}
+
+.slug-preview-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.url-base {
+  padding: 0.75rem;
+  background: #f5f5f5;
+  color: #666;
+  white-space: nowrap;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+#recipe-slug {
+  flex: 1;
+  border: none;
+  padding: 0.75rem;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+#recipe-slug:focus {
+  outline: none;
+}
+
+.slug-help {
+  display: block;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.slug-feedback {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.slug-feedback.success {
+  color: #2ecc71;
+}
+
+.slug-feedback.error {
+  color: #e74c3c;
+}
+
+.dev-notice {
+    box-sizing: border-box;
+    padding:10px 0;
+    background-color: #ffdc52;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -394,13 +394,7 @@ const addToExistingRecipes = () => {
     const time = getTimestamp()
     newRecipe.createdAt = time
     newRecipe.id = uuidv4()
-    console.log(recipes)
-    console.log("*************************combining*********************")
     recipes = [...recipes, newRecipe]
-    console.log("`````````````````````````````````````````````")
-    console.log(recipes)
-    console.log(newRecipe)
-    console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     saveRecipes(recipes)
 
 
@@ -601,6 +595,27 @@ const share = () => {
 }
 const print = () => {
     window.print()
+}
+
+/**
+ * Get shareable URL for a recipe
+ */
+export function getRecipeShareUrl(recipe) {
+  if (recipe.fullSlug) {
+    return `${window.location.origin}/@${recipe.fullSlug}`;
+  }
+  // Fallback to hash
+  return `${window.location.origin}/article.html#${recipe.id}`;
+}
+
+/**
+ * Get edit URL for a recipe
+ */
+export function getRecipeEditUrl(recipe) {
+  if (recipe.fullSlug) {
+    return `${window.location.origin}/@${recipe.fullSlug}/edit`;
+  }
+  return `${window.location.origin}/edit.html#${recipe.id}`;
 }
 
 export {

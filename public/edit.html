@@ -14,8 +14,8 @@
 
  
     <script src="https://kit.fontawesome.com/610bdb1969.js" crossorigin="anonymous"></script>
-<link href="./scripts/index.css" rel="stylesheet" media="screen" />
-<link href="./scripts/edit.css" rel="stylesheet" media="screen" />
+<link href="/scripts/index.css" rel="stylesheet" media="screen" />
+<link href="/scripts/edit.css" rel="stylesheet" media="screen" />
 
 
 
@@ -88,10 +88,31 @@
                         <div class="section-1">
                             <div class="form-group">
                                 <label for="recipe-name" id="recipe-name-label">
-                                <div>Name</div> </label>
-                                <input id="recipe-name" class="input" type="text"
-                                placeholder="Recipe Name" name="text" value="">
+                                <div>Recipe Name</div> </label>
+                                <input id="recipe-name" class="input" type="text" required
+                                placeholder="e.g., Authentic Italian Carbonara" name="text">
                             </div>
+                            <!-- ✅ NEW: Slug Editor -->
+<div class="form-group slug-editor">
+  <label for="recipe-slug">Recipe URL</label>
+  
+  <div class="slug-preview-container">
+    <span class="url-base">recipeme.com/@chef_caleb/</span>
+    <input 
+      type="text" 
+      id="recipe-slug" 
+      placeholder="carbonara"
+      pattern="[a-z0-9-]+"
+      maxlength="100"
+    />
+  </div>
+  
+  <small class="slug-help">
+    Customize your recipe URL. Use lowercase letters, numbers, and hyphens.
+  </small>
+  
+  <div id="slug-feedback" class="slug-feedback"></div>
+</div>
                             <div class="form-group">
                                 <label for="recipe-description">
                                 <div>Description</div></label>
@@ -360,7 +381,7 @@
             <!-- page container-->
         </div>
 
-        <script type="module" src="./scripts/edit-bundle.js"></script>
+        <script type="module" src="/scripts/edit-bundle.js"></script>
     </div>
  </body>
 

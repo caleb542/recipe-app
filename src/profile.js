@@ -125,6 +125,61 @@ function displayProfile(profile) {
         </div>
       </div>
 
+      ${/* Published Recipes Section */ ''}
+      ${profile.publishedRecipes && profile.publishedRecipes.length > 0 ? `
+        <div class="profile-section">
+          <div class="section-header">
+            <h2>
+              <i class="fa-solid fa-check-circle" style="color: #2ecc71;"></i>
+              ${isOwnProfile ? 'Published Recipes' : `${profile.profile.displayName}'s Recipes`}
+            </h2>
+            ${isOwnProfile ? `
+              <a href="/edit.html" class="btn-create-recipe">
+                <i class="fa-solid fa-plus"></i> Create Recipe
+              </a>
+            ` : ''}
+          </div>
+          <div class="recipe-grid">
+            ${profile.publishedRecipes.map(recipe => renderRecipeCard(recipe, true)).join('')}
+          </div>
+        </div>
+      ` : isOwnProfile ? `
+        <div class="profile-section">
+          <div class="section-header">
+            <h2>
+              <i class="fa-solid fa-check-circle" style="color: #2ecc71;"></i>
+              Published Recipes
+            </h2>
+            <a href="/edit.html" class="btn-create-recipe">
+              <i class="fa-solid fa-plus"></i> Create Recipe
+            </a>
+          </div>
+          <div class="empty-state">
+            <i class="fa-solid fa-utensils"></i>
+            <p>You haven't published any recipes yet.</p>
+          </div>
+        </div>
+      ` : ''}
+
+      ${/* Unpublished Recipes Section (own profile only) */ ''}
+      ${isOwnProfile && profile.unpublishedRecipes && profile.unpublishedRecipes.length > 0 ? `
+        <div class="profile-section">
+          <div class="section-header">
+            <h2>
+              <i class="fa-solid fa-eye-slash" style="color: #f39c12;"></i>
+              Unpublished Recipes (Drafts)
+            </h2>
+          </div>
+          <p class="section-note">
+            <i class="fa-solid fa-info-circle"></i>
+            These recipes are only visible to you. Publish them to share with others.
+          </p>
+          <div class="recipe-grid">
+            ${profile.unpublishedRecipes.map(recipe => renderRecipeCard(recipe, false)).join('')}
+          </div>
+        </div>
+      ` : ''}
+
       ${profile.recentReviews && profile.recentReviews.length > 0 ? `
         <div class="profile-section">
           <h2>Recent Reviews</h2>
@@ -153,6 +208,56 @@ function displayProfile(profile) {
 }
 
 /**
+ * Render recipe card with published/unpublished status
+ */
+function renderRecipeCard(recipe, isPublished) {
+  return `
+    <a href="${isPublished ? '/article.html' : '/edit.html'}#${recipe.id}" class="recipe-card ${!isPublished ? 'recipe-card-draft' : ''}">
+      ${!isPublished ? `
+        <div class="recipe-card-status">
+          <span class="status-badge draft-badge">
+            <i class="fa-solid fa-eye-slash"></i> Draft
+          </span>
+        </div>
+      ` : ''}
+      ${recipe.featuredImage ? `
+        <div class="recipe-card-image">
+          <img src="${recipe.featuredImage}" alt="${escapeHtml(recipe.name)}" loading="lazy">
+        </div>
+      ` : `
+        <div class="recipe-card-image recipe-card-no-image">
+          <i class="fa-solid fa-utensils"></i>
+        </div>
+      `}
+      <div class="recipe-card-content">
+        <h3 class="recipe-card-title">${escapeHtml(recipe.name)}</h3>
+        ${recipe.description ? `
+          <p class="recipe-card-description">${escapeHtml(recipe.description).substring(0, 100)}${recipe.description.length > 100 ? '...' : ''}</p>
+        ` : ''}
+        ${recipe.categories && recipe.categories.length > 0 ? `
+          <div class="recipe-card-tags">
+            ${recipe.categories.slice(0, 3).map(cat => `
+              <span class="recipe-tag">${escapeHtml(cat)}</span>
+            `).join('')}
+          </div>
+        ` : ''}
+        <div class="recipe-card-meta">
+          <span class="recipe-date">
+            <i class="fa-solid fa-calendar"></i>
+            ${new Date(recipe.createdAt).toLocaleDateString()}
+          </span>
+          ${!isPublished ? `
+            <span class="recipe-action">
+              <i class="fa-solid fa-edit"></i> Edit
+            </span>
+          ` : ''}
+        </div>
+      </div>
+    </a>
+  `;
+}
+
+/**
  * Setup avatar upload functionality (main profile page)
  */
 function setupAvatarUpload() {
@@ -178,12 +283,11 @@ function setupAvatarUpload() {
     try {
       showUploadStatus('Optimizing avatar...', 'uploading');
       
-      // ✅ OPTIMIZE to 400x400, ~50KB
       const optimizedBlob = await optimizeImage(file, IMAGE_PRESETS.avatar);
       
       console.log(`📉 Avatar: ${(file.size / 1024).toFixed(0)}KB → ${(optimizedBlob.size / 1024).toFixed(0)}KB`);
       
-      // ✅ Check global registry for duplicate
+      // Check global registry for duplicate
       const fileHash = await generateFileHash(optimizedBlob);
       const existingImage = findExistingImage(fileHash);
       
@@ -196,33 +300,22 @@ function setupAvatarUpload() {
         );
         
         if (shouldReuse) {
-          // ✅ Reuse existing image
           console.log('♻️ Reusing existing avatar:', existingImage.url);
-          
-          // Register usage (with special "avatar" ID)
           registerImage(fileHash, existingImage, `avatar-${currentProfile.username}`);
-          
-          // Update user profile with existing URL
           await updateUserAvatar(existingImage.url);
-          
           showUploadStatus('✓ Avatar updated (reused)!', 'success');
-          
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          setTimeout(() => window.location.reload(), 1000);
           return;
         }
       }
       
       showUploadStatus('Uploading...', 'uploading');
       
-      // Upload optimized blob
       const avatarUrl = await uploadToCloudinary(optimizedBlob, 'avatar.jpg');
       
-      // ✅ Register new upload in global registry
       const imageData = {
         url: avatarUrl,
-        cloudinaryPublicId: null, // Avatar doesn't store publicId
+        cloudinaryPublicId: null,
         metadata: {
           originalFilename: file.name,
           optimizedSize: optimizedBlob.size,
@@ -231,15 +324,9 @@ function setupAvatarUpload() {
       };
       
       registerImage(fileHash, imageData, `avatar-${currentProfile.username}`);
-      
-      // Update user profile
       await updateUserAvatar(avatarUrl);
-      
       showUploadStatus('✓ Avatar updated!', 'success');
-      
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      setTimeout(() => window.location.reload(), 1000);
       
     } catch (error) {
       console.error('Avatar upload failed:', error);
@@ -254,7 +341,6 @@ function setupAvatarUpload() {
 async function uploadToCloudinary(fileOrBlob, filename = 'avatar.jpg') {
   const formData = new FormData();
   
-  // Convert blob to file with name
   if (fileOrBlob instanceof Blob && !(fileOrBlob instanceof File)) {
     const file = new File([fileOrBlob], filename, { type: fileOrBlob.type });
     formData.append('file', file);
@@ -279,8 +365,6 @@ async function uploadToCloudinary(fileOrBlob, filename = 'avatar.jpg') {
   }
 
   const data = await response.json();
-  
-  // Return optimized URL
   return data.secure_url.replace('/upload/', '/upload/q_auto,f_auto/');
 }
 
@@ -345,7 +429,6 @@ window.editProfile = function() {
     return;
   }
 
-  // Populate form with current values
   document.getElementById('edit-display-name').value = currentProfile.profile.displayName || '';
   document.getElementById('edit-bio').value = currentProfile.profile.bio || '';
   document.getElementById('edit-location').value = currentProfile.profile.location || '';
@@ -353,26 +436,14 @@ window.editProfile = function() {
   document.getElementById('edit-public-profile').checked = currentProfile.preferences?.publicProfile !== false;
   document.getElementById('edit-email-notifications').checked = currentProfile.preferences?.emailNotifications !== false;
 
-  // Render current avatar in modal
   renderModalAvatar(currentProfile.avatar, currentProfile.profile.displayName);
-
-  // Update character count
   updateCharCount();
-
-  // Show modal
   modal.showModal();
-  
-  // Setup form submission
   setupEditForm();
-  
-  // Setup avatar upload in modal
   setupModalAvatarUpload();
   
-  // Close on backdrop click
   modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.close();
-    }
+    if (e.target === modal) modal.close();
   });
 };
 
@@ -383,10 +454,8 @@ window.closeEditModal = function() {
   const modal = document.getElementById('edit-profile-modal');
   if (modal) modal.close();
   
-  // Reset avatar state
   newAvatarUrl = null;
   
-  // Clear status
   const statusDiv = document.getElementById('modal-status');
   if (statusDiv) statusDiv.innerHTML = '';
 };
@@ -403,7 +472,6 @@ function renderModalAvatar(avatar, displayName) {
   const avatarHTML = getAvatarHTML(avatar, displayName);
   previewContainer.innerHTML = avatarHTML;
   
-  // Show remove button only if has uploaded avatar
   if (removeBtn && avatar?.type === 'uploaded' && avatar?.url) {
     removeBtn.style.display = 'inline-flex';
   } else if (removeBtn) {
@@ -420,18 +488,15 @@ function setupModalAvatarUpload() {
   
   if (!uploadInput) return;
 
-  // Remove existing listeners
   const newInput = uploadInput.cloneNode(true);
   uploadInput.parentNode.replaceChild(newInput, uploadInput);
   
   const finalInput = document.getElementById('modal-avatar-upload');
   
-  // Handle file selection
   finalInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate
     if (!file.type.startsWith('image/')) {
       showModalStatus('Please select an image file', 'error');
       return;
@@ -445,16 +510,13 @@ function setupModalAvatarUpload() {
     try {
       showModalStatus(`⏳ Optimizing ${(file.size / 1024).toFixed(0)}KB image...`, 'uploading');
       
-      // ✅ OPTIMIZE BEFORE UPLOAD
       const optimizedBlob = await optimizeImage(file, IMAGE_PRESETS.avatar);
-      
       const originalSize = (file.size / 1024).toFixed(0);
       const optimizedSize = (optimizedBlob.size / 1024).toFixed(0);
       const savings = Math.round((1 - optimizedBlob.size / file.size) * 100);
       
       console.log(`📉 Avatar: ${originalSize}KB → ${optimizedSize}KB (${savings}% smaller)`);
       
-      // ✅ Check global registry for duplicate
       const fileHash = await generateFileHash(optimizedBlob);
       const existingImage = findExistingImage(fileHash);
       
@@ -467,26 +529,16 @@ function setupModalAvatarUpload() {
         );
         
         if (shouldReuse) {
-          // ✅ Reuse existing image
           console.log('♻️ Reusing existing avatar:', existingImage.url);
-          
-          // Register usage
           registerImage(fileHash, existingImage, `avatar-${currentProfile.username}`);
-          
-          // Store for later save
           newAvatarUrl = existingImage.url;
           
-          // Update preview immediately
           const previewContainer = document.getElementById('modal-avatar-preview');
           if (previewContainer) {
             previewContainer.innerHTML = `<img src="${existingImage.url}" alt="New avatar" class="avatar-image" />`;
           }
           
-          // Show remove button
-          if (removeBtn) {
-            removeBtn.style.display = 'inline-flex';
-          }
-          
+          if (removeBtn) removeBtn.style.display = 'inline-flex';
           showModalStatus(`✅ Avatar ready to save! (Reused, saved ${savings}%)`, 'success');
           return;
         }
@@ -494,10 +546,8 @@ function setupModalAvatarUpload() {
       
       showModalStatus('⏳ Uploading optimized avatar...', 'uploading');
       
-      // Upload to Cloudinary (optimized blob, not original file!)
       const avatarUrl = await uploadToCloudinary(optimizedBlob, file.name);
       
-      // ✅ Register new upload in global registry
       const imageData = {
         url: avatarUrl,
         cloudinaryPublicId: null,
@@ -509,21 +559,14 @@ function setupModalAvatarUpload() {
       };
       
       registerImage(fileHash, imageData, `avatar-${currentProfile.username}`);
-      
-      // Store for later save
       newAvatarUrl = avatarUrl;
       
-      // Update preview immediately
       const previewContainer = document.getElementById('modal-avatar-preview');
       if (previewContainer) {
         previewContainer.innerHTML = `<img src="${avatarUrl}" alt="New avatar" class="avatar-image" />`;
       }
       
-      // Show remove button
-      if (removeBtn) {
-        removeBtn.style.display = 'inline-flex';
-      }
-      
+      if (removeBtn) removeBtn.style.display = 'inline-flex';
       showModalStatus(`✅ Avatar ready to save! (Saved ${savings}%)`, 'success');
       
     } catch (error) {
@@ -532,7 +575,6 @@ function setupModalAvatarUpload() {
     }
   });
 
-  // Handle remove avatar
   if (removeBtn) {
     const newRemoveBtn = removeBtn.cloneNode(true);
     removeBtn.parentNode.replaceChild(newRemoveBtn, removeBtn);
@@ -540,9 +582,8 @@ function setupModalAvatarUpload() {
     const finalRemoveBtn = document.getElementById('remove-avatar-btn');
     finalRemoveBtn.addEventListener('click', () => {
       if (confirm('Remove your avatar and use initials instead?')) {
-        newAvatarUrl = 'REMOVE'; // Special flag
+        newAvatarUrl = 'REMOVE';
         
-        // Show initials preview
         const previewContainer = document.getElementById('modal-avatar-preview');
         if (previewContainer && currentProfile) {
           const initials = currentProfile.avatar?.initials || '??';
@@ -561,16 +602,12 @@ function setupModalAvatarUpload() {
  */
 function setupEditForm() {
   const form = document.getElementById('edit-profile-form');
-  
-  // Remove existing listener to prevent duplicates
   const newForm = form.cloneNode(true);
   form.parentNode.replaceChild(newForm, form);
   
-  // Character count for bio
   const bioInputNew = document.getElementById('edit-bio');
   bioInputNew.addEventListener('input', updateCharCount);
   
-  // Form submission
   const finalForm = document.getElementById('edit-profile-form');
   finalForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -596,7 +633,6 @@ function updateCharCount() {
 async function saveProfileChanges() {
   const saveBtn = document.getElementById('save-profile-btn');
   
-  // Get form values
   const updates = {
     displayName: document.getElementById('edit-display-name').value.trim(),
     bio: document.getElementById('edit-bio').value.trim(),
@@ -608,7 +644,6 @@ async function saveProfileChanges() {
     }
   };
 
-  // Add avatar if changed
   if (newAvatarUrl === 'REMOVE') {
     updates.avatar = {
       type: 'initials',
@@ -621,22 +656,18 @@ async function saveProfileChanges() {
     };
   }
 
-  // Validate
   if (!updates.displayName) {
     showModalStatus('Display name is required', 'error');
     return;
   }
 
   try {
-    // Disable button
     saveBtn.disabled = true;
     saveBtn.textContent = 'Saving...';
     showModalStatus('Saving changes...', 'uploading');
 
-    // Get auth token
     const token = await getToken();
     
-    // Update profile
     const response = await fetch('/.netlify/functions/user-profile', {
       method: 'PUT',
       headers: {
@@ -651,21 +682,13 @@ async function saveProfileChanges() {
       throw new Error(error.error || 'Failed to update profile');
     }
 
-    // Reset avatar state
     newAvatarUrl = null;
-    
     showModalStatus('✓ Profile updated!', 'success');
-    
-    // Reload profile after 1 second
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+    setTimeout(() => window.location.reload(), 1000);
 
   } catch (error) {
     console.error('Failed to save profile:', error);
     showModalStatus(`✗ ${error.message}`, 'error');
-    
-    // Re-enable button
     saveBtn.disabled = false;
     saveBtn.textContent = 'Save Changes';
   }

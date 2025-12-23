@@ -48,11 +48,24 @@ let listRecipes = async () => {
         
         let name = recipe.name;
         let description = recipe.description;
-        let recipeID = recipe.id;
  
         // Create DOM cards
+          // ✅ Update link to use new URL format
+
+          console.log('Recipe:', recipe.name, 'fullSlug:', recipe.fullSlug);
+        const recipeLink = recipe.fullSlug 
+          ? `/article.html#${recipe.id}`
+          : `/@${recipe.fullSlug}`;  // Fallback
+    
+// const recipeLink = recipe.fullSlug && recipe.fullSlug.includes('/')
+//   ? `/article.html?user=${recipe.fullSlug.split('/')[0]}&slug=${recipe.fullSlug.split('/')[1]}`
+//   : `/article.html#${recipe.id}`;  // Fallback for old recipes
+
+
+        
+        console.log('Final link:', recipeLink); // ✅ Add this
         let cardAnchor = document.createElement('a');
-        cardAnchor.setAttribute('href', `article.html#${recipeID}`);
+        cardAnchor.setAttribute('href', recipeLink);
         
         let article = document.createElement('article');
         let figure = document.createElement('figure');
@@ -86,11 +99,13 @@ let listRecipes = async () => {
 
         // ✅ NEW: Get featured image from images array (backward compatible)
         const featuredImage = getFeaturedImage(recipe);
-        const photoURL = featuredImage?.url || '/default-recipe-image.jpg'; // Fallback image
+        const photoURL = featuredImage?.url || '/images/pexels-mali-maeder-1.jpg'; // Fallback image
         
         image.setAttribute('src', `${photoURL}`);
         image.setAttribute('alt', `Photo of ${recipe.name}`);
         image.setAttribute('description', `Decorative image relating to ${recipe.name}`);
+
+        
       });
     } else {
       const cardIndex = document.querySelector("#recipes");

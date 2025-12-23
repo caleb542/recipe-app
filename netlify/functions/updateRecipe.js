@@ -1,5 +1,6 @@
 import { getMongoClient } from "./utils/mongoClient.js";
 import { verifyToken, getTokenFromHeader, headers } from './utils/auth.js';
+import { generateUniqueSlug } from './utils/slugGenerator.js'; // ✅ NEW
 
 /**
  * Ensure recipe has images array format
@@ -87,7 +88,22 @@ export async function handler(event) {
     }
 
     const client = await getMongoClient();
-    const collection = client.db("recipe-me-db").collection("recipes");
+    const db = client.db("recipe-me-db");
+    const collection = db.collection("recipes");
+    const usersCollection = db.collection("users"); // ✅ NEW
+
+    // ✅ NEW: Get user's username
+    const user = await usersCollection.findOne({ auth0Id });
+    
+    if (!user || !user.username) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          error: 'User must have a username. Please complete your profile setup.' 
+        })
+      };
+    }
 
     // Check if recipe exists
     const existing = await collection.findOne({ id });
@@ -129,11 +145,41 @@ export async function handler(event) {
       // ✅ Ensure images array format
       const processedUpdates = ensureImagesArray({ ...updates });
       
+      // ✅ NEW: Handle slug updates
+      let slugUpdates = {};
+      
+      // If name changed or no slug exists, regenerate slug
+      if (processedUpdates.name && 
+          (processedUpdates.name !== existing.name || !existing.slug)) {
+        const { slug, fullSlug } = await generateUniqueSlug(
+          processedUpdates.name,
+          user.username,
+          id
+        );
+        slugUpdates.slug = slug;
+        slugUpdates.fullSlug = fullSlug;
+        console.log(`🔗 Generated slug: ${fullSlug}`);
+      }
+      
+      // If user provided custom slug, use it
+      if (processedUpdates.slug) {
+        const { slug, fullSlug } = await generateUniqueSlug(
+          processedUpdates.slug, // Use custom slug as "name"
+          user.username,
+          id
+        );
+        slugUpdates.slug = slug;
+        slugUpdates.fullSlug = fullSlug;
+        console.log(`🔗 Custom slug: ${fullSlug}`);
+      }
+      
       // Build update object
       const updateFields = {
         ...processedUpdates,
+        ...slugUpdates, // ✅ Add slug updates
         author: processedUpdates.author || {
           auth0Id: decoded.sub,
+          username: user.username, // ✅ NEW
           name: decoded.name,
           email: decoded.email
         },
@@ -143,7 +189,10 @@ export async function handler(event) {
 
       // ✅ ALWAYS use frontend author if provided
       if (updates.author) {
-        updateFields.author = updates.author;
+        updateFields.author = {
+          ...updates.author,
+          username: user.username // ✅ Ensure username is always set
+        };
       }
 
       // ✅ For legacy recipes being claimed, preserve old displayAuthor
@@ -153,6 +202,7 @@ export async function handler(event) {
 
       console.log('💾 About to save to MongoDB:', updateFields.author);
       console.log('💾 Images being saved:', updateFields.images);
+      console.log('💾 Slug being saved:', updateFields.fullSlug);
 
       const result = await collection.updateOne(
         { id },
@@ -167,6 +217,8 @@ export async function handler(event) {
           matched: result.matchedCount,
           modified: result.modifiedCount,
           version: newVersion,
+          slug: updateFields.slug,
+          fullSlug: updateFields.fullSlug
         }),
       };
 
@@ -174,11 +226,22 @@ export async function handler(event) {
       // ✅ INSERT (upsert for new recipe)
       const processedUpdates = ensureImagesArray({ ...updates });
 
+      // ✅ NEW: Generate slug for new recipe
+      const recipeName = processedUpdates.name || 'Untitled Recipe';
+      const { slug, fullSlug } = await generateUniqueSlug(
+        recipeName,
+        user.username,
+        id
+      );
+
       const newRecipe = {
         id,
         ...processedUpdates,
+        slug, // ✅ NEW
+        fullSlug, // ✅ NEW
         author: processedUpdates.author || {
           auth0Id: decoded.sub,
+          username: user.username, // ✅ NEW
           name: name,
           email: email
         },
@@ -191,6 +254,7 @@ export async function handler(event) {
       };
 
       console.log('💾 Creating new recipe with images:', newRecipe.images);
+      console.log('💾 Creating new recipe with slug:', newRecipe.fullSlug);
 
       const result = await collection.insertOne(newRecipe);
 
@@ -202,6 +266,8 @@ export async function handler(event) {
           inserted: true,
           id: result.insertedId,
           version: 1,
+          slug: newRecipe.slug,
+          fullSlug: newRecipe.fullSlug
         }),
       };
     }

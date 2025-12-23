@@ -87,9 +87,23 @@ export const login = async () => {
   if (!auth0) {
     throw new Error('Auth0 client not initialized. Call initAuth0() first.');
   }
+  // Check if current page uses pretty URLs
+  const currentPath = window.location.pathname;
+  const isPrettyUrl = currentPath.startsWith('/@');
+
+   const redirectUri = isPrettyUrl
+    ? window.location.origin  // Pretty URLs → go to homepage
+    : window.location.href;   // Regular URLs → stay on page
+
+    console.log('🔑 Logging in...');
+  console.log('   Current path:', currentPath);
+  console.log('   Is pretty URL:', isPrettyUrl);
+  console.log('   Redirect URI:', redirectUri);
+  
+  
   await auth0.loginWithRedirect({
     authorizationParams: {
-      redirect_uri: window.location.href,
+      redirect_uri: redirectUri,
       scope: 'openid profile email'  // ← Return to current page (including hash)
     }
   });
@@ -104,14 +118,16 @@ export const logout = () => {
   const protectedPages = ['/edit.html', '/addRecipe.html'];
   const currentPath = window.location.pathname;
   const isProtected = protectedPages.some(page => currentPath.includes(page));
+  const isPrettyUrl = currentPath.startsWith('/@');  // ✅ Add this check
   
-  const returnUrl = isProtected 
+  const returnUrl = (isProtected || isPrettyUrl) 
     ? window.location.origin
     : window.location.href;
   
   console.log('🚪 Logging out...');
   console.log('   Current path:', currentPath);
   console.log('   Is protected:', isProtected);
+  console.log('   Is pretty URL:', isPrettyUrl);
   console.log('   Return URL:', returnUrl);
   
   auth0.logout({

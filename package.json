@@ -7,7 +7,12 @@
   "scripts": {
     "dev": "webpack serve --mode development",
     "netlify": "netlify dev",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+     "migrate:usernames": "node scripts/add-usernames.js",
+  "migrate:slugs": "node scripts/add-recipe-slugs.js",
+  "migrate:all": "npm run migrate:usernames && npm run migrate:slugs",
+  "migrate:fix-orphaned": "node scripts/fix-orphaned-recipes.js",
+   "db:list-users": "node scripts/list-users.js"
   },
   "author": "",
   "license": "ISC",

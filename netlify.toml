@@ -1,11 +1,13 @@
-# netlify.toml - WITH CACHE HEADERS (preserving your existing config)
+# netlify.toml - WITH CACHE HEADERS AND CLEAN URL REDIRECTS
 
 [dev]
 command = "npm run dev"
 targetPort = 8888
 port = 8080
 functions = "netlify/functions"
-framework = "#custom"
+#framework = "#custom"
+#framework = "#custom"
+autoLaunch = false  # ✅ Add this
 
 [functions]
 directory = "netlify/functions"
@@ -16,7 +18,47 @@ external_node_modules = ["mongodb"]
 publish = "public"
 command = "npm run build"
 
-# Cache Headers for Static Assets
+# ========================================
+# CLEAN URL REDIRECTS (MUST BE FIRST!)
+# ========================================
+
+# /@username/slug → article page
+[[redirects]]
+  from = "/@:username/:slug"
+  to = "/article.html?user=:username&slug=:slug"
+  status = 200
+
+# /@username → profile page
+[[redirects]]
+  from = "/@:username"
+  to = "/profile.html?username=:username"
+  status = 200
+
+# Backward compatibility: old hash-based URLs still work
+[[redirects]]
+  from = "/article.html"
+  to = "/article.html"
+  status = 200
+
+[[redirects]]
+  from = "/profile.html"
+  to = "/profile.html"
+  status = 200
+
+# ========================================
+# SPA fallback - ONLY for non-@ paths
+# ========================================
+
+# First, handle all the @ paths (already done above)
+# Then catch everything else EXCEPT @ paths
+
+
+
+  
+# ========================================
+# CACHE HEADERS FOR STATIC ASSETS
+# ========================================
+
 [[headers]]
   for = "/assets/*"
   [headers.values]
@@ -52,18 +94,3 @@ command = "npm run build"
   [headers.values]
     Cache-Control = "public, max-age=3600"
     # 1 hour for partials/templates
-
-# Don't add blanket cache headers for functions - handle per function instead
-# [[headers]]
-#   for = "/.netlify/functions/*"
-#   [headers.values]
-#     Cache-Control = "no-cache, no-store, must-revalidate"
-
-# Security Headers (bonus - prevents clickjacking, XSS, etc.)
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"

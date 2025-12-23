@@ -12,7 +12,7 @@ async function setupPreview(recipeId) {
     const recipe = JSON.parse(localStorage.getItem('editingRecipe'));
     
     // Load article template
-    const res = await fetch('./partials/article-template.html');
+    const res = await fetch('/partials/article-template.html');
     const html = await res.text();
     
     const tempDiv = document.createElement('div');

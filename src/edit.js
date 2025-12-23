@@ -132,16 +132,12 @@ export async function initEdit(recipeId) {
  */
 export async function initCreate() {
   const currentUser = await getUser();
-  
   const recipes = await loadRecipes();
+  const newRecipeId = uuidv4();
 
-  setupEditor(newRecipe.id, newRecipe.article || '');
-  // ✅ NEW: Setup video helper
-const editorInstance = window.editorInstance;
-setupVideoHelper(editorInstance);
 
   const newRecipe = {
-    id: uuidv4(),
+    id: newRecipeId,
     name: "New unnamed recipe",
     prepTime: "",
     totalTime: "",
@@ -171,6 +167,10 @@ setupVideoHelper(editorInstance);
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
+  setupEditor(newRecipeId, newRecipe.article || '');
+  // ✅ NEW: Setup video helper
+  const editorInstance = window.editorInstance;
+  setupVideoHelper(editorInstance);
 
   location.hash = newRecipe.id;
   recipes.push(newRecipe);
@@ -199,6 +199,54 @@ setupVideoHelper(editorInstance);
 
   setupAccessibility();
   hamburger(); // menu toggle
+}
+
+// Add slug editor
+function setupSlugEditor(recipe) {
+  const slugInput = document.getElementById('recipe-slug');
+  const slugFeedback = document.getElementById('slug-feedback');
+  
+  if (!slugInput) return;
+  
+  let checkTimeout;
+  
+  slugInput.addEventListener('input', (e) => {
+    clearTimeout(checkTimeout);
+    const slug = e.target.value.toLowerCase();
+    
+    // Update preview
+    const preview = document.getElementById('slug-preview');
+    if (preview) {
+      preview.textContent = `/@${currentUser.username}/${slug}`;
+    }
+    
+    // Debounce availability check
+    checkTimeout = setTimeout(async () => {
+      if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+        slugFeedback.textContent = '❌ Only lowercase letters, numbers, and hyphens';
+        slugFeedback.className = 'slug-feedback error';
+        return;
+      }
+      
+      const token = await getToken();
+      const response = await fetch(
+        `/.netlify/functions/check-recipe-slug?slug=${slug}&recipeId=${recipe.id}`,
+        {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      );
+      
+      const result = await response.json();
+      
+      if (result.available) {
+        slugFeedback.textContent = '✅ Available!';
+        slugFeedback.className = 'slug-feedback success';
+      } else {
+        slugFeedback.textContent = '❌ You already have a recipe with this slug';
+        slugFeedback.className = 'slug-feedback error';
+      }
+    }, 500);
+  });
 }
 
 const previewButton = document.getElementById('preview-link');

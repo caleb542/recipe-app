@@ -9,7 +9,14 @@ import { CommunityNotes } from './components/CommunityNotes.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { autoEmbedVideos } from './helpers/youtubeEmbed.js';
 
+// ✅ NEW: Check for slug-based URL first
+const urlParams = new URLSearchParams(window.location.search);
+const username = urlParams.get('user');
+const slug = urlParams.get('slug');
+
+// Fallback to hash-based URL
 const recipeId = location.hash.substring(1);
+
 let recipes;
 let likesInitialized = false;
 let articleHydrated = false;
@@ -31,23 +38,70 @@ window.addEventListener("storage", e => {
   }
 });
 
-// Entry point
+// ✅ NEW: Entry point - handle both URL formats
 async function fetchRecipes() {
-  recipes = await loadRecipesFromLocalStorage();
-  await hydrateArticle(recipes);
+  if (username && slug) {
+    // New slug-based URL: /@username/slug
+    await loadRecipeBySlug(username, slug);
+  } else if (recipeId) {
+    // Old hash-based URL: /article.html#recipe-123
+    recipes = await loadRecipesFromLocalStorage();
+    await hydrateArticle(recipes);
+  } else {
+    // No recipe specified
+    location.assign("/index.html");
+  }
 }
 
 fetchRecipes();
 
-async function hydrateArticle(recipes) {
+// ✅ NEW: Load recipe by slug from backend
+async function loadRecipeBySlug(username, slug) {
+  try {
+    const fullSlug = `${username}/${slug}`;
+    const response = await fetch(
+      `/.netlify/functions/recipe-by-slug?fullSlug=${encodeURIComponent(fullSlug)}`
+    );
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.error('Recipe not found');
+        location.assign("/index.html");
+      } else {
+        console.error('Failed to load recipe');
+        location.assign("/index.html");
+      }
+      return;
+    }
+    
+    const recipe = await response.json();
+    
+    // Convert to array format for hydrateArticle
+    const recipesArray = [recipe];
+    
+    // Update global recipeId for other functions
+    window.currentRecipeId = recipe.id;
+    
+    await hydrateArticle(recipesArray, recipe.id);
+    
+  } catch (error) {
+    console.error('Load by slug failed:', error);
+    location.assign("/index.html");
+  }
+}
+
+async function hydrateArticle(recipes, recipeIdOverride = null) {
   // Prevent multiple hydrations
   if (articleHydrated) {
     console.log('Article already hydrated, skipping...');
     return;
   }
   
+  // ✅ Use override ID if provided (from slug loading)
+  const currentRecipeId = recipeIdOverride || recipeId;
+  
   const recItem = Array.isArray(recipes)
-    ? recipes.find(recipe => recipe.id === recipeId)
+    ? recipes.find(recipe => recipe.id === currentRecipeId)
     : null;
 
   if (!recItem) {
@@ -55,8 +109,14 @@ async function hydrateArticle(recipes) {
     return;
   }
 
+  // ✅ NEW: Update URL to clean format if loaded via hash
+  if (!username && !slug && recItem.fullSlug) {
+    const newUrl = `/@${recItem.fullSlug}`;
+    window.history.replaceState({}, '', newUrl);
+  }
+
   // Load and insert template first
-  const res = await fetch("./partials/article-template.html");
+  const res = await fetch("/partials/article-template.html");
   const html = await res.text();
   const container = document.querySelector(".template-container");
   container.insertAdjacentHTML("beforeend", html);
@@ -89,7 +149,7 @@ async function hydrateArticle(recipes) {
   const dsum = tpl.querySelector(".description.summary");
   if (dsum) dsum.innerHTML = recItem.description;
 
-  // ✅ NEW: Handle multiple images from images array
+  // Handle multiple images from images array
   const imageElement = tpl.querySelector(".imageElement");
   const photoInfo = tpl.querySelector(".photoInfo");
   
@@ -121,7 +181,7 @@ async function hydrateArticle(recipes) {
     }
   }
 
-  // ✅ NEW: Display image gallery (all images)
+  // Display image gallery (all images)
   const imageGalleryContainer = tpl.querySelector(".recipe-image-gallery");
   if (imageGalleryContainer) {
     const allImages = getAllImages(recItem);
@@ -152,12 +212,11 @@ async function hydrateArticle(recipes) {
   }
 
   // Summary content
-  
   const summaryContent = tpl.querySelector(".summary-content");
   
   if (summaryContent) {
     let html = marked.parse(recItem.article || "");
-    html = autoEmbedVideos(html); // ✅ Auto-embed YouTube/Vimeo
+    html = autoEmbedVideos(html); // Auto-embed YouTube/Vimeo
     summaryContent.innerHTML = html;
   }
 
@@ -179,7 +238,7 @@ async function hydrateArticle(recipes) {
     if (recItem.ingredients.length < 1) {
       const warning = document.createElement("div");
       warning.classList.add("warning");
-      warning.innerHTML = `Do you want to <a href="edit.html#${recipeId}">start adding some ingredients</a>?`;
+      warning.innerHTML = `Do you want to <a href="edit.html#${currentRecipeId}">start adding some ingredients</a>?`;
       tpl.querySelector(".checklist-container")?.appendChild(warning);
     } else {
       recItem.ingredients.forEach(ingr => {
@@ -208,7 +267,7 @@ async function hydrateArticle(recipes) {
       const isLegacy = !recItem.author || recItem.author.name === "Legacy User";
       
       if (isAuthor || isLegacy) {
-        editBtn.href = `./edit.html#${recipeId}`;
+        editBtn.href = `/edit.html#${currentRecipeId}`;
         editBtn.title = isLegacy ? "Claim and edit recipe" : "Edit recipe";
         editBtn.style.display = 'inline-block';
       } else {
@@ -225,15 +284,15 @@ async function hydrateArticle(recipes) {
   // Community notes
   const notesContainer = document.getElementById("community-notes");
   if (notesContainer) {
-    new CommunityNotes(notesContainer, recipeId);
+    new CommunityNotes(notesContainer, currentRecipeId);
   }
 
   // Wire shopping list helper
-  setupShoppingList(recItem, recipeId, "caleb542@gmail.com");
+  setupShoppingList(recItem, currentRecipeId, "caleb542@gmail.com");
 
   // Initialize likes once
   if (!likesInitialized) {
-    await initializeLikes(recipeId, container);
+    await initializeLikes(currentRecipeId, container);
     likesInitialized = true;
   }
 

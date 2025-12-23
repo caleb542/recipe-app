@@ -2,7 +2,7 @@
 // Public user profile view (no auth required)
 
 import { getMongoClient } from './utils/mongoClient.js';
-import { headers } from './utils/verifyAuth.js';
+import { headers, verifyToken, getTokenFromHeader } from './utils/verifyAuth.js';
 
 export const handler = async (event) => {
   // Handle CORS preflight
@@ -49,13 +49,53 @@ export const handler = async (event) => {
       };
     }
 
-    // Check if profile is public
-    if (!user.preferences?.publicProfile) {
+    // ✅ Check if viewing own profile (authenticated)
+    let isOwnProfile = false;
+    const token = getTokenFromHeader(event.headers);
+    
+    if (token) {
+      try {
+        const decoded = await verifyToken(token);
+        isOwnProfile = decoded.sub === user.auth0Id;
+      } catch (error) {
+        // Invalid token, continue as public view
+        isOwnProfile = false;
+      }
+    }
+
+    // Check if profile is public (unless viewing own profile)
+    if (!isOwnProfile && !user.preferences?.publicProfile) {
       return {
         statusCode: 403,
         headers,
         body: JSON.stringify({ error: 'This profile is private' })
       };
+    }
+
+    // ✅ Get published recipes (always)
+    const publishedRecipes = await recipesCollection
+      .find({ 
+        'author.auth0Id': user.auth0Id,
+        isPublic: true
+      })
+      .sort({ createdAt: -1 })
+      .limit(12)
+      .toArray();
+
+    // ✅ Get unpublished recipes (only if viewing own profile)
+    let unpublishedRecipes = [];
+    if (isOwnProfile) {
+      unpublishedRecipes = await recipesCollection
+        .find({ 
+          'author.auth0Id': user.auth0Id,
+          $or: [
+            { isPublic: false },
+            { isPublic: { $exists: false } }
+          ]
+        })
+        .sort({ createdAt: -1 })
+        .limit(12)
+        .toArray();
     }
 
     // Get user's recent reviews
@@ -84,9 +124,23 @@ export const handler = async (event) => {
       })
     );
 
+    // Helper function to format recipes
+    const formatRecipes = (recipes) => recipes.map(recipe => ({
+      id: recipe.id,
+      name: recipe.name,
+      // description: recipe.description,
+      featuredImage: recipe.images?.find(img => img.isFeatured)?.url || recipe.images?.[0]?.url || null,
+      createdAt: recipe.createdAt,
+      updatedAt: recipe.updatedAt,
+      isPublic: recipe.isPublic !== false,
+      categories: recipe.categories || [],
+      tags: recipe.tags || []
+    }));
+
     // Build public profile response
     const publicProfile = {
       username: user.username,
+      isOwnProfile: isOwnProfile, // ✅ NEW: Flag to show unpublished section
       profile: {
         displayName: user.profile.displayName,
         bio: user.profile.bio || '',
@@ -95,6 +149,8 @@ export const handler = async (event) => {
       },
       avatar: user.avatar,
       stats: user.stats,
+      publishedRecipes: formatRecipes(publishedRecipes), // ✅ Renamed for clarity
+      unpublishedRecipes: isOwnProfile ? formatRecipes(unpublishedRecipes) : [], // ✅ NEW
       recentReviews: reviewsWithRecipeNames,
       memberSince: user.createdAt
     };

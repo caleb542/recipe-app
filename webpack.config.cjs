@@ -148,7 +148,7 @@ module.exports = (env, argv) => {
   
   hot: false,
   liveReload: false,
-  historyApiFallback: true,
+  historyApiFallback: false,
   open: false,
   port: 8888,
   
