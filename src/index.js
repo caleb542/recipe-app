@@ -28,35 +28,52 @@ import {
 } from './functions.js'
 import { getRecipesFromDatabase } from "./backend/getRecipesFromDatabase.js";
 
+import { initAuth0, login, isAuthenticated } from './auth/auth0.js';
+import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
+import { loadUserProfile, getUserProfile } from './userContext.js';
 
-const staticOverlay = document.getElementById("static-landing-page");
-const pageContainer = document.querySelector('.page-container');
+// Initialize auth
+await initAuth0();
+await loadUserProfile(); 
+await updateAuthUI();
+setupAuthListeners();
 
-if(localStorage.getItem("firstTime") === null || localStorage.getItem("firstTime") === "true") {
-  localStorage.setItem("firstTime","true");
-  pageContainer.style.opacity='0.4'
-  pageContainer.style.top="10%"
-  staticOverlay.style.opacity="1"
-  staticOverlay.style.zIndex="10"
-  staticOverlay.classList.add('show');
-}
+// Check if user is already logged in
+const authenticated = await isAuthenticated();
 
+// Get overlay elements
+const overlay = document.getElementById("static-landing-page");
+const browseBtn = document.getElementById('browse-btn');
+const splashLoginBtn = document.getElementById('splash-login-btn');
 
-const stlCta = document.querySelector('.stl-cta')
-stlCta.addEventListener("click", function(e){
+// Check if first time visiting
+const isFirstTime = localStorage.getItem('firstTime') !== 'false';
+
+// Show splash only if first time AND not authenticated
+if (!isFirstTime || authenticated) {
+  overlay.classList.add('hidden');
+  await updateAuthUI();
+  setupAuthListeners();
+  loadRecipes();
+} else {
+  // Show splash for first-time visitors
   
-  staticOverlay.style.opacity="0.5"
-  staticOverlay.style.position="fixed"
-  staticOverlay.style.top="-120%"
-  staticOverlay.style.transition=" 0.8s ease-out"
-  pageContainer.style.opacity="1"
-  pageContainer.style.top="0"
-  pageContainer.style.display="block"
-  pageContainer.style.transition="all 0.8s ease-out"
-
-  localStorage.setItem("firstTime","false");
-    staticOverlay.classList.remove('show');
-})
+  // Browse without login
+  browseBtn.addEventListener('click', () => {
+    localStorage.setItem('firstTime', 'false'); // ✅ Mark as seen
+    overlay.classList.add('hidden');
+    updateAuthUI();
+    setupAuthListeners();
+    loadRecipes();
+  });
+  
+  // Login to create
+  splashLoginBtn.addEventListener('click', async () => {
+    localStorage.setItem('firstTime', 'false'); // ✅ Mark as seen
+    await login();
+    // After Auth0 redirects back, they won't see splash again
+  });
+}
 
 
 let recipes =  await loadRecipesFromLocalStorage()
@@ -140,8 +157,8 @@ document.addEventListener("change", (e) => {
 await getCategories()
 hamburger()
       
-window.addEventListener('storage', (e) => {
-  if (e.key === 'recipes') {
-    listRecipes(recipes)
-  }
-})
+// window.addEventListener('storage', (e) => {
+//   if (e.key === 'recipes') {
+//     listRecipes(recipes)
+//   }
+// })

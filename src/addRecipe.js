@@ -14,7 +14,12 @@ import { loadNewRecipeFromLocalStorage, saveNewRecipeToLocalStorage, getTimestam
         photographerLink: "",
         createdAt: "",
         updatedAt: "",
-        author: "",
+        author: {
+            auth0Id: user.sub,
+            name: user.name,
+            email: user.email
+            },
+        isPublic: recipeData.isPublic || false,  // from checkbox or default
         description: "",
         directions:"",
         categories: "",

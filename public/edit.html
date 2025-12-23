@@ -9,15 +9,14 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
     <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Fugaz+One&family=Lato:wght@300;400;700&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
 
  
     <script src="https://kit.fontawesome.com/610bdb1969.js" crossorigin="anonymous"></script>
-<link href="./scripts/index.css" rel="stylesheet" media="screen" />
-<link href="./scripts/edit.css" rel="stylesheet" media="screen" />
+<link href="/scripts/index.css" rel="stylesheet" media="screen" />
+<link href="/scripts/edit.css" rel="stylesheet" media="screen" />
+
 
 
     <title>Recipe App - Edit</title>
@@ -29,6 +28,13 @@
             <header class="">
                 <div class="header-top">
                     <h1 class="site__title"><a href="/">Recipe Me</a></h1>
+                     <div id="auth-buttons">
+                        <button id="login-btn" style="display: none;">Login</button>
+                        <div id="user-info" style="display: none;">
+                            <span id="user-name"></span>
+                            <button id="logout-btn">Logout</button>
+                        </div>
+                    </div>
                     <a href="#" id="menu-toggle" aria-expanded="false" aria-controls="nav" class="menu-toggle"
                         aria-label="Open the menu">
                         <i class="fa fa-bars" aria-hidden="true"></i>
@@ -47,39 +53,197 @@
                     </ul>
                 </nav>
               
+                         
             </header>
-  <div class="heading-h2-container edit-header">
-                    
-                    <h2>Editing: &nbsp;<span id="heading-name" class="header__subtitle"> </span></h2>
+            <div class="heading-h2-container edit-header">
                     <div class="edit-header__actions">
-                        <span id="statusBadge" class="status-badge status-staging">Staging</span>
-                        <button id="saveToDatabaseButton" class="save-button">Save to Database</button>
-                        <button id="remove-recipe" class="delete-recipe" >Delete Recipe</button>
+                        <!-- Status Toggle Button -->
+                        <button id="statusToggle" class="status-toggle" data-published="false">
+                            <span class="status-icon">
+                                <i class="fa-solid fa-eye-slash"></i>
+                            </span>
+                            <span class="status-text">Unpublished</span>
+                        </button>
+                        
+                        <button id="preview-recipe-btn" class="action-btn preview-btn">
+                            <i class="fa-solid fa-eye"></i>
+                            <span>Preview</span>
+                        </button>
+                        
+                        <button id="save-button" class="action-btn save-btn">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Save</span>
+                        </button>
+                        
+                        <button id="remove-recipe" class="action-btn delete-btn">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>Delete</span>
+                        </button>
                     </div>
-                </div>
+            </div>
             <div class="container">
-              
-
-                
-                    
                 <div class="former form">
+                    <h2><span id="heading-name" class=""><!-- Recipe Name --></span></h2>
                     <div class="edit-form-list">
                         <div class="section-1">
                             <div class="form-group">
-                                 <label for="recipe-name" id="recipe-name-label">
-                                <div>Name</div> </label>
-                                    <input id="recipe-name" class="input" type="text"
-                                    placeholder="Recipe Name" name="text" value="">
-                               
+                                <label for="recipe-name" id="recipe-name-label">
+                                <div>Recipe Name</div> </label>
+                                <input id="recipe-name" class="input" type="text" required
+                                placeholder="e.g., Authentic Italian Carbonara" name="text">
                             </div>
+                            <!-- ✅ NEW: Slug Editor -->
+<div class="form-group slug-editor">
+  <label for="recipe-slug">Recipe URL</label>
+  
+  <div class="slug-preview-container">
+    <span class="url-base">recipeme.com/@chef_caleb/</span>
+    <input 
+      type="text" 
+      id="recipe-slug" 
+      placeholder="carbonara"
+      pattern="[a-z0-9-]+"
+      maxlength="100"
+    />
+  </div>
+  
+  <small class="slug-help">
+    Customize your recipe URL. Use lowercase letters, numbers, and hyphens.
+  </small>
+  
+  <div id="slug-feedback" class="slug-feedback"></div>
+</div>
                             <div class="form-group">
-                                 <label id="description">
+                                <label for="recipe-description">
                                 <div>Description</div></label>
                                 <textarea id="recipe-description"
                                     placeholder="Recipe Description"></textarea>
-                                    <!-- <button id="description-button" type="submit">Submit</button> -->
-                                
                             </div>
+               
+                            <!-- UPDATED: Image selection with Cloudinary upload + Unsplash search -->
+                           <!-- Image Gallery Management -->
+<div class="form-group">
+    <label>Recipe Images</label>
+    
+    <!-- Upload/Search Section -->
+    <div class="image-upload-section">
+        <!-- Cloudinary Upload -->
+        <div class="upload-option">
+            <h3>Upload Your Photo</h3>
+            <label for="cloudinary-upload" class="upload-button">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                Add Image
+            </label>
+            <input 
+                type="file" 
+                id="cloudinary-upload" 
+                accept="image/*"
+                style="display: none;"
+            />
+            <div id="upload-status"></div>
+        </div>
+        
+        <div class="upload-divider">
+            <span>OR</span>
+        </div>
+        
+        <!-- Unsplash Search -->
+        <div class="search-option">
+            <h3>Search Stock Photos</h3>
+            <fieldset id="image" class="feature-image">
+                <input id="feature-keyword" placeholder="Search for a photo">
+                <button class="feature-image" id="feature-image-button" type="button">
+                    <i class="fa fa-solid fa-magnifying-glass"></i>
+                </button>
+            </fieldset>
+        </div>
+    </div>
+    
+    <!-- Image Gallery (sortable list) -->
+    <div id="image-gallery" class="image-gallery">
+        <p class="no-images" style="display: none;">No images yet. Upload or search to add images.</p>
+        <!-- Images will be rendered here -->
+    </div>
+</div>
+
+<!-- Unsplash Modal (keep existing) -->
+<dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
+    <div class="carousel">
+        <ul class="carousel-track">
+        <!-- Unsplash images -->
+        </ul>
+    </div>
+</dialog>
+                             
+<!-- EXISTING: Unsplash modal -->
+<dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
+    <div class="carousel">
+        <!-- <button class="arrow left" aria-label="Previous">&#9664;</button> -->
+        <ul class="carousel-track">
+        <!-- Unsplash images -->
+        </ul>
+        <!-- <button class="arrow right" aria-label="Next">&#9654;</button> -->
+    </div>
+</dialog>
+                        <!-- Video Section -->
+                        <div class="form-group video-section">
+                        <details>
+                            <summary>
+                                <label>Recipe Video (Optional)</label>
+                            </summary>
+                       
+                            <div class="video-helper-card">
+                                <div class="video-icon">📹</div>
+                                
+                                <div class="video-content">
+                                <h4>Add a Recipe Video</h4>
+                                
+                                <div class="video-benefits">
+                                    <p><strong>Why use YouTube?</strong></p>
+                                    <ul>
+                                    <li>✅ Free unlimited storage</li>
+                                    <li>✅ You keep copyright and ad revenue</li>
+                                    <li>✅ Build your audience</li>
+                                    <li>✅ Professional video player</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="video-instructions">
+                                    <p><strong>How to add a video:</strong></p>
+                                    <ol>
+                                    <li>Record your recipe video</li>
+                                    <li>Upload to <a href="https://youtube.com/upload" target="_blank" rel="noopener">YouTube</a> or <a href="https://vimeo.com/upload" target="_blank" rel="noopener">Vimeo</a></li>
+                                    <li>Copy the video link</li>
+                                    <li>Paste it anywhere in your article below</li>
+                                    </ol>
+                                    <p class="note">💡 <strong>Pro tip:</strong> Just paste the URL in your article text. It will automatically become an embedded video!</p>
+                                </div>
+                                
+                                <div class="video-quick-add">
+                                    <label for="quick-video-url">Quick Add Video:</label>
+                                    <div class="video-input-group">
+                                    <input 
+                                        type="url" 
+                                        id="quick-video-url" 
+                                        placeholder="https://youtube.com/watch?v=..." 
+                                        class="video-url-input"
+                                    />
+                                    <button 
+                                        type="button" 
+                                        id="add-video-btn" 
+                                        class="btn-add-video"
+                                    >
+                                        <i class="fa-solid fa-plus"></i> Add to Article
+                                    </button>
+                                    </div>
+                                    <small>Supports YouTube and Vimeo links</small>
+                                </div>
+                                </div>
+                            </div>
+                        </details>   
+                       
+                        </div>
+                        <!-- end video -->
                             <div class="form-group">
                                  <div id="article">
                                 <div>Article</div>
@@ -87,18 +251,28 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label id="author">
-                                    <div>Author</div>
+                                <label for="recipe-author">
+                                    <div>Author Display Name</div>
                                 </label>
                                 <input id="recipe-author" class="input" type="text"
-                                    placeholder="Peter Peter pumpkin eater" name="text" value="">
+                                    placeholder="Chef Smith" name="text" value="">
                             </div>
-                            <div class="form-group">
+                            <div class="form-group cols-2">
+                                <div class="form-group">
                                 <label for="recipe-prep-time">
                                     <div>Prep Time</div>
                                 </label>
-                                <input id="recipe-prep-time" class="input" type="text" placeholder="e.g. 15 minutes">
+                                <input id="recipe-prep-time" class="input" type="text" placeholder="20 minutes">
                             </div>
+
+                            <div class="form-group">
+                                <label for="recipe-total-time">
+                                    <div>Total Time</div>
+                                </label>
+                                <input id="recipe-total-time" class="input" type="text" placeholder="1.5 hours">
+                            </div>
+                            </div>
+                            
                             
                            
                         <div class="form-group" id="tags">
@@ -130,34 +304,6 @@
                                 <li><div class="form-group"><label class="checkbox"  for="dinner">Dinner</label><input type="checkbox" name="category" id="dinner" value="dinner"></div></li>
                             </ul>
                         </div>
-
-                        <div class="form-group">
-                            <label for="#feature-keyword">Feature&nbsp;Image</label>
-                            <fieldset id="image" class="feature-image">
-                                <input id="feature-keyword"
-                                    placeholder="Search for a photo">
-                                    <button class="feature-image"
-                                    id="feature-image-button">
-                                        <i class="fa fa-solid fa-magnifying-glass"></i>
-                                    </button>
-                                <figure class="image-preview">
-                                        <img src="" style="width:200px;aspect-ratio:16/9">
-                                        <figcaption>Unsplash photo by 
-                                            <a href="https://unsplash.com/@jugoslocos"></a>
-                                        </figcaption>
-                                </figure>
-                            </fieldset>
-                        </div>
-                            <!-- Image selection </div>modal -->
-                            <dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
-                                <div class="carousel">
-                                    <!-- <button class="arrow left" aria-label="Previous">&#9664;</button> -->
-                                    <ul class="carousel-track">
-                                    <!-- Unsplash images -->
-                                    </ul>
-                                    <!-- <button class="arrow right" aria-label="Next">&#9654;</button> -->
-                                </div>
-                                </dialog>
                         </div>
                          <div class="form-group">
                                     <article>
@@ -210,51 +356,32 @@
                                         <button id="add-an-ingredient"><i class="fa fa-plus" aria-hidden="true"></i> Add an Ingredient
                                         </button>
                                     </div>
-                                    <div>
-                                        <button id="save-button">Save this recipe</button> 
-                                    </div>
+                                   
                              </footer>
                         </article>
                         <div id="ingredients" class="edit-ingredients">
+                            <!-- Dynamically list ingredients with js-->
                         </div>
-                        <a class="button button-large" href=""  id="preview-link">Preview Article</a>
                         </div>
                     </div>
             </div>     
                 <!--container-->     
             </div>
-           <dialog id="preview-dialog" closedBy="any"></dialog>
+            
 
   
             </div>
+            <dialog id="preview-dialog" class="preview-dialog" closedBy="any">
+                <div id="preview-content"></div>
+                <button id="close-preview">Close Preview</button>
+            </dialog>
             <footer class="page-footer">
                 <p>© Caleb Hamilton 2022 - current revisions underway 2025</p>
             </footer>
             <!-- page container-->
         </div>
-        <script type="module">
-    async function loadTemplate() {
-      const res = await fetch("/partials/article-template.html");
-      const html = await res.text();
-      document.body.insertAdjacentHTML("beforeend", html);
-    }
-    await loadTemplate();
 
-    document.getElementById("preview-btn").addEventListener("click", () => {
-      const tpl = document.getElementById("article-template").content.cloneNode(true);
-
-      // Fill with draft form data
-      tpl.querySelector(".article__title").textContent = document.getElementById("title-input").value;
-      tpl.querySelector(".description").textContent = document.getElementById("body-input").value;
-      tpl.querySelector(".dates").textContent = new Date().toLocaleDateString();
-
-      const dialog = document.getElementById("preview-dialog");
-      dialog.innerHTML = "";
-      dialog.appendChild(tpl);
-      dialog.showModal();
-    });
-  </script>
-        <script src="./scripts/edit-bundle.js" defer></script>
+        <script type="module" src="/scripts/edit-bundle.js"></script>
     </div>
  </body>
 

@@ -4,7 +4,8 @@
         <h2 class="article__title"></h2>
             <!-- Rating -->
             <div class="meta-item">
-                <p><span class="meta-text rating-stars" id="rating-stars"></span> out of <strong>X</strong> Reviews</p>  
+                <div id="rating-stars"></div>
+                <div id="community-notes"></div>
             </div>
             <p class="author"></p>
             <p class="description summary"></p> 
@@ -12,27 +13,29 @@
         <p class="photoInfo"></p>
                 
         </div>
-            <header class="article-meta">
+        <header class="article-meta something">
             <div class="meta-icons">
+
                 <!-- Date -->
                 <div class="meta-item">
                     <i class="fa fa-calendar" aria-hidden="true"></i>
                     <span class="meta-text dates"></span>
                 </div>
-                <!-- Prep time -->
-                <div class="meta-item">
-                    <i class="fa fa-stopwatch" aria-hidden="true"></i>
-                    <span class="meta-text preptime"></span>
+                <div class="recipe-meta">
+                    <div class="preptime">
+                        <strong>Prep Time:</strong> <span class="prep-time-value"></span>
+                    </div>
+                    <div class="totaltime">
+                        <strong>Total Time:</strong> <span class="total-time-value"></span>
+                    </div>
                 </div>
-
-                
                 <!-- Likes -->
                 <div class="meta-item">
                     <p><button id="like-button" aria-pressed="false"><i class="fa fa-heart" aria-hidden="true"></i></button> Likes</p>
                     <span class="meta-text" id="like-count">0</span>
                 </div>
             </div>
-    </header>
+        </header>
         <div class="summary">
         <a class="recipe-link" href="#recipe">Jump to the recipe</a>
 
@@ -60,6 +63,12 @@
         <div class="directions-heading"><h3>Directions:</h3></div>
         <ol class="directions-list"></ol>
         </div>
+
+        <!-- Reviews section lower on page -->
+        <section class="reviews-section">
+        <h2>What People Are Saying</h2>
+        <div id="reviews-list"></div>
+        </section>
     </div>
     </article>
     </template>

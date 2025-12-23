@@ -1,0 +1,41 @@
+<template id="authTemplate">
+  <dialog class="auth-modal" aria-labelledby="authTitle" closedBy="any">
+    <button class="modal-close" aria-label="Close">×</button>
+
+    <form method="dialog" class="auth-form" id="loginForm">
+      <h2 id="authTitle">Log In to Recipe‑Me</h2>
+      <label for="loginEmail">Email</label>
+      <input id="loginEmail" type="email" required>
+      
+      <label for="loginPassword">Password</label>
+      <input id="loginPassword" type="password" required>
+      
+      <menu>
+        <button type="submit">Log In</button>
+        <button id="auth-reset" type="reset">Reset</button>
+      </menu>
+      
+      <p>No account?<a href="#" id="switchToRegister" class="login-register">Register instead</a></p>
+    </form>
+
+    <form method="dialog" class="auth-form hidden" id="registerForm">
+      <h2>Create Your Recipe‑Me Account</h2>
+      <label for="registerName">Name</label>
+      <input id="registerName" type="text" required>
+      
+      <label for="registerEmail">Email</label>
+      <input id="registerEmail" type="email" required>
+      
+      <label for="registerPassword">Password</label>
+      <input id="registerPassword" type="password" required>
+      
+      <menu>
+        <button type="submit">Register</button>
+        <button type="reset">Cancel</button>
+      </menu>
+      
+      <p>Already have an account? <a href="#" id="switchToLogin" class="login-register">Log in instead</a></p>
+    </form>
+  </dialog>
+</template>
+

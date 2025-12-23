@@ -1,15 +1,99 @@
+# netlify.toml - WITH CACHE HEADERS AND CLEAN URL REDIRECTS
+
+[build.environment]
+SECRETS_SCAN_OMIT_KEYS = "AUTH0_CLIENT_ID,AUTH0_DOMAIN"
+
 [dev]
 command = "npm run dev"
 targetPort = 8888
 port = 8080
 functions = "netlify/functions"
+autoLaunch = false  # ✅ Add this
+#framework = "#custom"
+#framework = "#custom"
 
 [functions]
 directory = "netlify/functions"
 node_bundler = "esbuild"
+external_node_modules = ["mongodb"]
 
 [build]
 publish = "public"
 command = "npm run build"
 
+# ========================================
+# CLEAN URL REDIRECTS (MUST BE FIRST!)
+# ========================================
 
+# /@username/slug → article page
+[[redirects]]
+  from = "/@:username/:slug"
+  to = "/article.html?user=:username&slug=:slug"
+  status = 200
+
+# /@username → profile page
+[[redirects]]
+  from = "/@:username"
+  to = "/profile.html?username=:username"
+  status = 200
+
+# Backward compatibility: old hash-based URLs still work
+[[redirects]]
+  from = "/article.html"
+  to = "/article.html"
+  status = 200
+
+[[redirects]]
+  from = "/profile.html"
+  to = "/profile.html"
+  status = 200
+
+# ========================================
+# SPA fallback - ONLY for non-@ paths
+# ========================================
+
+# First, handle all the @ paths (already done above)
+# Then catch everything else EXCEPT @ paths
+
+
+
+  
+# ========================================
+# CACHE HEADERS FOR STATIC ASSETS
+# ========================================
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    # 1 year cache for hashed assets (CSS, JS with version hashes)
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+    # 30 days for images
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+    # 7 days for CSS
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+    # 7 days for JS
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    # Always revalidate HTML
+
+[[headers]]
+  for = "/partials/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+    # 1 hour for partials/templates
