@@ -1,13 +1,16 @@
 # netlify.toml - WITH CACHE HEADERS AND CLEAN URL REDIRECTS
 
+[build.environment]
+SECRETS_SCAN_OMIT_KEYS = "AUTH0_CLIENT_ID,AUTH0_DOMAIN"
+
 [dev]
 command = "npm run dev"
 targetPort = 8888
 port = 8080
 functions = "netlify/functions"
-#framework = "#custom"
-#framework = "#custom"
 autoLaunch = false  # ✅ Add this
+#framework = "#custom"
+#framework = "#custom"
 
 [functions]
 directory = "netlify/functions"
