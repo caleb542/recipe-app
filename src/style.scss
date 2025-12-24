@@ -2090,6 +2090,7 @@ ADDITION OF CLOUDINARY UPLOADS
 }
 
 .btn-small.has-attribution {
+    display:none;
   background: #3498db;
   color: white;
   border-color: #2980b9;
@@ -2259,6 +2260,10 @@ div#recipes {
 
 .summary {
     padding:2rem 0;
+    margin:10px 0;
+}
+.summary img {
+    width:100%;
 }
 .star {
   cursor: pointer;
@@ -3094,7 +3099,9 @@ legend {
   margin: 2rem 0;
   grid-auto-flow: dense; /* Fills gaps automatically */
 }
-
+.recipe-image-item.featured-image {
+  grid-column: span 2;
+}
 .recipe-image-item img,
 .recipe-image-item video {
   width: 100%;
@@ -3991,6 +3998,7 @@ dialog #preview-content {
 #preview-dialog #preview-content .card.article {
     overflow-x:clip;
     padding:10px;
+    scale:0.8;
 }
 .edit-page #preview-content .card.article  header {
     display:flex;
@@ -4050,7 +4058,7 @@ dialog #preview-content {
     display:none;
 }
 
-.edit-page button:not(#editor button) {
+.edit-page button:not(#editor button, .btn-tooltip) {
     --b-color: lch(71.39% 0 67.2);
     font-weight: 400;
     font-size: 0.9rem;
@@ -4181,7 +4189,7 @@ label.ingredient-label {
   button:not(#editor button, #remove-recipe, #feature-image-button, #add-directions button, .remove-ingredient, .edit-ingredient, .remove-direction, .remove-tag)  {
    
     // background: #ff77ff;
-    color: #fff;
+    color: #333;
 
     transition: background 0.2s ease, box-shadow 0.2s ease;
   }
@@ -5823,4 +5831,75 @@ button:has(.fa-heart) {
     display:flex;
     align-items: center;
     justify-content: center;
+}
+.video-quick-add .form-group {
+    position:relative;
+}
+button:is(.btn-tooltip){
+    display:inline-block;
+    position:absolute;
+    border-radius:50%;
+    background:#f0f483 !important;
+    width:20px;
+    aspect-ratio: 1/1;
+    color:#333 !important;
+    display:grid;
+    place-content:center;
+    font-size:1rem;
+    top:-20px; right:-20px;
+    padding:0 !important;
+}
+
+#video-tooltip {
+    display:none;
+}
+#video-tooltip:popover-open {
+
+    display: flex !important;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+       &::backdrop {
+        backdrop-filter: blur(1px);
+        background-color:rgba(10,0,0,0.8);
+        opacity:0;
+        animation:backdrop .2s ease-in-out forwards;
+    }
+}
+@keyframes backdrop {
+    from {
+        opacity:0%
+    }
+    to {
+        opacity:100%
+    }
+}
+#video-tooltip .card-inner{
+    width:600px;
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%, -50%);
+    text-align: center;
+    border:8px solid #fff;
+    border-radius:25px;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    padding:10px 20px;
+    animation:expandIn .6s linear ease-in-out;
+
+    & p {
+        margin-bottom:40px;
+    }
+
+  
+}
+
+
+#video-tooltip.closing::backdrop {
+    backdrop-filter: blur(1px);
+    background-color:rgba(10,0,0,0.8);
+    opacity:0;
+    animation:fadeOut .6s ease-in-out forwards;
 }

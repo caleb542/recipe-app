@@ -187,12 +187,8 @@
 </dialog>
                         <!-- Video Section -->
                         <div class="form-group video-section">
-                        <details>
-                            <summary>
-                                <label>Recipe Video (Optional)</label>
-                            </summary>
-                       
-                            <div class="video-helper-card">
+                     
+                            <div class="video-helper-card" id="video-tooltip" popover>
                                 <div class="video-icon">📹</div>
                                 
                                 <div class="video-content">
@@ -219,8 +215,13 @@
                                     <p class="note">💡 <strong>Pro tip:</strong> Just paste the URL in your article text. It will automatically become an embedded video!</p>
                                 </div>
                                 
-                                <div class="video-quick-add">
-                                    <label for="quick-video-url">Quick Add Video:</label>
+                               
+                                </div>
+                            </div>
+                             <div class="video-quick-add">
+                                 <div class="form-group">
+                                     <button role="button" class="btn-tooltip" popovertarget="video-tooltip" >?</button>
+                                    <label class="video-label" for="quick-video-url">Quick Add Video: </label>
                                     <div class="video-input-group">
                                     <input 
                                         type="url" 
@@ -235,12 +236,12 @@
                                     >
                                         <i class="fa-solid fa-plus"></i> Add to Article
                                     </button>
+                                 </div>
+                                    
                                     </div>
                                     <small>Supports YouTube and Vimeo links</small>
                                 </div>
-                                </div>
-                            </div>
-                        </details>   
+                         
                        
                         </div>
                         <!-- end video -->
