@@ -2,3 +2,12 @@ node_modules
 .env
 # Local Netlify folder
 .netlify
+# Build files
+# Build files
+public/scripts/*.js
+public/scripts/*.js.map
+public/scripts/*.css
+public/scripts/*.css.map
+
+# EXCEPT these HTML files (need to be tracked)
+!public/scripts/*.html
