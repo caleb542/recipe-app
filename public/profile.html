@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Profile | Recipe Me</title>
+  <link rel="stylesheet" href="./scripts/profile.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header/Nav will go here -->
+    <header class="site-header">
+      <div class="container">
+        <a href="/" class="site-logo">Recipe Me</a>
+        <nav class="site-nav">
+          <a href="/">Home</a>
+          <div id="auth-buttons">
+            <button id="login-btn" style="display: none;">Login</button>
+            <button id="logout-btn" style="display: none;">Logout</button>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="profile-page">
+      <div class="container">
+        <!-- Profile content loads here -->
+        <div id="profile-container">
+          <div class="loading">Loading profile...</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Edit Profile Modal -->
+ <!-- Edit Profile Modal -->
+  <dialog id="edit-profile-modal" class="modal-dialog profile-edit-dialog">
+    <div class="modal-header">
+      <h2>Edit Profile</h2>
+      <button type="button" class="modal-close" onclick="window.closeEditModal()">&times;</button>
+    </div>
+    
+    <form id="edit-profile-form" method="dialog">
+      <!-- NEW: Avatar Upload Section -->
+      <div class="form-group avatar-upload-section">
+        <label>Profile Picture</label>
+        <div class="avatar-upload-container">
+          <div class="current-avatar-preview" id="modal-avatar-preview">
+            <!-- Avatar will be rendered here -->
+          </div>
+          <div class="avatar-upload-controls">
+            <label for="modal-avatar-upload" class="avatar-upload-btn-secondary">
+              <i class="fa-solid fa-camera"></i>
+              Change Avatar
+            </label>
+            <input 
+              type="file" 
+              id="modal-avatar-upload" 
+              accept="image/*"
+              style="display: none;"
+            />
+            <button 
+              type="button" 
+              id="remove-avatar-btn" 
+              class="btn-remove-avatar"
+              style="display: none;"
+            >
+              <i class="fa-solid fa-trash"></i>
+              Remove
+            </button>
+          </div>
+        </div>
+        <small>Recommended: Square image, at least 200x200px</small>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-display-name">Display Name *</label>
+        <input 
+          type="text" 
+          id="edit-display-name" 
+          required 
+          maxlength="50"
+          placeholder="Your name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-bio">Bio</label>
+        <textarea 
+          id="edit-bio" 
+          maxlength="500"
+          rows="4"
+          placeholder="Tell us about yourself..."
+        ></textarea>
+        <small class="char-count"><span id="bio-char-count">0</span>/500</small>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-location">Location</label>
+        <input 
+          type="text" 
+          id="edit-location" 
+          maxlength="100"
+          placeholder="City, Country"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-website">Website</label>
+        <input 
+          type="url" 
+          id="edit-website" 
+          maxlength="200"
+          placeholder="https://yourwebsite.com"
+        />
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" id="edit-public-profile" />
+          Make my profile public
+        </label>
+        <small>Allow others to view your profile and reviews</small>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" id="edit-email-notifications" />
+          Email notifications
+        </label>
+        <small>Receive emails about likes, comments, and new followers</small>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="window.closeEditModal()">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" id="save-profile-btn">
+          Save Changes
+        </button>
+      </div>
+    </form>
+
+    <div id="modal-status"></div>
+  </dialog>
+
+  <script type="module" src="/scripts/profile-bundle.js"></script>
+</body>
+</html>

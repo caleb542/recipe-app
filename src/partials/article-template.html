@@ -1,65 +1,76 @@
- <template class="article-template" id="article-template">
+<template class="article-template" id="article-template">
     <article class="recipe-article">
         <div class="card article">
-        <h2 class="article__title"></h2>
+            <h2 class="article__title"></h2>
             <!-- Rating -->
-            <div class="meta-item">
-                <p><span class="meta-text rating-stars" id="rating-stars"></span> out of <strong>X</strong> Reviews</p>  
-            </div>
             <p class="author"></p>
+            <div id="rating-display"></div>
             <p class="description summary"></p> 
-        <div class="imageElement">
-        <p class="photoInfo"></p>
-                
-        </div>
+            
+            <!-- Featured Image (existing) -->
+            <div class="imageElement">
+                <p class="photoInfo"></p>
+            </div>
+            
+            <!-- NEW: Image Gallery (all images) -->
+            <div class="recipe-image-gallery"></div>
+            
             <header class="article-meta">
-            <div class="meta-icons">
-                <!-- Date -->
-                <div class="meta-item">
-                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                    <span class="meta-text dates"></span>
+                <div class="meta-icons">
+                    <!-- Date -->
+                    <div class="meta-item">
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                        <span class="meta-text dates"></span>
+                    </div>
+                    <!-- Prep time -->
+                    <div class="meta-item">
+                        <i class="fa fa-hourglass-half" aria-hidden="true"></i>
+                        <i class="fa fa-clock" aria-hidden="true"></i><span>Prep time:</span>
+                        <span class="meta-text preptime prep-time-value"></span>
+                    </div>
+                    <!-- Total time -->
+                    <div class="meta-item">
+                        <i class="fa fa-hourglass-end" aria-hidden="true"></i>
+                        <i class="fa-solid fa-stopwatch" aria-hidden="true"></i><span>Total time:</span>
+                        <span class="meta-text total-time-value"></span>
+                    </div>
+                    <!-- Likes -->
+                    <div class="meta-item">
+                        <p><button id="like-button" aria-pressed="false"><i class="fa fa-heart" aria-hidden="true"></i></button></p>
+                        <span class="meta-text" id="like-count">0</span>
+                    </div>
                 </div>
-                <!-- Prep time -->
-                <div class="meta-item">
-                    <i class="fa fa-stopwatch" aria-hidden="true"></i>
-                    <span class="meta-text preptime"></span>
+            </header>
+            
+            <div class="summary">
+                <a class="recipe-link" href="#recipe">Jump to the recipe</a>
+                <div class="summary-content"></div>
+            </div>
+            
+            <div class="lists">
+                <div class="checklist-container">
+                    <div class="checklistHeader" id="recipe">
+                        <h3>Recipe</h3>
+                        <a id="edit-recipe-btn" class="cta-update btn" title="Edit recipe">
+                            <i class="fa-sharp fa-solid fa-pen-to-square"></i>
+                            <span class="hide-text">Edit</span>
+                        </a>
+                    </div>
+                    <ul class="checklist"></ul>
                 </div>
 
-                
-                <!-- Likes -->
-                <div class="meta-item">
-                    <p><button id="like-button" aria-pressed="false"><i class="fa fa-heart" aria-hidden="true"></i></button> Likes</p>
-                    <span class="meta-text" id="like-count">0</span>
+                <div class="shoppinglist-container hide">
+                    <h3>Shopping List</h3>
+                    <ul class="shopping-list"></ul>
                 </div>
             </div>
-    </header>
-        <div class="summary">
-        <a class="recipe-link" href="#recipe">Jump to the recipe</a>
 
-        <div class="summary-content"></div>
-        </div>
-        <div class="lists">
-        <div class="checklist-container">
-            <div class="checklistHeader" id="recipe">
-            <h3>Recipe</h3>
-            <a id="cta-update" class="cta-update btn" title="Edit recipe">
-                <i class="fa-sharp fa-solid fa-pen-to-square"></i>
-                <span class="hide-text">Edit</span>
-            </a>
+            <div class="directions">
+                <div class="directions-heading"><h3>Directions:</h3></div>
+                <ol class="directions-list"></ol>
             </div>
-            <ul class="checklist"></ul>
-        </div>
 
-        <div class="shoppinglist-container hide">
-            <h3>Shopping List</h3>
-            <ul class="shopping-list"></ul>
+            <div id="community-notes"></div>
         </div>
-        </div>
-
-        <div class="directions">
-        <div class="directions-heading"><h3>Directions:</h3></div>
-        <ol class="directions-list"></ol>
-        </div>
-    </div>
     </article>
-    </template>
+</template>

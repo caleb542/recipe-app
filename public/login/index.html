@@ -11,8 +11,8 @@
 
     async function init() {
       const auth0 = await createAuth0Client({
-        domain: "YOUR_AUTH0_DOMAIN",       // e.g. dev-qzgo4nchcoytqnho.us.auth0.com
-        client_id: "YOUR_AUTH0_CLIENT_ID", // from Auth0 dashboard
+        domain:  process.env.AUTH0_DOMAIN,
+        client_id: process.env.AUTH0_CLIENT_ID,
         redirect_uri: window.location.origin + "/login"
       });
 

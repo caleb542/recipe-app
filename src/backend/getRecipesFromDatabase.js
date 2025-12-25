@@ -1,4 +1,5 @@
 export async function getRecipesFromDatabase() {
+  console.trace('🔵 WHO IS CALLING THIS?');
   try {
     const response = await fetch('/.netlify/functions/getRecipesFromDatabase');
     const result = await response.json();
