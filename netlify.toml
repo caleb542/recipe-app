@@ -30,6 +30,7 @@ command = "npm run build"
   from = "/@:username/:slug"
   to = "/article.html?user=:username&slug=:slug"
   status = 200
+  force = true
 
 # /@username → profile page
 [[redirects]]

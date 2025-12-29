@@ -55,7 +55,7 @@ let listRecipes = async () => {
           console.log('Recipe:', recipe.name, 'fullSlug:', recipe.fullSlug);
         const recipeLink = recipe.fullSlug 
           ? `/article.html#${recipe.id}`
-          : `/@${recipe.fullSlug}`;  // Fallback
+          : `/${recipe.fullSlug}`;  // Fallback
     
 // const recipeLink = recipe.fullSlug && recipe.fullSlug.includes('/')
 //   ? `/article.html?user=${recipe.fullSlug.split('/')[0]}&slug=${recipe.fullSlug.split('/')[1]}`

@@ -154,16 +154,8 @@ export async function initCreate() {
     categories: [],
     article: "",
     ingredients: [],
-    
     // NEW: Use images array instead of single photoURL
     images: [], // Start with empty array
-    
-    // REMOVE these old fields:
-    // photoURL: "",
-    // photographer: "",
-    // photographerLink: "",
-    // imageSource: "",
-    
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Fugaz+One&family=Lato:wght@300;400;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    
+    <!-- NEW DESIGN SYSTEM -->
+    <link href="/scripts/index.css" rel="stylesheet" media="screen" />
+    
+    <title>Recipe Me - Clean Layout</title>
+    
+    <style>
+        /* SPLASH PAGE */
+        .splash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .splash-overlay.hidden {
+            display: none;
+        }
+        
+        .centered-title {
+            text-align: center;
+            color: white;
+        }
+        
+        .splash-logo {
+            font-size: 4rem;
+            font-family: var(--font-heading);
+            margin-bottom: var(--space-4);
+            color: white;
+        }
+        
+        .splash-tagline {
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-8);
+            opacity: 0.9;
+        }
+        
+        .splash-actions {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+        }
+        
+        /* TWO-TIER HEADER - SLACK STYLE */
+        
+        /* Top Bar - Dark/Transparent with Search */
+        .top-bar {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            padding: var(--space-3) var(--space-6);
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .top-bar-search {
+            flex: 1;
+            max-width: 600px;
+            position: relative;
+        }
+        
+        .top-bar-search input {
+            width: 100%;
+            padding: var(--space-2) var(--space-4) var(--space-2) var(--space-10);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: var(--text-base);
+        }
+        
+        .top-bar-search input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .top-bar-search input:focus {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            outline: none;
+        }
+        
+        .top-bar-search .search-icon {
+            position: absolute;
+            left: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: var(--text-lg);
+        }
+        
+        .top-bar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-left: auto;
+        }
+        
+        .top-bar-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-semibold);
+            font-size: var(--text-sm);
+        }
+        
+        .top-bar button {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+        }
+        
+        .top-bar button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Second Bar - White with Logo & Navigation */
+        .nav-bar {
+            background: var(--surface-card);
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+            border-bottom: 1px solid var(--surface-border);
+            position: sticky;
+            top: 52px;
+            z-index: 100;
+        }
+        
+        .nav-bar-logo {
+            font-family: var(--font-heading);
+            font-size: var(--text-2xl);
+            margin: 0;
+            flex-shrink: 0;
+        }
+        
+        .nav-bar-logo a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        
+        .nav-bar-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            margin-left: auto;
+        }
+        
+        .sort-compact {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+        
+        .sort-compact select {
+            border: 1px solid var(--surface-border);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            background: var(--surface-background);
+        }
+        
+        /* Mobile Navigation */
+        nav#nav {
+            background: var(--surface-card);
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--surface-border);
+        }
+        
+        nav#nav.hide {
+            display: none;
+        }
+        
+        nav#nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        nav#nav a {
+            display: block;
+            padding: var(--space-3);
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        
+        /* Icon button for menu toggle */
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .icon-btn:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+        
+        /* Tags Cloud */
+        #categories-cloud {
+            background: var(--color-neutral-100);
+            padding: var(--space-6);
+        }
+        
+        #categories-cloud h3 {
+            text-align: center;
+            margin-bottom: var(--space-4);
+            font-size: var(--text-lg);
+        }
+        
+       /* Tags - Radio buttons inside labels */
+#categories-cloud section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+}
+
+#categories-cloud label {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background:var(--color-secondary);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+}
+
+#categories-cloud label:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+}
+
+/* Hide the actual radio button */
+#categories-cloud input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Style when checked */
+#categories-cloud label:has(input:checked) {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+        
+        .tag-badge {
+            padding: var(--space-2) var(--space-4);
+            background: white;
+            border: 1px solid var(--surface-border);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .tag-badge:hover {
+            background: var(--color-primary-light);
+            border-color: var(--color-primary);
+        }
+        
+        /* Recipe cards grid */
+        #recipes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--space-6);
+            padding: var(--space-8) 0;
+        }
+        
+        /* Recipe card link styling */
+        .card.home {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .imageElement {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-4);
+        }
+        
+        .text-area h1 {
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-2);
+            font-weight: var(--font-semibold);
+        }
+        
+        .text-area p {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: var(--leading-relaxed);
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: var(--color-neutral-900);
+            color: white;
+            text-align: center;
+            padding: var(--space-8);
+            margin-top: var(--space-16);
+        }
+        
+        /* Dev notice */
+        .dev-notice {
+            background: var(--color-warning-bg);
+            color: var(--text-primary);
+            padding: var(--space-3);
+            text-align: center;
+            font-size: var(--text-sm);
+        }
+        
+        .dev-notice a {
+            color: var(--color-primary);
+            font-weight: var(--font-semibold);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-bar {
+                top: 48px;
+            }
+            
+            .sort-compact {
+                display: none;
+            }
+            
+            .top-bar-search {
+                max-width: none;
+            }
+            
+            .icon-btn {
+                display: flex;
+            }
+            
+            .nav-bar-controls a.primary {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="home-page">
+    <!-- Splash Page -->
+    <div id="static-landing-page" class="splash-overlay">
+        <div class="centered-title">
+            <div class="splash-content">
+                <h1 class="splash-logo">RECIPE ME</h1>
+                <p class="splash-tagline">Publish your recipes to the web</p>
+                
+                <div class="splash-actions">
+                    <button id="browse-btn" class="primary">Browse Recipes</button>
+                    <button id="splash-login-btn" class="secondary">Login to Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-container">
+        <div class="content-wrap">
+            <!-- Dev Notice -->
+            <div class="dev-notice">
+                ⚙️ Active Development: Migrating infrastructure. Some features may be unstable.
+                <a href="https://github.com/caleb542/recipe-app">View code</a>
+            </div>
+            
+            <!-- TWO-TIER HEADER -->
+            
+            <!-- Top Bar - Dark with Search -->
+            <div class="top-bar">
+                <div class="top-bar-search">
+                    <i class="fa fa-search search-icon"></i>
+                    <input type="text" id="search-filter" placeholder="Search recipes, ingredients, authors..." aria-label="Search recipes">
+                </div>
+                
+                <div class="top-bar-user">
+                    <button id="login-btn" class="primary sm">Login</button>
+                    <div id="user-info" style="display: none;">
+                        <div class="top-bar-avatar">CH</div>
+                        <button id="logout-btn">Logout</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Bar - White with Logo -->
+            <div class="nav-bar">
+                <h1 class="nav-bar-logo"><a href="/">Recipe Me</a></h1>
+                
+                <div class="nav-bar-controls">
+                    <div class="sort-compact">
+                        <span>Sort:</span>
+                        <select id="filter-by">
+                            <option value="byEdited">Last modified</option>
+                            <option value="byCreated">Created date</option>
+                            <option value="alphabetical">Alphabetical</option>
+                        </select>
+                    </div>
+                    
+                    <a href="/edit.html" class="primary sm">
+                        <i class="fa fa-plus"></i> Add Recipe
+                    </a>
+                    
+                    <button id="menu-toggle" class="icon-btn" aria-expanded="false" aria-controls="nav" aria-label="Open the menu">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Navigation -->
+            <nav id="nav" class="hide">
+                <ul>
+                    <li><a href="/edit.html" title="add a recipe">Add a recipe</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Tags Cloud -->
+           <div id="categories-cloud">
+    <h3>Categories</h3>
+    <section role="radiogroup">
+        <!-- Tags populated by JavaScript -->
+    </section>
+</div>
+            
+            <!-- Recipe Cards -->
+            <div class="container">
+                <div id="recipes" class="cards">
+                    <a href="article.html#c6c9d4be-6713-4965-a4f3-08a9a3a089dd" class="card home">
+                        <article>
+                            <div class="imageElement"
+                                style="background-image:url(https://images.unsplash.com/photo-1579954115567-dff2eeb6fdeb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwxMnx8aWNlJTIwY3JlYW18ZW58MHwwfHx8MTY2NTk3MDAxNA&ixlib=rb-1.2.1&q=80&w=1080)"
+                                aria-label="Decorative image relating to A new new recipe"></div>
+                            <div class="text-area">
+                                <h1>A new new recipe</h1>
+                                <p>OMG You're gonna love this recipe</p>
+                            </div>
+                        </article>
+                    </a>
+                    
+                    <a href="article.html#a0e4b295-46dc-47d9-8d42-deb78a16aa19" class="card home">
+                        <article>
+                            <div class="imageElement" style="background: var(--color-neutral-200);"
+                                aria-label="Decorative image relating to Vegetarian Gumbo"></div>
+                            <div class="text-area">
+                                <h1>Vegetarian Gumbo</h1>
+                                <p>This flavourful vegan dinner is a version of the Louisiana classic.</p>
+                            </div>
+                        </article>
+                    </a>
+                    
+                    <a href="article.html#b0a11025-b18f-4ecd-842f-8f0c8388c099" class="card home">
+                        <article>
+                            <div class="imageElement"
+                                style="background-image:url(https://images.unsplash.com/photo-1579523360595-bee0f3b9fafb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHw2fHxiYW5hbmF8ZW58MHwwfHx8MTY2NTc4NTc3MQ&ixlib=rb-1.2.1&q=80&w=1080)"
+                                aria-label="Decorative image relating to Undecided Recipe"></div>
+                            <div class="text-area">
+                                <h1>Undecided Recipe</h1>
+                                <p>Banana.</p>
+                            </div>
+                        </article>
+                    </a>
+                    
+                    <a href="article.html#d6f22d08-ab09-4335-bc58-e0b0df065dbf" class="card home">
+                        <article>
+                            <div class="imageElement"
+                                style="background-image:url(https://images.unsplash.com/photo-1495480137269-ff29bd0a695c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNTk2NTV8MHwxfHNlYXJjaHwxMHx8RnJ1aXQlMjBQaWV8ZW58MHwwfHx8MTY2NTc4Mjg4Mw&ixlib=rb-1.2.1&q=80&w=1080)"
+                                aria-label="Decorative image relating to Fruit Pie"></div>
+                            <div class="text-area">
+                                <h1>Fruit Pie</h1>
+                                <p>Yummy fruit cooked into a pie with some lemon juice and sugar added.</p>
+                            </div>
+                        </article>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="page-footer">
+            <p>&copy; Caleb Hamilton 2022</p>
+        </footer>
+    </div>
+    <script>
+    // Dismiss splash page
+    document.getElementById('browse-btn')?.addEventListener('click', () => {
+        document.getElementById('static-landing-page').classList.add('hidden');
+    });
+    
+    document.getElementById('splash-login-btn')?.addEventListener('click', () => {
+        document.getElementById('static-landing-page').classList.add('hidden');
+        // Your login logic here
+    });
+</script>
+    <script type="module" src="/scripts/index-bundle.js"></script>
+</body>
+</html>

@@ -1,4 +1,5 @@
-import "./style.scss";
+// import "./style.scss";
+import "./recipe-me.scss"
 import { loadRecipesFromLocalStorage, hamburger, getFeaturedImage, getAllImages } from "./functions.js";
 import { marked } from "marked";
 import { setupShoppingList } from "./helpers/shoppingList.js";

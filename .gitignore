@@ -11,3 +11,4 @@ public/scripts/*.css.map
 
 # EXCEPT these HTML files (need to be tracked)
 !public/scripts/*.html
+!public/design-tokens.css

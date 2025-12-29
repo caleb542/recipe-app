@@ -1,4 +1,5 @@
 import "./style.scss";
+import "./recipe-me.scss"
 import {
   stringify,
   v4 as uuidv4
@@ -102,24 +103,27 @@ const getCategories = async () => {
   let categories = [];
 
   if (Array.isArray(recipes)) {
+    console.log('First recipe:', recipes[0]);
+    
     recipes.forEach((recipe) => {
-      // Controlled category
-      const category = recipe.category || "Uncategorized";
-      categories.push(category);
-
-      // Optional: include tags if you want them in the cloud
-      if (Array.isArray(recipe.tags)) {
-        recipe.tags.forEach(tag => categories.push(tag));
+      console.log('Recipe:', recipe.name, 'Categories:', recipe.categories);
+      
+      // Extract individual categories from array
+      if (Array.isArray(recipe.categories) && recipe.categories.length > 0) {
+        categories.push(...recipe.categories); // Flatten the array
+      } else {
+        categories.push("Uncategorized");
       }
     });
   } else {
     console.warn("Recipes not available yet:", recipes);
   }
 
-  categories = [...new Set(categories)];
+  categories = [...new Set(categories)]; // Remove duplicates
   categories.unshift("All");
 
   const categoriesCloud = document.querySelector("#categories-cloud section");
+  categoriesCloud.innerHTML = ''; // Clear first
   categoriesCloud.setAttribute("tabindex", "0");
   categoriesCloud.setAttribute("role", "radiogroup");
 
