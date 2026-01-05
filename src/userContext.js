@@ -23,11 +23,10 @@ export async function loadUserProfile(skipFetch = false) {
     }
  // ✅ Skip fetch if requested or if we have cache
     if (skipFetch || cached) {
-      console.log("!!!!!!!!!! Should be returning currentUserProfile")
       return currentUserProfile;
     }
     // Fetch fresh profile from API
-     console.log("???????????????  FUUUUCK looking for tokern")
+ 
     const token = await getToken();
     const response = await fetch('/.netlify/functions/user-profile', {
       headers: {
@@ -122,7 +121,7 @@ export function getUserAvatar() {
     };
   }
 
-  if (avatar.type === 'gravatar' || avatar.type === 'upload') {
+  if (avatar.type === 'gravatar' || avatar.type === 'uploaded') {
     return {
       type: 'image',
       url: avatar.url

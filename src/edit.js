@@ -1,6 +1,6 @@
 // Entry point for Recipe Editor
 import { v4 as uuidv4 } from 'uuid';
-import { loadRecipes, saveRecipes } from './functions.js';
+import { loadRecipes, saveRecipes, hideWarning } from './functions.js';
 import '@toast-ui/editor/dist/toastui-editor.css';
 
 // Helpers
@@ -22,12 +22,17 @@ import { loadUserProfile } from './userContext.js';
 import { setupPreview } from './helpers/preview.js'
 import { initStatusToggle, getCurrentPublishedState } from './helpers/statusToggle.js'
 import { setupVideoHelper } from './helpers/setupVideoHelper.js';
+import { loadHeader } from './components/HeaderComponent.js';
 
+
+loadHeader();
+hideWarning();
 // Initialize auth
 await initAuth0();
 await loadUserProfile();
 await updateAuthUI();
 setupAuthListeners();
+
 
 // Protect this page - must be logged in to edit
 const authenticated = await isAuthenticated();

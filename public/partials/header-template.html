@@ -1,0 +1,34 @@
+<!-- Dev Notice -->
+<div class="dev-notice">
+    <p><span><i class="fa fa-warning --color-warning-bg"></i></span> Active Development: Migrating infrastructure. Some features may be unstable.&nbsp;<a href="https://github.com/caleb542/recipe-app">View code</a></p>
+   
+    <span id="hide-this-header" role="button" aria-label="Hide this warning"><i class="fa fa-times"></i></span>       
+</div>
+
+<!-- Two-Tier Header -->
+
+<!-- Top Bar - Dark (Search only on homepage) -->
+<div class="top-bar">
+    <div class="top-bar-left">
+        <h1 class="nav-bar-logo"><a href="/">Recipe Me</a></h1>
+        <!-- Search bar - only visible on homepage -->
+        <div class="top-bar-search homepage-only">
+            <i class="fa fa-search search-icon"></i>
+            <input type="text" id="search-filter" placeholder="Search recipes, ingredients, authors..." aria-label="Search recipes">
+        </div>
+    </div>
+    
+    <div class="top-bar-right">        
+        
+        <div class="top-bar-user">
+            <button id="login-btn" class="primary sm">Login</button>
+            <div id="user-info" style="display: none;">
+                <!-- Avatar will be inserted here by JavaScript -->
+                <div id="user-avatar-container"></div>
+                <span id="user-name"></span>
+                <button id="logout-btn">Logout</button>
+            </div>
+        </div>
+    </div>
+  
+</div>

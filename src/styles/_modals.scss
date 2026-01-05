@@ -1,0 +1,739 @@
+/* ========================================
+   MODALS & DIALOGS
+   Auth modal, image selector, profile setup, preview dialog
+   ======================================== */
+
+/* Base Dialog Styles */
+dialog {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    border: none;
+}
+
+dialog[open] {
+    display: flex;
+}
+
+dialog[open]:focus-within {
+    border: 2px solid #555;
+}
+
+dialog[open]:not(:focus-within) {
+    border-color: rgb(255, 255, 254);
+    transition: border-color 0.01s;
+}
+
+/* Auth Modal */
+@keyframes appear {
+    from {
+        opacity: 0.4;
+        scale: 1.1;
+    }
+    to {
+        opacity: 1;
+        scale: 1;
+    }
+}
+
+dialog.auth-modal {
+    position: relative;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 8px;
+    padding: 2rem;
+    width: clamp(300px, 100%, 600px);
+    box-shadow: 0 4px 10px 0px rgba(0,0,0,0.25);
+    animation: appear 0.4s;
+    font-size: 1rem;
+    transition: 0.4s;
+
+    &:focus {
+        outline: 0;
+    }
+    &:focus-visible {
+        outline: 0px solid #000;
+    }
+    &:focus-within {
+        background: #fff;
+        outline: 0;
+    }
+
+    &::backdrop {
+        position: relative;
+        background: rgba(0,0,0,0.5);
+        background-blend-mode: color;
+    }
+
+    .modal-close {
+        position: absolute;
+        width: 40px;
+        right: 40px;
+        aspect-ratio: 1 / 1;
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        flex: 1 1;
+
+        &.hidden {
+            display: none;
+        }
+    }
+
+    .auth-form label {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .auth-form input {
+        font-size: 1rem;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    menu {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    menu button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    menu button[type="submit"] {
+        background: #ff7043;
+        color: white;
+    }
+
+    menu button[type="reset"] {
+        background: #eee;
+    }
+
+    .login-register {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+/* Profile Setup Modal */
+.profile-setup-dialog {
+    border: none;
+    border-radius: 1rem;
+    padding: 0;
+    max-width: 500px;
+    width: calc(100% - 2rem);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    &::backdrop {
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+    }
+
+    .dialog-content {
+        padding: 2rem;
+    }
+
+    .dialog-header {
+        margin-bottom: 2rem;
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 0.5rem;
+        }
+    }
+
+    .dialog-subtitle {
+        font-size: 1rem;
+        color: #6b7280;
+        margin: 0;
+    }
+
+    .form-field {
+        margin-bottom: 1.5rem;
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+    }
+
+    .required {
+        color: #ef4444;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #d1d5db;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.2s;
+        background: white;
+
+        &:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        &:invalid:not(:placeholder-shown) {
+            border-color: #ef4444;
+        }
+    }
+
+    .avatar-preview-section {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .avatar-preview-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        .initials {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+    }
+
+    .avatar-help {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .form-actions {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        background: #f59e0b;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover:not(:disabled) {
+            background: #d97706;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        &:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        &:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        &[aria-busy="true"] {
+            position: relative;
+            color: transparent;
+
+            &::after {
+                content: '';
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                top: 50%;
+                left: 50%;
+                margin-left: -10px;
+                margin-top: -10px;
+                border: 3px solid #9ca3af;
+                border-radius: 50%;
+                border-top-color: white;
+                animation: spinner 0.6s linear infinite;
+            }
+        }
+    }
+
+    @keyframes spinner {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+        .dialog-content {
+            padding: 1.5rem;
+        }
+
+        .dialog-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .avatar-preview-section {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+}
+
+/* Generic Modal Dialog */
+dialog.modal-dialog {
+    display: none;
+    width: clamp(300px, 60cqw, 798px);
+    padding: 2rem 3rem;
+
+    h2 {
+        font-size: 1rem;
+        text-align: center;
+        color: hotpink;
+        font-weight: 900;
+    }
+}
+
+dialog.modal-dialog[open] {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Image Selection Dialog */
+//  #select-images[open] {
+//     display: block;
+//     width: clamp(300px, 85vw, 1100px);
+//     max-height: 90vh;
+//     max-width:90vw;
+//     padding: 2rem;
+//     border: none;
+//     border-radius: 12px;
+//     background: white;
+//     overflow: hidden;
+
+//     .image-viewport {
+//         width: 100%;
+//         overflow: hidden;
+//         position: relative;
+//         height: 500px;
+//         border-radius: 8px;
+//         background: #f5f5f5;
+//         margin-bottom: 1rem;
+
+//         ul {
+//             padding: 0;
+//             margin: 0;
+//             list-style: none;
+//             display: flex;
+//             gap: 0;
+//             transition: transform 0.4s ease;
+//             height: 100%;
+
+//             li {
+//                 flex: 0 0 100%;
+//                 width: 100%;
+//                 display: flex;
+//                 align-items: center;
+//                 justify-content: center;
+//                 height: 100%;
+//             }
+//         }
+//     }
+// }
+
+// #select-images[open] figure {
+    // width: 100%;
+    // height: 100%;
+    // display: flex;
+    // flex-direction: column;
+    // align-items: center;
+    // justify-content: center;
+    // margin: 0;
+    // padding: 16px;
+// }
+
+// #select-images[open] img {
+//     max-width: 100%;
+//     max-height: 85%;
+//     width: auto;
+//     height: auto;
+//     object-fit: contain;
+// }
+
+// #select-images figcaption {
+//     padding: 0.5rem 1rem;
+//     font-size: 0.9rem;
+//     color: #666;
+//     text-align: center;
+//     margin-top: 0.5rem;
+// }
+/* Image Selection Dialog - Horizontal Layout */
+#select-images {
+  max-width: 90vw;
+  max-height: 90vh;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.carousel {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 1rem;
+  margin: 0;
+  list-style: none;
+}
+
+.carousel-item {
+  display: block;
+  height: auto;
+}
+
+.unsplash-photo {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.unsplash-photo:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.unsplash-photo img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.photo-credit {
+  font-size: 0.875rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.photo-credit a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.photo-credit a:hover {
+  text-decoration: underline;
+}
+
+.select-photo-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.select-photo-btn:hover {
+  background: #059669;
+}
+
+.select-photo-btn i {
+  font-size: 0.875rem;
+}
+.image-buttons {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1rem;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.image-buttons button {
+    pointer-events: all;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.image-buttons button i {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.next,
+.prev {
+    background: rgba(255, 255, 255, 0.95);
+    color: #000;
+}
+
+.next:hover:not(:disabled),
+.prev:hover:not(:disabled) {
+    background: #000;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.next:disabled,
+.prev:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.count {
+    text-align: center;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.close-image-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    z-index: 20;
+}
+
+.close-image-modal:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+}
+
+.close-image-modal:hover i {
+    color: white;
+}
+
+.close-image-modal i {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+#select-images::backdrop {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+#select-images.show::backdrop {
+    background-color: rgba(0, 0, 0, 0.75);
+    filter: blur(5px);
+    transition: background-color 0.3s ease, filter 0.3s ease;
+}
+
+/* Preview Dialog */
+dialog#preview-dialog {
+    padding: 20px;
+    width: clamp(300px, 80%, 800px);
+    display: none;
+    flex-direction: column-reverse;
+    gap: 20px;
+    align-items: center;
+
+    &::backdrop {
+        background-color: rgba(0,0,0,0.5);
+    }
+}
+
+dialog#preview-dialog[open] {
+    display: flex;
+}
+
+dialog #preview-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    container-type: inline-size;
+    border: 0px solid green;
+}
+
+#preview-dialog #preview-content .card.article {
+    overflow-x: clip;
+    padding: 10px;
+}
+
+.edit-page #preview-content .card.article header {
+    display: flex;
+}
+
+@container (min-width: 300px) and (max-width: 768px) {
+    article {
+        padding: 20px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .imageElement {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16/9;
+    }
+}
+
+#preview-dialog #preview-content .card.article >:nth-child(odd) {
+    opacity: 0.5;
+    translate: -550px 0;
+    animation: slideRight 1s cubic-bezier(0.175, 0.245, 0.5, 1) forwards 0.5s;
+}
+
+#preview-dialog #preview-content .card.article >:nth-child(even) {
+    animation: slideLeft 1s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+}
+
+@keyframes slideRight {
+    from {
+        opacity: 0.5;
+        translate: -350px 0;
+    }
+    to {
+        opacity: 1;
+        translate: 0px 0;
+    }
+}
+
+@keyframes slideLeft {
+    from {
+        opacity: 0.5;
+        translate: 150px 0;
+    }
+    to {
+        opacity: 1;
+        translate: 0px 0;
+    }
+}
+
+/* Dialog Buttons */
+#dialog-close-button {
+    background: #000;
+    border: #333;
+    padding: 1rem 1.5rem;
+    color: #fff;
+}
+
+button.dialog-close-button {
+    background: #000;
+    float: right;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    bottom: 2rem;
+}
+
+dialog fieldset {
+    height: inherit;
+    border: none;
+}
+
+dialog textarea {
+    height: inherit;
+    display: block;
+    height: 10rem;
+    width: 100%;
+}
+
+dialog label {
+    display: flex;
+    flex-direction: row;
+    place-content: space-between;
+}
+
+dialog input {
+    height: 2rem;
+    padding: 0.5rem;
+}
+
+dialog ul {
+    display: grid;
+    grid-row-gap: 0.5rem;
+}
+
+.close-ingredient-modal {
+    position: absolute;
+    top: unset;
+    bottom: 0;
+    right: 0;
+    width: auto;
+    padding: 0.5rem;
+    height: 2rem;
+    display: grid;
+    place-content: center;
+}

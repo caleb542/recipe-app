@@ -1,39 +1,51 @@
 import { isAuthenticated, getUser, login, logout } from './auth0.js';
-import { getUserProfile } from '../userContext.js' 
+import { getUserProfile, getUserAvatar } from '../userContext.js' 
 
 // Update the header based on auth status
 export async function updateAuthUI() {
   const authenticated = await isAuthenticated();
-    const profile = getUserProfile();
-  
-  // Get DOM elements
   const loginBtn = document.getElementById('login-btn');
-  const logoutBtn = document.getElementById('logout-btn');
   const userInfo = document.getElementById('user-info');
-  const userName = document.getElementById('user-name');
-
+  
   if (authenticated) {
-    const user = await getUser();
-    const profile = getUserProfile();  // ← Get cached profile
+    loginBtn.style.display = 'none';
+    userInfo.style.display = 'flex';
+    userInfo.style.alignItems = 'center';
+    userInfo.style.gap = '0.5rem';
     
-    // Show user info, hide login
-    if (loginBtn) loginBtn.style.display = 'none';
-    if (userInfo) userInfo.style.display = 'flex';
+    const user = getUserProfile();
+    const userNameElement = document.getElementById('user-name');
+    const avatarContainer = document.getElementById('user-avatar-container');
     
-    if (userName) {
-      if (profile && profile.username) {
-        // Use profile data and make it a link
-        userName.innerHTML = `Hi, <a href="/profile.html?username=${profile.username}" class="user-profile-link">${profile.profile.displayName}</a>`;
-      } else {
-        // Fallback to Auth0 data (before profile setup)
-        userName.textContent = `Hi, ${user.name || user.email}`;
+    // Render avatar
+    if (avatarContainer) {
+      const avatar = getUserAvatar();
+      
+      if (avatar && avatar.type === 'image') {
+        avatarContainer.innerHTML = `
+                 <a href="/profile.html?username=${user.username}" ><img src="${avatar.url}" alt="Profile" class="header-avatar"></a>
+            
+          
+        `;
+      } else if (avatar && avatar.type === 'initials') {
+        avatarContainer.innerHTML = `
+                <a href="/profile.html?username=${user.username}" 
+            <div class="header-avatar-initials">${avatar.initials}</div>
+          </a>
+        `;
       }
     }
     
+    // Render username
+    if (userNameElement && user) {
+      const displayName = user.profile?.displayName || user.username || 'User';
+      userNameElement.innerHTML = `
+        <a href="/profile.html?username=${user.username}" class="user-profile-link">${displayName}</a>
+      `;
+    }
   } else {
-    // Show login, hide user info
-    if (loginBtn) loginBtn.style.display = 'block';
-    if (userInfo) userInfo.style.display = 'none';
+    loginBtn.style.display = 'inline-block';
+    userInfo.style.display = 'none';
   }
 }
 

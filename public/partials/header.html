@@ -1,0 +1,54 @@
+<!-- Dev Notice -->
+<div class="dev-notice">
+    ⚙️ Active Development: Migrating infrastructure. Some features may be unstable.
+    <a href="https://github.com/caleb542/recipe-app">View code</a>
+</div>
+
+<!-- Two-Tier Header -->
+
+<!-- Top Bar - Dark with Search -->
+<div class="top-bar">
+    <div class="top-bar-search">
+        <i class="fa fa-search search-icon"></i>
+        <input type="text" id="search-filter" placeholder="Search recipes, ingredients, authors..." aria-label="Search recipes">
+    </div>
+    
+    <div class="top-bar-user">
+        <button id="login-btn" class="primary sm">Login</button>
+        <div id="user-info" style="display: none;">
+            <span id="user-name"></span>
+            <button id="logout-btn">Logout</button>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Bar - White with Logo -->
+<div class="nav-bar">
+    <h1 class="nav-bar-logo"><a href="/">Recipe Me</a></h1>
+    
+    <div class="nav-bar-controls">
+        <div class="sort-compact">
+            <span>Sort:</span>
+            <select id="filter-by">
+                <option value="byEdited">Last modified</option>
+                <option value="byCreated">Created date</option>
+                <option value="alphabetical">Alphabetical</option>
+            </select>
+        </div>
+        
+        <a href="/edit.html" class="primary sm">
+            <i class="fa fa-plus"></i> Add Recipe
+        </a>
+        
+        <button id="menu-toggle" class="icon-btn" aria-expanded="false" aria-controls="nav" aria-label="Open the menu">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Mobile Navigation -->
+<nav id="nav" class="hide">
+    <ul>
+        <li><a href="/edit.html" title="add a recipe">Add a recipe</a></li>
+    </ul>
+</nav>

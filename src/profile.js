@@ -5,6 +5,8 @@ import { loadUserProfile, getUserProfile } from './userContext.js';
 import { optimizeImage, IMAGE_PRESETS } from './helpers/imageOptimizer.js';
 import { generateFileHash } from './helpers/duplicateCheck.js';
 import { findExistingImage, registerImage } from './helpers/globalImageRegistry.js';
+import { loadHeader } from './components/HeaderComponent.js';
+import { hideWarning } from './functions.js';
 
 const CLOUDINARY_CLOUD_NAME = 'day1f5nz8';
 const CLOUDINARY_UPLOAD_PRESET = 'recipe_images';
@@ -14,6 +16,8 @@ let currentProfile = null;
 let newAvatarUrl = null; // Store temporarily until save
 
 async function init() {
+  await loadHeader()
+  hideWarning ()
   // Initialize Auth0
   await initAuth0();
   await loadUserProfile();

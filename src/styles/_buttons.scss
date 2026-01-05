@@ -1,0 +1,632 @@
+/* ========================================
+   BUTTONS & ACTIONS
+   All button styles, CTAs, action buttons
+   ======================================== */
+
+/* Base Button Styles */
+.btn {
+    display: inline-block;
+    cursor: pointer;
+}
+
+button {
+    cursor: pointer;
+}
+
+.button {
+    background: #43799c;
+    border: none;
+    border-bottom: 2px solid #396684;
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 300;
+    padding: .8rem;
+    transition: background .3s ease;
+}
+
+.button:hover {
+    background: #396684;
+}
+
+.button--secondary {
+    background: #888888;
+    border-bottom: 2px solid #717171;
+}
+
+.button--secondary:hover {
+    background: #6E6E6E;
+}
+
+/* Primary & Secondary Buttons */
+.btn-primary, .btn-secondary {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+}
+
+.btn-primary {
+    background: white;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 2px solid white;
+    backdrop-filter: blur(10px);
+}
+
+/* Edit Page Buttons */
+.edit-page button:not(#editor button) {
+    --b-color: lch(71.39% 0 67.2);
+    font-weight: 400;
+    font-size: 0.9rem;
+    padding: 0.5em 1.25em;
+    border-radius: 25px;
+    height: 40px;
+    transition: all 0.35s;
+    border-width: 1px;
+}
+
+.edit-page button:is(.remove-ingredient) {
+    --color: hwb(35 0% 0%);
+    --hover-color: #fff;
+    background: #fff;
+    color: var(--color);
+    border-style: solid;
+    border-color: var(--b-color);
+
+    &:hover {
+        background-color: var(--color);
+        border-color: var(--color);
+        color: var(--hover-color);
+    }
+    &:focus-visible {
+        background-color: var(--color);
+        border-color: var(--color);
+        color: var(--hover-color);
+    }
+}
+
+.edit-page button:is(.edit-ingredient) {
+    --color: hwb(211 0% 0%);
+    --hover-color: #fff;
+    background: #fff;
+    color: var(--color);
+    border-color: var(--b-color);
+    border-style: solid;
+    border-color: var(--b-color);
+
+    &:hover {
+        background-color: var(--color);
+        color: var(--hover-color);
+        border-color: var(--color);
+    }
+    &:focus-visible {
+        background-color: var(--color);
+        border-color: var(--color);
+        color: var(--hover-color);
+    }
+}
+
+.edit-page button:is(.remove-ingredient) {
+    border-color: orange;
+    color: orange;
+}
+
+/* Add Ingredient Button */
+.edit-page button#add-an-ingredient {
+    color: #000;
+    background-color: #ebfaff;
+    border: none;
+    text-decoration: none;
+    display: grid;
+    overflow: hidden;
+    place-content: center;
+    border-radius: 12px;
+    outline: none;
+    position: relative;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.25rem;
+    display: inline-block;
+    border: 0;
+    border-radius: 6px;
+
+    &:focus {
+        background-color: #0dd;
+    }
+
+    &:hover {
+        background-color: #0dd;
+    }
+
+    span {
+        position: absolute;
+    }
+}
+
+.addIngredient {
+    padding: 0.5em 1em;
+    display: grid;
+    place-content: center;
+    width: auto;
+    height: 30px;
+    position: absolute;
+    background: orangered;
+    right: 10px;
+}
+
+/* Add Recipe Button */
+.addNewRecipe {
+    position: absolute;
+    right: 0;
+    display: grid;
+    grid-template-columns: 8fr 4fr;
+    place-content: center;
+    color: #222;
+    border-radius: 12px;
+    text-decoration: none;
+    font-family: 'Poppins';
+    height: 5.2rem;
+    margin-top: 2.5rem;
+    font-size: 6.2rem;
+    padding: 0.1em 0 0 2rem;
+    font-weight: 100;
+    width: auto;
+
+    &:hover {
+        opacity: 0.5;
+    }
+
+    background: turquoise;
+}
+
+.addNewRecipe::before {
+    content: 'Add a recipe';
+    font-size: 1.125rem;
+    padding: 3rem 2rem 0 0;
+    font-weight: 400;
+}
+
+.addNewRecipe span {
+    font-size: 3em;
+}
+
+/* Splash CTA */
+.stl-cta {
+    padding: 0.5rem 2rem;
+    height: auto;
+    min-height: 2rem;
+    line-height: 2rem;
+    border-width: 0.2rem;
+    border-style: solid;
+    border-color: #1abc9c;
+    color: #1abc9c;
+    font-size: 1.2rem;
+    background: transparent;
+    text-transform: CAPITALIZE;
+    font-weight: bold;
+    width: fit-content;
+    display: inline-block;
+    z-index: 10;
+    font-size: large;
+    font-weight: 500;
+    font-family: 'poppins';
+
+    &:hover {
+        color: #ddd;
+        border-color: #ddd;
+        animation: 1.2s ease-in 0s 1 buttonAnimation;
+        animation-fill-mode: forwards;
+        font-family: 'poppins';
+    }
+}
+
+@keyframes buttonAnimation {
+    from {
+        background: linear-gradient(75deg, #eee, #000, #000, #000,#000,#000,#000);
+    }
+    10% { background: linear-gradient(75deg, #000, rgb(200, 200, 255), #000, #000,#000,#000,#000,#000,#000,#000,#000,#000,#000) };
+    15% { background: linear-gradient(75deg, #000, #000, rgb(200, 200, 255),#000,#000,#000,#000,#000,#000,#000,#000,#000,#000) };
+    20% { background: linear-gradient(75deg, #000, #000, #000, rgb(200, 200, 255), #000,#000,#000,#000,#000,#000,#000,#000,#000) };
+    25% { background: linear-gradient(75deg, #000, #000, #000,#000,rgb(200, 200, 255),#000,#000,#000,#000,#000,#000,#000,#000) };
+    30% { background: linear-gradient(75deg, #000, #000, #000,#000,#000,rgb(200, 200, 255),#000,#000,#000,#000,#000,#000,#000) };
+    35% { background: linear-gradient(75deg, #000, #000, #000,#000,#000,#000,rgb(200, 200, 255),#000,#000,#000,#000,#000,#000) };
+    40% { background: linear-gradient(75deg, #000, #000, #000,#000,#000,#000,#000,rgb(200, 200, 255),#000,#000,#000,#000,#000) };
+    45% { background: linear-gradient(75deg, #000, #000, #000,#000,#000,#000,#000,#000,rgb(200, 200, 255),#000,#000,#000,#000) };
+    50% { background: linear-gradient(75deg, #000, #000, #000,#000,#000,#000,#000,#000,#000,rgb(200, 200, 255),#000,#000,#000) };
+    55% { background: linear-gradient(70deg, #000,#000, #000, #000,#000,#000,#000,#000,#000,#000,#000,rgb(200, 200, 255),#000#000) };
+    60% { background: linear-gradient(75deg, #000,#000, #000, #000,#000,#000,#000,#000,#000,#000,#000,#000,rgb(200, 200, 255),#000) };
+    65% { background: linear-gradient(45deg, #000,#000, #000, #000,#000,#000,#000,#000,#000,#000,#000,#000,#000,rgb(200, 200, 255),) };
+    70% { background: linear-gradient(45deg, #000,#000, #000, #000,#000,#000,#000,#000,#000,#000,#000,#000,#000) };
+    75% { background: linear-gradient(45deg, #000,#000, #000, #000,#000,#000,#000,#000,#000,#000,#000,#000,#000) };
+    100% { background: linear-gradient(45deg, #000,#000, #000, #000,#000,#000,#000,#000,#000,#000,#000,#000,#000) };
+}
+
+/* Large Button */
+.btn.btn-large {
+    font-size: 1.25rem;
+    font-weight: normal;
+    padding: 0rem 2rem;
+    text-transform: initial;
+    color: #fff;
+    background: #2d2d2d;
+    font-family: "source sans pro";
+    font-size: 2rem;
+    display: inline-block;
+    display: flex;
+    justify-content: center;
+    border-radius: 6px;
+    ALIGN-ITEMS: CENTER;
+    flex-shrink: 1;
+    float: right;
+    right: 2rem;
+    bottom: 0;
+    position: absolute;
+    height: 6rem;
+    line-height: 3rem;
+    position: fixed;
+    bottom: 20rem;
+    width: 120px;
+    bottom: 0;
+    width: calc(100%);
+    left: 0;
+    border: unset;
+    border-color: #5d5d5d;
+    border-width: 0.3rem 0.3rem;
+    border-style: solid;
+
+    &:hover {
+        background: #555;
+        border-color: #2d2d2d;
+        opacity: 1;
+    }
+
+    &:focus {
+        background: #40e09e;
+        opacity: 1;
+    }
+}
+
+/* Feature Image Button */
+button.feature-image {
+    background: transparent;
+    border: none;
+    position: relative;
+    display: inline-block;
+    position: relative;
+    place-content: center;
+    left: -20px;
+    height: 41px;
+    width: 41px;
+    color: #fff;
+    margin-left: -1rem;
+    font-size: 1.125rem;
+    background: #0077ff !important;
+
+    &:hover {
+        opacity: 0.5;
+    }
+    &:focus {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    i {
+        position: absolute;
+        display: grid;
+        place-content: center;
+        width: 100%;
+        height: 41px;
+        top: 50%;
+        left: 2px;
+        transform: translate(0, -50%);
+        font-size: 1.15em;
+    }
+}
+
+/* Action Buttons */
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn i {
+    font-size: 1rem;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+.preview-btn {
+    background: #6366f1;
+    color: white;
+    border-color: #4f46e5;
+}
+
+.preview-btn:hover {
+    background: #4f46e5;
+    border-color: #4338ca;
+}
+
+.save-btn, .save-button {
+    display: inline-block;
+    background: #007a3d;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5em 1.25em;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background: #10b981;
+    border-color: #059669;
+}
+
+.save-btn:hover, .save-button:hover {
+    background: #005c2d;
+    background: #059669;
+    border-color: #047857;
+}
+
+.save-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+    border-color: #dc2626;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    border-color: #b91c1c;
+}
+
+/* Loading State */
+.action-btn.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.action-btn.loading::after {
+    content: "";
+    width: 14px;
+    height: 14px;
+    margin-left: 0.5rem;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Success Animation */
+@keyframes successPulse {
+    0%, 100% {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    50% {
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+}
+
+.action-btn.success {
+    animation: successPulse 0.6s ease;
+}
+
+/* Status Toggle Button */
+.status-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.status-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.status-toggle:active {
+    transform: translateY(0);
+}
+
+.status-toggle[data-published="false"] {
+    background: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+}
+
+.status-toggle[data-published="false"]:hover {
+    background: #ffe69c;
+    border-color: #ffb300;
+}
+
+.status-toggle[data-published="false"] .status-icon {
+    color: #f59e0b;
+}
+
+.status-toggle[data-published="true"] {
+    background: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.status-toggle[data-published="true"]:hover {
+    background: #c3e6cb;
+    border-color: #218838;
+}
+
+.status-toggle[data-published="true"] .status-icon {
+    color: #10b981;
+}
+
+.status-toggle .status-icon {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.status-toggle .status-text {
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+}
+
+/* Profile Buttons */
+.btn-edit-profile {
+    margin-top: 1rem;
+    padding: 0.625rem 1.5rem;
+    background: #f59e0b;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0.5rem 1.5rem;
+    background: #3498db;
+    border-radius: 6px;
+    font-weight: 500;
+
+    &:hover {
+        background: #d97706;
+        background: #2980b9;
+    }
+}
+
+/* Add Direction Button */
+#add-step {
+    color: #333;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 2px solid #fff;
+    font-size: 1.5rem;
+    position: absolute;
+    display: grid;
+    place-content: center;
+    border-radius: 50%;
+    right: 2.5rem;
+    bottom: 0;
+    border: 1px solid #333;
+}
+
+/* Upload Button */
+.upload-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #ff6b6b;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.upload-button:hover {
+    background: #ff5252;
+}
+
+/* Remove/Delete Buttons */
+.remove-image-btn {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.remove-image-btn:hover {
+    background: #c0392b;
+}
+
+.btn-danger {
+    color: #e74c3c;
+    background: #fee;
+    border-color: #e74c3c;
+}
+
+.btn-danger:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+/* Small Buttons */
+.btn-small {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #333;
+    transition: all 0.2s;
+}
+
+.btn-small:hover:not(:disabled) {
+    background: #f0f0f0;
+    border-color: #999;
+}
+
+.btn-small.active {
+    background: #ffd700;
+    border-color: #ffa500;
+    color: #333;
+    font-weight: 600;
+}
+
+.btn-small:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #f5f5f5;
+}

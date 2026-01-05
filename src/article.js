@@ -1,6 +1,6 @@
 // import "./style.scss";
 import "./recipe-me.scss"
-import { loadRecipesFromLocalStorage, hamburger, getFeaturedImage, getAllImages } from "./functions.js";
+import { loadRecipesFromLocalStorage, hamburger, getFeaturedImage, getAllImages, hideWarning } from "./functions.js";
 import { marked } from "marked";
 import { setupShoppingList } from "./helpers/shoppingList.js";
 import { initAuth0, getToken, isAuthenticated, getUser } from './auth/auth0.js';
@@ -9,6 +9,7 @@ import { RatingDisplay } from './components/RatingDisplay.js';
 import { CommunityNotes } from './components/CommunityNotes.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { autoEmbedVideos } from './helpers/youtubeEmbed.js';
+import { loadHeader } from './components/HeaderComponent.js';
 
 // ✅ NEW: Check for slug-based URL first
 const urlParams = new URLSearchParams(window.location.search);
@@ -21,6 +22,9 @@ const recipeId = location.hash.substring(1);
 let recipes;
 let likesInitialized = false;
 let articleHydrated = false;
+
+await loadHeader();
+hideWarning();
 
 // Initialize Auth0
 await initAuth0();
@@ -186,11 +190,17 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
   const imageGalleryContainer = tpl.querySelector(".recipe-image-gallery");
   if (imageGalleryContainer) {
     const allImages = getAllImages(recItem);
+
+    // ✅ Filter out featured image if there are fewer than 3 uploaded images
+  const uploadedImages = allImages.filter(img => img.source === 'upload');
+  const displayImages = uploadedImages.length < 3 
+    ? allImages.filter(img => !img.isFeatured) // Exclude featured if < 3 uploads
+    : allImages; // Show all if >= 3 uploads
     
     if (allImages.length > 0) {
       imageGalleryContainer.innerHTML = `
         <div class="recipe-images-grid">
-          ${allImages.map((img, index) => `
+          ${displayImages.map((img, index) => `
             <figure class="recipe-image-item ${img.isFeatured ? 'featured-image' : ''}">
               ${img.resourceType === 'video' ? `
                 <video controls>

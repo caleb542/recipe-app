@@ -50,6 +50,12 @@ export const handler = async (event) => {
         { $set: { lastLoginAt: new Date() } }
       );
 
+      console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!User profile being returned:', {
+        username: user.username,
+        email: user.email,
+        role: user.role  || 'user' // Check if role exists
+      });
+
       return {
         statusCode: 200,
         headers,
