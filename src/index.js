@@ -37,9 +37,12 @@ import { initAuth0, login, isAuthenticated } from './auth/auth0.js';
 import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { loadHeader } from './components/HeaderComponent.js';
+import { appendSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 // Load shared header FIRST
 await loadHeader();
 hideWarning();
+const container = document.getElementById("spinner-container");
+appendSpinner(container);
 // Then initialize auth
 await initAuth0();
 await loadUserProfile();
@@ -92,25 +95,14 @@ if (!isFirstTime || authenticated) {
 
 
 let recipes =  await loadRecipesFromLocalStorage()
-await listRecipes(recipes);
+// ✅ Add safety check
+if (!recipes) {
+  console.warn('⚠️ No recipes in localStorage, fetching from database...');
+  recipes = await getRecipesFromDatabase();
+  saveRecipes(recipes);
+}
 
-// Event Listeners
-document.querySelector('#search-filter').addEventListener('input', (e) => {
-  console.log(e.target.value)
-  setFilters({
-    searchText: e.target.value
-  })
-  listRecipes(recipes)
-})
-
-
-document.querySelector('#filter-by').addEventListener('change', (e) => {
-  console.log(e.target.value)
-  setFilters({
-    sortBy: e.target.value
-  })
-  listRecipes()
-})
+console.log('📦 Initial recipes loaded:', recipes.length);
 
 
 const getCategories = async () => {
@@ -194,6 +186,34 @@ console.log('🔍 Final categories array:', categories); // ✅ Add this
     categoriesCloud.appendChild(label);
   });
 };
+
+// Only proceed if we have recipes
+if (recipes && recipes.length > 0) {
+  await getCategories();
+  await listRecipes(recipes);
+} else {
+  console.warn('⚠️ No recipes available to display');
+  // Maybe show a "No recipes yet" message to user
+}
+
+removeSpinner(200);
+// Event Listeners
+document.querySelector('#search-filter').addEventListener('input', (e) => {
+  console.log(e.target.value)
+  setFilters({
+    searchText: e.target.value
+  })
+  listRecipes(recipes)
+})
+
+
+document.querySelector('#filter-by').addEventListener('change', (e) => {
+  console.log(`Sort Changed To `, e.target.value)
+  setFilters({
+    sortBy: e.target.value
+  })
+  listRecipes()
+})
 
 
 // Event Listeners

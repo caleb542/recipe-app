@@ -13,6 +13,7 @@
 @use './styles/modals';
 @use './styles/splash';
 @use './styles/edit-page';
+@use './styles/spinner';
 
 @import './design-tokens.css';
 // Import Google Fonts
@@ -84,6 +85,7 @@ article {
     height: auto;
     width: 70%;
     margin: 0 auto;
+    margin-top: 2rem;
 }
 
 .home-page article {

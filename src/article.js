@@ -10,6 +10,7 @@ import { CommunityNotes } from './components/CommunityNotes.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { autoEmbedVideos } from './helpers/youtubeEmbed.js';
 import { loadHeader } from './components/HeaderComponent.js';
+import { appendSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 
 // ✅ NEW: Check for slug-based URL first
 const urlParams = new URLSearchParams(window.location.search);
@@ -42,6 +43,9 @@ window.addEventListener("storage", e => {
     fetchRecipes();
   }
 });
+  const container = document.querySelector(".template-container");
+
+  appendSpinner(container);
 
 // ✅ NEW: Entry point - handle both URL formats
 async function fetchRecipes() {
@@ -51,6 +55,8 @@ async function fetchRecipes() {
   } else if (recipeId) {
     // Old hash-based URL: /article.html#recipe-123
     recipes = await loadRecipesFromLocalStorage();
+
+    removeSpinner(7000)
     await hydrateArticle(recipes);
   } else {
     // No recipe specified
@@ -123,7 +129,7 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
   // Load and insert template first
   const res = await fetch("/partials/article-template.html");
   const html = await res.text();
-  const container = document.querySelector(".template-container");
+  removeSpinner(500);
   container.insertAdjacentHTML("beforeend", html);
 
   const template = document.getElementById("article-template");

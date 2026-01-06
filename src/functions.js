@@ -372,8 +372,9 @@ const hideWarning = () => {
     
     // Hide the banner
     warningCloseButton.classList.add("clicked");
+     console.warn('Warning close button clicked');
     warningBanner.classList.add("hide-up");
-    
+     console.warn('warning banner should be hidden');
     // ✅ Save to localStorage
     localStorage.setItem('warning-notification-hidden', 'true');
   });
