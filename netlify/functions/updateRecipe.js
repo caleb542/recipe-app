@@ -1,6 +1,6 @@
 import { getMongoClient } from "./utils/mongoClient.js";
 import { verifyToken, getTokenFromHeader, headers } from './utils/auth.js';
-import { generateUniqueSlug } from './utils/slugGenerator.js'; // ✅ NEW
+import { generateUniqueSlug } from './utils/slugGenerator.js';
 
 /**
  * Ensure recipe has images array format
@@ -90,9 +90,9 @@ export async function handler(event) {
     const client = await getMongoClient();
     const db = client.db("recipe-me-db");
     const collection = db.collection("recipes");
-    const usersCollection = db.collection("users"); // ✅ NEW
+    const usersCollection = db.collection("users");
 
-    // ✅ NEW: Get user's username
+    // ✅ Get user's username
     const user = await usersCollection.findOne({ auth0Id });
     
     if (!user || !user.username) {
@@ -145,7 +145,7 @@ export async function handler(event) {
       // ✅ Ensure images array format
       const processedUpdates = ensureImagesArray({ ...updates });
       
-      // ✅ NEW: Handle slug updates
+      // ✅ Handle slug updates
       let slugUpdates = {};
       
       // If name changed or no slug exists, regenerate slug
@@ -164,7 +164,7 @@ export async function handler(event) {
       // If user provided custom slug, use it
       if (processedUpdates.slug) {
         const { slug, fullSlug } = await generateUniqueSlug(
-          processedUpdates.slug, // Use custom slug as "name"
+          processedUpdates.slug,
           user.username,
           id
         );
@@ -176,10 +176,10 @@ export async function handler(event) {
       // Build update object
       const updateFields = {
         ...processedUpdates,
-        ...slugUpdates, // ✅ Add slug updates
+        ...slugUpdates,
         author: processedUpdates.author || {
           auth0Id: decoded.sub,
-          username: user.username, // ✅ NEW
+          username: user.username,
           name: decoded.name,
           email: decoded.email
         },
@@ -191,13 +191,23 @@ export async function handler(event) {
       if (updates.author) {
         updateFields.author = {
           ...updates.author,
-          username: user.username // ✅ Ensure username is always set
+          username: user.username
         };
       }
 
       // ✅ For legacy recipes being claimed, preserve old displayAuthor
       if (isLegacy && existing.author?.name && existing.author.name !== "Legacy User") {
         updateFields.displayAuthor = existing.author.name;
+      }
+
+      // ✅ Auto-unpublish if recipe becomes incomplete
+      const hasIngredients = updateFields.ingredients && updateFields.ingredients.length > 0;
+      const hasDirections = updateFields.directions && updateFields.directions.length > 0;
+      
+      if (updateFields.isPublic && (!hasIngredients || !hasDirections)) {
+        console.log(`⚠️ Recipe "${updateFields.name}" is incomplete - auto-unpublishing`);
+        updateFields.isPublic = false;
+        updateFields.wasAutoUnpublished = true;
       }
 
       console.log('💾 About to save to MongoDB:', updateFields.author);
@@ -218,15 +228,19 @@ export async function handler(event) {
           modified: result.modifiedCount,
           version: newVersion,
           slug: updateFields.slug,
-          fullSlug: updateFields.fullSlug
+          fullSlug: updateFields.fullSlug,
+          recipe: {
+            ...existing,
+            ...updateFields
+          }
         }),
       };
 
     } else {
-      // ✅ INSERT (upsert for new recipe)
+      // ✅ INSERT (new recipe)
       const processedUpdates = ensureImagesArray({ ...updates });
 
-      // ✅ NEW: Generate slug for new recipe
+      // ✅ Generate slug for new recipe
       const recipeName = processedUpdates.name || 'Untitled Recipe';
       const { slug, fullSlug } = await generateUniqueSlug(
         recipeName,
@@ -237,17 +251,17 @@ export async function handler(event) {
       const newRecipe = {
         id,
         ...processedUpdates,
-        slug, // ✅ NEW
-        fullSlug, // ✅ NEW
+        slug,
+        fullSlug,
         author: processedUpdates.author || {
           auth0Id: decoded.sub,
-          username: user.username, // ✅ NEW
+          username: user.username,
           name: name,
           email: email
         },
         displayAuthor: processedUpdates.displayAuthor || decoded.name,
         isPublic: processedUpdates.isPublic !== undefined ? processedUpdates.isPublic : true,
-        images: processedUpdates.images || [], // Ensure images array
+        images: processedUpdates.images || [],
         version: 1,
         createdAt: new Date().toISOString(),
         updatedAt: updatedAt || new Date().toISOString(),

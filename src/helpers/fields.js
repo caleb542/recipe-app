@@ -56,11 +56,23 @@ function wireFieldListeners(recipeId) {
   const categoryInputs = document.querySelectorAll('input[name="category"]');
 
   // Name - updates as you type
-  if (nameInput) {
-    nameInput.addEventListener('input', e => {
-      updateLocalStorage(recipeId, { name: e.target.value });
+if (nameInput) {
+  nameInput.addEventListener('input', e => {
+    updateLocalStorage(recipeId, { name: e.target.value });
+  });
+}
+
+// ✅ NEW: Slug input - updates as you type
+const slugInput = document.getElementById('recipe-slug');
+if (slugInput) {
+  slugInput.addEventListener('input', e => {
+    updateLocalStorage(recipeId, { 
+      slug: e.target.value,
+      fullSlug: e.target.value 
     });
-  }
+  });
+}
+
 
   // Description - updates as you type
   if (descriptionInput) {

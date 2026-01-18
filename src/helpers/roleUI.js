@@ -62,7 +62,8 @@ export const showAdminBadge = () => {
   
   // Add badge if admin or superadmin
   if (isAdmin(user) || isSuperAdmin(user)) {
-    const badge = document.createElement('span');
+    const badge = document.createElement('a');
+    badge.href="/admin";
     badge.className = 'admin-badge';
     badge.textContent = getRoleDisplayName(user);
     badge.style.cssText = `

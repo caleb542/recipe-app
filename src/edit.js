@@ -23,6 +23,7 @@ import { setupPreview } from './helpers/preview.js'
 import { initStatusToggle, getCurrentPublishedState } from './helpers/statusToggle.js'
 import { setupVideoHelper } from './helpers/setupVideoHelper.js';
 import { loadHeader } from './components/HeaderComponent.js';
+import { initImpersonationBanner } from './components/ImpersonationBanner.js';
 
 
 loadHeader();
@@ -32,7 +33,8 @@ await initAuth0();
 await loadUserProfile();
 await updateAuthUI();
 setupAuthListeners();
-
+initImpersonationBanner();
+setUrlBase();
 
 // Protect this page - must be logged in to edit
 const authenticated = await isAuthenticated();
@@ -47,6 +49,17 @@ if (!authenticated) {
 
 // Bootstrapping
 const recipeId = location.hash.substring(1); 
+/**
+ * Set dynamic URL base based on environment
+ */
+function setUrlBase() {
+  const urlBaseElement = document.getElementById('url-base');
+  if (urlBaseElement) {
+    // Use current origin (e.g., http://localhost:8080 or https://recipeme.com)
+    const origin = window.location.origin;
+    urlBaseElement.textContent = `${origin}/`;
+  }
+}
 
 export async function initEdit(recipeId) {
   const recipes = await loadRecipes();
@@ -92,6 +105,7 @@ export async function initEdit(recipeId) {
 
   // Orchestration: call helpers
   populateFields(recipe);
+  setupSlugEditor(recipe, currentUser)
 
   wireFieldListeners(recipeId);
 
@@ -176,6 +190,8 @@ export async function initCreate() {
 
   // Orchestration: call helpers
   populateFields(newRecipe);
+  setupSlugEditor(newRecipe, currentUser);
+
   wireFieldListeners(newRecipe.id);
 
   listDirections(newRecipe.directions);
@@ -197,6 +213,20 @@ export async function initCreate() {
   setupAccessibility();
   hamburger(); // menu toggle
 }
+/**
+ * Generate a URL-safe slug from text
+ */
+function generateSlug(text) {
+  if (!text) return '';
+  
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove invalid chars
+    .replace(/\s+/g, '-')          // Replace spaces with hyphens
+    .replace(/-+/g, '-')           // Collapse multiple hyphens
+    .replace(/^-+|-+$/g, '');      // Remove leading/trailing hyphens
+}
 
 // Add slug editor
 function setupSlugEditor(recipe) {
@@ -204,43 +234,81 @@ function setupSlugEditor(recipe) {
   const slugFeedback = document.getElementById('slug-feedback');
   
   if (!slugInput) return;
+
+
+  // ✅ Populate with existing slug if editing saved recipe
+  if (recipe.fullSlug) {
+    // ✅ NEW: Strip username prefix if it exists
+    let cleanSlug = recipe.fullSlug;
+    
+    // Remove old format: "username/slug" or "@username/slug" → "slug"
+    if (cleanSlug.includes('/')) {
+      cleanSlug = cleanSlug.split('/').pop(); // Get part after last slash
+    }
+    
+    slugInput.value = cleanSlug;
+  } else if (recipe.slug) {
+    // Same cleanup for slug field
+    let cleanSlug = recipe.slug;
+    if (cleanSlug.includes('/')) {
+      cleanSlug = cleanSlug.split('/').pop();
+    }
+    slugInput.value = cleanSlug;
+  }
   
   let checkTimeout;
   
   slugInput.addEventListener('input', (e) => {
+
+    // ✅ Auto-generate slug when recipe name changes (if slug is empty)
+    const recipeNameInput = document.getElementById('recipe-name');
+    if (recipeNameInput) {
+      recipeNameInput.addEventListener('blur', () => {
+        if (!slugInput.value && recipeNameInput.value) {
+          const generatedSlug = generateSlug(recipeNameInput.value);
+          slugInput.value = generatedSlug;
+          slugInput.dispatchEvent(new Event('input')); // Trigger validation
+        }
+      });
+    }
+
     clearTimeout(checkTimeout);
-    const slug = e.target.value.toLowerCase();
+   let slug = e.target.value.toLowerCase();
     
-    // Update preview
-    const preview = document.getElementById('slug-preview');
-    if (preview) {
-      preview.textContent = `/@${currentUser.username}/${slug}`;
+    // ✅ If empty, auto-generate from recipe name
+    if (!slug) {
+      const recipeNameInput = document.getElementById('recipe-name');
+      if (recipeNameInput && recipeNameInput.value) {
+        slug = generateSlug(recipeNameInput.value);
+        slugInput.value = slug;
+        
+        if (!slug) {
+          slugFeedback.textContent = '⚠️ Recipe name needed to generate slug';
+          slugFeedback.className = 'slug-feedback warning';
+          return;
+        }
+      } else {
+        slugFeedback.textContent = '⚠️ Enter a recipe name first';
+        slugFeedback.className = 'slug-feedback warning';
+        return;
+      }
     }
     
     // Debounce availability check
+   // ✅ Check availability in localStorage (no DB call)
     checkTimeout = setTimeout(async () => {
-      if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
-        slugFeedback.textContent = '❌ Only lowercase letters, numbers, and hyphens';
-        slugFeedback.className = 'slug-feedback error';
-        return;
-      }
-      
-      const token = await getToken();
-      const response = await fetch(
-        `/.netlify/functions/check-recipe-slug?slug=${slug}&recipeId=${recipe.id}`,
-        {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }
+      const recipes = await loadRecipes();
+      const slugTaken = recipes.some(r => 
+        r.id !== recipe.id && 
+        (r.fullSlug === slug || r.slug === slug)
       );
       
-      const result = await response.json();
-      
-      if (result.available) {
+      if (slugTaken) {
+        slugFeedback.textContent = '❌ This slug is already in use';
+        slugFeedback.className = 'slug-feedback error';
+      } else {
         slugFeedback.textContent = '✅ Available!';
         slugFeedback.className = 'slug-feedback success';
-      } else {
-        slugFeedback.textContent = '❌ You already have a recipe with this slug';
-        slugFeedback.className = 'slug-feedback error';
       }
     }, 500);
   });

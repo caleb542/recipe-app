@@ -7,6 +7,7 @@ import {
 import {
     getImageGroup
 } from './unsplash.js';
+
 import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
 import { updateRecipeInDatabase } from './backend/updateRecipeInDatabase.js';
 import { syncRecipeUpdate } from './helpers/syncRecipe.js'
@@ -252,43 +253,48 @@ function migrateRecipeImages(recipe) {
   return recipe;
 }
 
-const loadRecipes = async () => {
+const loadRecipes = async (forceRefresh = false) => {
   const raw = localStorage.getItem('recipes');
-
-  if (raw) {
-    console.log('📦 Getting recipes from localStorage');
-
+  const timestamp = localStorage.getItem('recipes_timestamp');
+  
+  // ✅ Check if cache is fresh (5 minutes)
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  const isCacheFresh = timestamp && (Date.now() - parseInt(timestamp)) < CACHE_DURATION;
+  
+  // ✅ Use cache if available and fresh
+  if (raw && !forceRefresh && isCacheFresh) {
+    console.log('📦 Using cached recipes (age: ' + Math.round((Date.now() - parseInt(timestamp)) / 1000) + 's)');
+    
     try {
       let parsed = JSON.parse(raw);
-
+      
       if (Array.isArray(parsed)) {
-        console.log('✅ Parsed recipes successfully');
-        
-        // ✅ Migrate recipes to new format
+        // Migrate recipes to new format
         parsed = parsed.map(recipe => migrateRecipeImages(recipe));
-        
-        // Save migrated recipes back to localStorage
-        localStorage.setItem('recipes', JSON.stringify(parsed));
-        
         return parsed;
       } else {
-        console.warn('⚠️ Parsed data is not an array:', parsed);
-        return [];
+        console.warn('⚠️ Cached data is not an array');
+        // Fall through to fetch fresh data
       }
     } catch (e) {
-      console.error('❌ Failed to parse recipes from localStorage:', e);
-      return [];
+      console.error('❌ Failed to parse cached recipes:', e);
+      // Fall through to fetch fresh data
     }
   }
 
-  console.log('🌐 Fetching recipes from database');
+  // ✅ Fetch fresh data from database
+  console.log('🌐 Fetching recipes from database' + (forceRefresh ? ' (forced refresh)' : ' (cache expired/missing)'));
   const recipes = await getRecipesFromDatabase();
   
-  // ✅ Recipes are already migrated by the backend
+  // ✅ Save to cache with timestamp
+  localStorage.setItem('recipes', JSON.stringify(recipes));
+  localStorage.setItem('recipes_timestamp', Date.now().toString());
+  console.log('💾 Cached ' + recipes.length + ' recipes');
+  
   return recipes;
 };
 
-export { loadRecipes };
+
 
 
 const loadRecipesFromLocalStorage = async () => {
@@ -720,6 +726,7 @@ export {
     sortRecipes,
     saveRecipes,
     getTimestamp,
+    loadRecipes,
     loadRecipesFromLocalStorage,
     loadNewRecipeFromLocalStorage,
     saveNewRecipeToLocalStorage,

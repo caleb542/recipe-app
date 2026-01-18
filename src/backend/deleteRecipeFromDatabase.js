@@ -1,6 +1,7 @@
 
 import { Notyf } from 'notyf'
 const notyf = new Notyf();
+import { getToken } from '../auth/auth0.js';
 import 'notyf/notyf.min.css'; 
 
 
@@ -13,13 +14,22 @@ export async function deleteRecipeFromDatabase() {
   if (!confirmed) return;
 
   try {
+    // Get auth token
+    const token = await getToken();
+
     const response = await fetch('/.netlify/functions/deleteRecipe', {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` // ✅ Add auth header
+      },
       body: JSON.stringify({ id: recipe.id })
     });
 
-    if (!response.ok) throw new Error('Delete failed');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Delete failed');
+    }
 
     // ✅ Clear localStorage
     localStorage.removeItem('editingRecipe');
@@ -28,7 +38,7 @@ export async function deleteRecipeFromDatabase() {
     notyf.success("Recipe deleted from database.");
     setTimeout(() => {
           window.location.href = '/'; // or wherever you want to go
-      }, 2500); // 1.5 seconds gives the toast time to animate
+      }, 2000); // 1.5 seconds gives the toast time to animate
   } catch (err) {
     console.error("❌ Delete failed:", err);
     notyf.error("Failed to delete recipe.");

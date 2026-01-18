@@ -14,6 +14,10 @@
 @use './styles/splash';
 @use './styles/edit-page';
 @use './styles/spinner';
+@use './styles/impersonation-banner';
+@use './styles/recipe-badges';
+@use './styles/recipe-me';
+
 
 @import './design-tokens.css';
 // Import Google Fonts
@@ -121,9 +125,12 @@ article {
     border: 0px dashed #333;
     padding: 1em 0;
 }
+.list-container {
+   filter: drop-shadow(0px 4px 6px black);
 
+}
 .shoppinglist-container {
-    padding: 1rem 1rem;
+    padding: 1rem 1rem 3rem 1rem;
     background: $cSet2_bg;
     min-height: 8rem;
     border: 0;
@@ -132,6 +139,8 @@ article {
     left: 0;
     transition: all 0.3s;
     border: 0;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 80% 85%, 60% 100%, 40% 85%, 20% 100%, 0% 85%);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 95% 90%, 90% 100%, 85% 90%, 80% 100%, 75% 90%, 70% 100%, 65% 90%, 60% 100%, 55% 90%, 50% 100%, 45% 90%, 40% 100%, 35% 90%, 30% 100%, 25% 90%, 20% 100%, 25% 90%, 20% 100%, 15% 90%, 10% 100%, 5% 90%, 0% 100%);
 }
 
 .shoppinglist-container.hide {
@@ -332,7 +341,7 @@ article {
 /* Recipe Images Grid */
 .recipe-images-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
     gap: 1rem;
     margin: 2rem 0;
     grid-auto-flow: dense;
@@ -371,8 +380,94 @@ article {
 
 /* Profile Page Styles */
 .profile-page {
+    font-family:'Poppins', sans-serif;
     padding: 2rem 0;
     min-height: calc(100vh - 200px);
+
+    :is(h1,h2,h3,h4) {
+        font-family:'Poppins';
+    }
+    section {
+        box-shadow:0px 4px 10px 0 rgb(0 0 0 / 25%);
+        margin-bottom:2rem;
+        padding: 1.25rem;
+        position: relative;
+    }
+    .recipe-grid {
+        display:grid;
+        grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
+        gap:1rem;
+        margin-bottom:2rem;
+    }
+    .btn-create-recipe {
+        position:absolute;
+        top:1rem;
+        right:1rem;
+
+        margin-top: 1rem;
+        padding: 0.625rem 1.5rem;
+        background: #f59e0b;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        padding: 0.5rem 1.5rem;
+        background: #3498db;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 0.9rem;
+
+        &:hover {
+            background: #2980b9;
+            text-decoration: none;
+        }
+
+         
+   
+    }
+    .about-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap:2rem;
+
+            >div:nth-child(2) {
+                background-color:hsl(120,50%,80%);
+                padding:1rem;
+            }
+    }
+    .recipe-card {
+        display: inline-flex;
+        flex-direction:column;
+        gap: 1rem;
+        box-shadow:0 0 20px 0 rgb(0 0 0 / 25%);
+
+    }
+    
+    .recipe-card-image {
+        // max-width:100%;
+        height:auto;
+        aspect-ratio:unset;
+    }
+
+    .recipe-card-content {
+        padding: 0 0.5rem 1rem 0.5rem;
+        white-space: normal;
+    }
+    ul {
+        display:flex;
+        padding:0;
+        list-style:none;
+        gap:1rem;
+
+        & li {
+            display:flex;
+            flex-direction: column-reverse;
+            align-items:center;
+            justify-content:center;
+        }
+    }
 }
 
 .profile-card {
@@ -380,7 +475,7 @@ article {
     border-radius: 1rem;
     padding: 2rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
+    // max-width: 800px;
     margin: 0 auto;
 }
 
@@ -419,6 +514,7 @@ article {
         border-radius: 50%;
         object-fit: cover;
     }
+   
 }
 
 .avatar-upload-btn {
@@ -448,7 +544,9 @@ article {
 .profile-info {
     flex: 1;
 }
-
+.profile-section:has(.empty-state){
+    position:relative;
+}
 .profile-display-name {
     font-size: 2rem;
     font-weight: 700;

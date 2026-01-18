@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading...</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: system-ui;
+      margin: 0;
+      background: #f8f9fa;
+    }
+  </style>
+  <script>
+    // Client-side router for recipe slugs
+    const path = window.location.pathname;
+    
+    // Known static pages - don't redirect these
+    const staticPages = [
+      '/',
+      '/index.html',
+      '/article.html',
+      '/edit.html', 
+      '/profile.html',
+      '/admin.html',
+      '/admin',
+      '/callback.html',
+      '/callback'
+    ];
+    
+    // Check if it's a static file (has extension)
+    const hasExtension = /\.(js|css|png|jpg|jpeg|svg|ico|woff|woff2|ttf|map|json)$/.test(path);
+    
+    // If not a known page and not a file, treat as recipe slug
+    if (!staticPages.includes(path) && !hasExtension) {
+      const slug = path.substring(1).replace(/\/$/, ''); // Remove leading / and trailing /
+      console.log('🔀 Routing slug to article page:', slug);
+      window.location.replace('/article.html?slug=' + encodeURIComponent(slug));
+    } else {
+      // Shouldn't get here, but redirect to home as fallback
+      console.warn('Router caught unknown route:', path);
+      window.location.replace('/');
+    }
+  </script>
+</head>
+<body>
+  <p>Loading recipe...</p>
+</body>
+</html>

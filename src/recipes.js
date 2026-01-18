@@ -4,42 +4,64 @@ import {
 } from 'uuid';
 import { getFilters } from './filters.js'
 import { loadRecipes, saveRecipes, sortRecipes, getFeaturedImage } from './functions.js';
-import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js'
+import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
+import { generateRecipeBadges } from './components/RecipeBadges.js';
+import { isAuthenticated, getUser, isAuthor } from './auth/auth0.js';
 
 let listRecipes = async () => {
   let recipes = await getRecipesFromDatabase();
   saveRecipes(recipes);
   recipes = await loadRecipes();
 
+  // ✅ Get current user
+  const authenticated = await isAuthenticated();
+  let currentUserId = null;
+  
+  if (authenticated) {
+    console.log("✅ AUTHENTICATED")
+    const user = await getUser();
+     console.log("✅ USER:", user);
+    currentUserId = user?.sub;
+    console.log('Cur User ID: ', currentUserId);
+  }
+
   const filters = getFilters();
   recipes = sortRecipes(filters.sortBy, recipes);
+ let yescount = 0;
+ let nocount = 0;
 
-  // FILTER LOGIC
-  recipes = recipes.filter(function (recipe) {
-    // ✅ Handle Uncategorized filter FIRST
-    if (filters.showUncategorized) {
-      return !recipe.categories || recipe.categories.length === 0;
-    }
+  // ✅ Filter out incomplete recipes (except own drafts)
+ recipes = recipes.filter(function (recipe) {
+  // ✅ Handle Uncategorized filter FIRST
+  if (filters.showUncategorized) {
+    return !recipe.categories || recipe.categories.length === 0;
+  }
 
-    // FILTER WITH SEARCH TEXT
-    const search = filters.searchText.toLowerCase();
-    
-    // If no search text, show all
-    if (!search) {
-      return true;
-    }
-    
-    const matchName = recipe.name?.toLowerCase().includes(search);
-    const matchAuthor = recipe.author?.name?.toLowerCase().includes(search);
+  // ✅ Handle category filter (exact match) - BEFORE checking searchText
+  if (filters.categoryFilter) {
+    const recipeCategories = Array.isArray(recipe.categories)
+      ? recipe.categories.map(cat => cat.toLowerCase())
+      : [];
+    return recipeCategories.includes(filters.categoryFilter);
+  }
 
-    // Handle both old categories and new category/tags
-    const matchCategories = Array.isArray(recipe.categories)
-      ? recipe.categories.join(" ").toLowerCase().includes(search)
-      : (recipe.categories || "").toLowerCase().includes(search);
+  // ✅ Handle text search (searches name, author, categories)
+  const search = filters.searchText.toLowerCase();
+  
+  // If no search text AND no category filter, show all
+  if (!search) {
+    return true;
+  }
+  
+  const matchName = recipe.name?.toLowerCase().includes(search);
+  const matchAuthor = recipe.author?.name?.toLowerCase().includes(search);
 
-    return matchName || matchAuthor || matchCategories;
-  });
+  const matchCategories = Array.isArray(recipe.categories)
+    ? recipe.categories.some(cat => cat.toLowerCase().includes(search))
+    : false;
 
+  return matchName || matchAuthor || matchCategories;
+});
   // Clear everything out
   const cardIndex = document.querySelector("#recipes");
   cardIndex.innerHTML = '';
@@ -58,10 +80,10 @@ let listRecipes = async () => {
       let name = recipe.name;
       let description = recipe.description;
 
-      // Create DOM cards
+      // ✅ FIXED: Use simple slug format
       const recipeLink = recipe.fullSlug 
-        ? `/article.html#${recipe.id}`
-        : `/${recipe.fullSlug}`;  // Fallback
+        ? `/${recipe.fullSlug}`           // New: /carbonara
+        : `/article.html#${recipe.id}`;   // Fallback: old hash format
 
       let cardAnchor = document.createElement('a');
       cardAnchor.setAttribute('href', recipeLink);
@@ -103,6 +125,11 @@ let listRecipes = async () => {
       image.setAttribute('src', `${photoURL}`);
       image.setAttribute('alt', `Photo of ${recipe.name}`);
       image.setAttribute('description', `Decorative image relating to ${recipe.name}`);
+
+      const badges = generateRecipeBadges(recipe, currentUserId);
+      if (badges) {
+        article.insertAdjacentHTML('afterbegin', badges);
+      }
     });
   } else {
     const cardIndex = document.querySelector("#recipes");

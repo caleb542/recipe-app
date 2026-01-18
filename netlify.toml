@@ -1,4 +1,4 @@
-# netlify.toml - WITH CACHE HEADERS AND CLEAN URL REDIRECTS
+# netlify.toml - NO CACHE VERSION FOR DEBUGGING
 
 [build.environment]
 SECRETS_SCAN_OMIT_KEYS = "AUTH0_CLIENT_ID,AUTH0_DOMAIN"
@@ -8,9 +8,9 @@ command = "npm run dev"
 targetPort = 8888
 port = 8080
 functions = "netlify/functions"
-autoLaunch = false  # ✅ Add this
-#framework = "#custom"
-#framework = "#custom"
+autoLaunch = false
+framework = "#static" 
+
 
 [functions]
 directory = "netlify/functions"
@@ -22,79 +22,56 @@ publish = "public"
 command = "npm run build"
 
 # ========================================
-# CLEAN URL REDIRECTS (MUST BE FIRST!)
+# CLEAN URL REDIRECTS
 # ========================================
 
-# /@username/slug → article page
-[[redirects]]
-  from = "/@:username/:slug"
-  to = "/article.html?user=:username&slug=:slug"
-  status = 200
-  force = true
+# Static pages - serve as-is
+# [[redirects]]
+#  from = "/index.html"
+#  to = "/index.html"
+#  status = 200
 
-# /@username → profile page
-[[redirects]]
-  from = "/@:username"
-  to = "/profile.html?username=:username"
-  status = 200
+# [[redirects]]
+#  from = "/edit.html"
+#  to = "/edit.html"
+#  status = 200
 
-# Backward compatibility: old hash-based URLs still work
-[[redirects]]
-  from = "/article.html"
-  to = "/article.html"
-  status = 200
+# [[redirects]]
+#  from = "/profile.html"
+#  to = "/profile.html"
+#  status = 200
 
-[[redirects]]
-  from = "/profile.html"
-  to = "/profile.html"
-  status = 200
+# [[redirects]]
+#  from = "/article.html"
+#  to = "/article.html"
+#  status = 200
+
+# [[redirects]]
+#  from = "/admin.html"
+#  to = "/admin.html"
+#  status = 200
+
+# Auth0 callback
+# [[redirects]]
+#  from = "/callback"
+#  to = "/callback.html"
+#  status = 200
+#  force = true
+
+# Simple slug-based recipe URLs
+#[[redirects]]
+#  from = "/:slug"
+#  to = "/article.html?slug=:slug"
+#  status = 200
+#  force = false
 
 # ========================================
-# SPA fallback - ONLY for non-@ paths
+# NO CACHE HEADERS (FOR DEBUGGING)
 # ========================================
 
-# First, handle all the @ paths (already done above)
-# Then catch everything else EXCEPT @ paths
-
-
-
-  
-# ========================================
-# CACHE HEADERS FOR STATIC ASSETS
-# ========================================
-
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    # 1 year cache for hashed assets (CSS, JS with version hashes)
-
-[[headers]]
-  for = "/images/*"
-  [headers.values]
-    Cache-Control = "public, max-age=2592000"
-    # 30 days for images
-
-[[headers]]
-  for = "/*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
-    # 7 days for CSS
-
-[[headers]]
-  for = "/*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
-    # 7 days for JS
-
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-    # Always revalidate HTML
-
-[[headers]]
-  for = "/partials/*"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
-    # 1 hour for partials/templates
+# [[headers]]
+#  for = "/*"
+#  [headers.values]
+#    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+#    Pragma = "no-cache"
+#    Expires = "0"

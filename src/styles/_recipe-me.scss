@@ -308,8 +308,8 @@ button:disabled {
   background: var(--surface-card);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-sm);
+  // padding: var(--space-6);
+  // box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
 }
 

@@ -31,10 +31,13 @@
             background: transparent;
         }
     }
-
+    article header {
+        background:#fff;
+    }
     article header .header__title {
         text-align: left;
         font-size: 1.5rem;
+       
     }
 
     #preview-dialog #like-button {

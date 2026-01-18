@@ -6,9 +6,9 @@ export function appendSpinner(container = 'container') {
   
   const spinner = document.createElement('div');
   spinner.id = 'spinner';
-      spinner.innerHTML =  `<div class="spinner-container"> <i class="fa fa-hat-chef"></i>
+      spinner.innerHTML =  `<div class="spinner-container">
                                 <div class="spinner-container__outer">
-                                    <div class="spinner-column"> <span style="background-image:url(/assets/hat-chef.svg)"></span></div>
+                                    <div class="spinner-column"></div>
                                     <div class="spinner-container__inner">
                                         <p>LOADING</p>
                                       

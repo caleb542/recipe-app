@@ -1,6 +1,5 @@
-// import "./style.scss";
-import "./recipe-me.scss"
-import { loadRecipesFromLocalStorage, hamburger, getFeaturedImage, getAllImages, hideWarning } from "./functions.js";
+import "./style.scss";
+import { loadRecipes, hamburger, getFeaturedImage, getAllImages, hideWarning, loadRecipesFromLocalStorage } from "./functions.js";
 import { marked } from "marked";
 import { setupShoppingList } from "./helpers/shoppingList.js";
 import { initAuth0, getToken, isAuthenticated, getUser } from './auth/auth0.js';
@@ -11,13 +10,35 @@ import { loadUserProfile, getUserProfile } from './userContext.js';
 import { autoEmbedVideos } from './helpers/youtubeEmbed.js';
 import { loadHeader } from './components/HeaderComponent.js';
 import { appendSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
 
-// ✅ NEW: Check for slug-based URL first
+
+
+// ✅ Wait for DOM before doing anything
+if (document.readyState === 'loading') {
+  await new Promise(resolve => {
+    document.addEventListener('DOMContentLoaded', resolve);
+  });
+}
+
+// ✅ Extract slug from URL pathname or query string
+let slug = null;
+
+// Try query string first
 const urlParams = new URLSearchParams(window.location.search);
-const username = urlParams.get('user');
-const slug = urlParams.get('slug');
+slug = urlParams.get('slug');
 
-// Fallback to hash-based URL
+// If not in query, extract from pathname
+if (!slug && window.location.pathname !== '/' && window.location.pathname !== '/article.html') {
+  slug = window.location.pathname.substring(1);
+  if (slug.endsWith('/')) {
+    slug = slug.slice(0, -1);
+  }
+}
+
+console.log("Slug:", slug);
+console.log("Pathname:", window.location.pathname);
+
 const recipeId = location.hash.substring(1);
 
 let recipes;
@@ -26,6 +47,18 @@ let articleHydrated = false;
 
 await loadHeader();
 hideWarning();
+
+// ✅ Query DOM for container
+const container = document.querySelector(".template-container");
+
+if (!container) {
+  console.error("❌ CRITICAL: .template-container not found in DOM!");
+  document.body.innerHTML = '<div style="padding: 2rem; text-align: center;">Error loading page. Please refresh.</div>';
+  throw new Error('Container element missing');
+}
+
+console.log("✅ Container found:", container);
+appendSpinner(container);
 
 // Initialize Auth0
 await initAuth0();
@@ -36,6 +69,7 @@ if (authenticated) {
 
 await updateAuthUI();
 setupAuthListeners();
+initImpersonationBanner();
 
 // Add storage listener
 window.addEventListener("storage", e => {
@@ -43,60 +77,57 @@ window.addEventListener("storage", e => {
     fetchRecipes();
   }
 });
-  const container = document.querySelector(".template-container");
 
-  appendSpinner(container);
-
-// ✅ NEW: Entry point - handle both URL formats
+// ✅ Entry point - handle both URL formats
 async function fetchRecipes() {
-  if (username && slug) {
-    // New slug-based URL: /@username/slug
-    await loadRecipeBySlug(username, slug);
+  if (slug) {
+    // New simple slug URL: /carbonara
+    await loadRecipeBySlug(slug);
   } else if (recipeId) {
     // Old hash-based URL: /article.html#recipe-123
     recipes = await loadRecipesFromLocalStorage();
-
-    removeSpinner(7000)
     await hydrateArticle(recipes);
   } else {
     // No recipe specified
+    removeSpinner(0);
     location.assign("/index.html");
   }
 }
 
 fetchRecipes();
 
-// ✅ NEW: Load recipe by slug from backend
-async function loadRecipeBySlug(username, slug) {
+// ✅ Load recipe by simple slug
+async function loadRecipeBySlug(slug) {
+
   try {
-    const fullSlug = `${username}/${slug}`;
-    const response = await fetch(
-      `/.netlify/functions/recipe-by-slug?fullSlug=${encodeURIComponent(fullSlug)}`
-    );
+    const token = await getToken();
+    const headers = {};
     
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(
+      `/.netlify/functions/recipe-by-slug?slug=${encodeURIComponent(slug)}`,
+      { headers } 
+    );
+
     if (!response.ok) {
-      if (response.status === 404) {
-        console.error('Recipe not found');
-        location.assign("/index.html");
-      } else {
-        console.error('Failed to load recipe');
-        location.assign("/index.html");
-      }
+      console.error('Recipe not found:', response.status);
+      removeSpinner(0);
+      location.assign("/index.html");
       return;
     }
     
     const recipe = await response.json();
-    
-    // Convert to array format for hydrateArticle
     const recipesArray = [recipe];
-    
-    // Update global recipeId for other functions
     window.currentRecipeId = recipe.id;
     
     await hydrateArticle(recipesArray, recipe.id);
     
   } catch (error) {
     console.error('Load by slug failed:', error);
+    removeSpinner(0);
     location.assign("/index.html");
   }
 }
@@ -116,20 +147,24 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
     : null;
 
   if (!recItem) {
+    removeSpinner(0);
     location.assign("/index.html");
     return;
   }
 
-  // ✅ NEW: Update URL to clean format if loaded via hash
-  if (!username && !slug && recItem.fullSlug) {
-    const newUrl = `/@${recItem.fullSlug}`;
+  // ✅ Update URL to clean format if loaded via hash
+  if (!slug && recItem.fullSlug) {
+    const newUrl = `/${recItem.fullSlug}`;
     window.history.replaceState({}, '', newUrl);
   }
 
-  // Load and insert template first
+  // Load template
   const res = await fetch("/partials/article-template.html");
   const html = await res.text();
-  removeSpinner(500);
+  
+  // ✅ Remove spinner BEFORE adding content
+  removeSpinner(0);
+  
   container.insertAdjacentHTML("beforeend", html);
 
   const template = document.getElementById("article-template");
@@ -187,7 +222,7 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
           }
         }
       } else if (photoInfo) {
-        photoInfo.innerHTML = ''; // No attribution needed
+        photoInfo.innerHTML = '';
       }
     }
   }
@@ -198,10 +233,10 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
     const allImages = getAllImages(recItem);
 
     // ✅ Filter out featured image if there are fewer than 3 uploaded images
-  const uploadedImages = allImages.filter(img => img.source === 'upload');
-  const displayImages = uploadedImages.length < 3 
-    ? allImages.filter(img => !img.isFeatured) // Exclude featured if < 3 uploads
-    : allImages; // Show all if >= 3 uploads
+    const uploadedImages = allImages.filter(img => img.source === 'upload');
+    const displayImages = uploadedImages.length < 3 
+      ? allImages.filter(img => !img.isFeatured)
+      : allImages;
     
     if (allImages.length > 0) {
       imageGalleryContainer.innerHTML = `
@@ -233,7 +268,7 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
   
   if (summaryContent) {
     let html = marked.parse(recItem.article || "");
-    html = autoEmbedVideos(html); // Auto-embed YouTube/Vimeo
+    html = autoEmbedVideos(html);
     summaryContent.innerHTML = html;
   }
 
@@ -305,7 +340,9 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
   }
 
   // Wire shopping list helper
-  setupShoppingList(recItem, currentRecipeId, "caleb542@gmail.com");
+  const userProfile = getUserProfile();
+  const userEmail = userProfile?.email || '';
+  setupShoppingList(recItem, currentRecipeId, userEmail);
 
   // Initialize likes once
   if (!likesInitialized) {
@@ -313,7 +350,7 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
     likesInitialized = true;
   }
 
-  // Hamburger + storage listener
+  // Hamburger menu
   hamburger();
   articleHydrated = true;
 }
@@ -343,7 +380,7 @@ function formatImageAttribution(image) {
   return attr.photographer;
 }
 
-// Like functionality (unchanged)
+// Like functionality
 async function initializeLikes(recipeId, container) {
   const likeButton = container.querySelector("#like-button");
 
@@ -366,6 +403,10 @@ async function initializeLikes(recipeId, container) {
           if (res.ok) {
             const data = await res.json();
             const countEl = document.getElementById("like-count");
+            if (countEl) {
+              const likesText = data.likes === 1 ? ` ${data.likes} Like` : ` ${data.likes} Likes`;
+              countEl.textContent = likesText;
+            }
           }
         } catch (err) {
           console.log('Could not fetch public like count:', err);
