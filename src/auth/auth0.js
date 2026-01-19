@@ -168,7 +168,14 @@ export const getToken = async () => {
   if (!auth0) {
     throw new Error('Auth0 client not initialized. Call initAuth0() first.');
   }
+  
   try {
+    // ✅ Check if authenticated first
+    const authenticated = await auth0.isAuthenticated();
+    if (!authenticated) {
+      return null; // No token if not logged in
+    }
+    
     return await auth0.getTokenSilently();
   } catch (error) {
     console.error('Error getting token:', error);
