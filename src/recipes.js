@@ -27,41 +27,60 @@ let listRecipes = async () => {
 
   const filters = getFilters();
   recipes = sortRecipes(filters.sortBy, recipes);
- let yescount = 0;
- let nocount = 0;
 
-  // ✅ Filter out incomplete recipes (except own drafts)
- recipes = recipes.filter(function (recipe) {
-  // ✅ Handle Uncategorized filter FIRST
-  if (filters.showUncategorized) {
-    return !recipe.categories || recipe.categories.length === 0;
-  }
+  // ✅ STEP 1: Filter by visibility and completeness
+  recipes = recipes.filter(recipe => {
+    const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
+    const hasDirections = recipe.directions && recipe.directions.length > 0;
+    const isComplete = hasIngredients && hasDirections;
+    
+    // Show all complete recipes (regardless of isPublic)
+    if (isComplete) return true;
+    
+    // For incomplete recipes:
+    // Only show if unpublished (isPublic: false) AND you're the author
+    if (!recipe.isPublic) {
+      const isAuthor = currentUserId && recipe.author?.auth0Id === currentUserId;
+      return isAuthor;
+    }
+    
+    // Hide incomplete published recipes (safety check - shouldn't exist after migration)
+    return false;
+  });
 
-  // ✅ Handle category filter (exact match) - BEFORE checking searchText
-  if (filters.categoryFilter) {
-    const recipeCategories = Array.isArray(recipe.categories)
-      ? recipe.categories.map(cat => cat.toLowerCase())
-      : [];
-    return recipeCategories.includes(filters.categoryFilter);
-  }
+  // ✅ STEP 2: Apply search/category filters
+  recipes = recipes.filter(function (recipe) {
+    // ✅ Handle Uncategorized filter FIRST
+    if (filters.showUncategorized) {
+      return !recipe.categories || recipe.categories.length === 0;
+    }
 
-  // ✅ Handle text search (searches name, author, categories)
-  const search = filters.searchText.toLowerCase();
-  
-  // If no search text AND no category filter, show all
-  if (!search) {
-    return true;
-  }
-  
-  const matchName = recipe.name?.toLowerCase().includes(search);
-  const matchAuthor = recipe.author?.name?.toLowerCase().includes(search);
+    // ✅ Handle category filter (exact match) - BEFORE checking searchText
+    if (filters.categoryFilter) {
+      const recipeCategories = Array.isArray(recipe.categories)
+        ? recipe.categories.map(cat => cat.toLowerCase())
+        : [];
+      return recipeCategories.includes(filters.categoryFilter);
+    }
 
-  const matchCategories = Array.isArray(recipe.categories)
-    ? recipe.categories.some(cat => cat.toLowerCase().includes(search))
-    : false;
+    // ✅ Handle text search (searches name, author, categories)
+    const search = filters.searchText.toLowerCase();
+    
+    // If no search text AND no category filter, show all
+    if (!search) {
+      return true;
+    }
+    
+    const matchName = recipe.name?.toLowerCase().includes(search);
+    const matchAuthor = recipe.author?.name?.toLowerCase().includes(search);
 
-  return matchName || matchAuthor || matchCategories;
-});
+    const matchCategories = Array.isArray(recipe.categories)
+      ? recipe.categories.some(cat => cat.toLowerCase().includes(search))
+      : false;
+
+    return matchName || matchAuthor || matchCategories;
+  });
+
   // Clear everything out
   const cardIndex = document.querySelector("#recipes");
   cardIndex.innerHTML = '';
