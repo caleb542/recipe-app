@@ -2208,10 +2208,6 @@ div#recipes {
     height: inherit;
 }
 
-.card.article {
-    box-shadow: none;
-}
-
 .card a.photographer {
     position: relative;
     color: #000;
@@ -3991,11 +3987,11 @@ dialog #preview-content {
     border:0px solid green;
     
 }
-#preview-dialog #preview-content .card.article {
+#preview-dialog #preview-content .recipe-article > div {
     overflow-x:clip;
     padding:10px;
 }
-.edit-page #preview-content .card.article  header {
+.edit-page #preview-content .recipe-article  header {
     display:flex;
 }
 @container (min-width: 300px) and (max-width: 768px) {
@@ -4013,17 +4009,6 @@ dialog #preview-content {
         aspect-ratio:16/9;
     }
 }
-
-#preview-dialog #preview-content .card.article >:nth-child(odd) {
-    opacity:0.5;
-    translate:-550px 0;
-    animation:slideRight 1s cubic-bezier(0.175, 0.245, 0.5, 1) forwards 0.5s;
-}
-#preview-dialog #preview-content .card.article >:nth-child(even) {
-    
-    animation:slideLeft 1s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
-}
-
 
 @keyframes slideRight {
     from {
