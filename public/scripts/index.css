@@ -2952,7 +2952,7 @@ div#recipes {
 }
 
 .card .text-area {
-  padding: 0;
+  padding: 0 10px;
   margin: 0;
 }
 
@@ -3008,6 +3008,7 @@ div#recipes {
   overflow: hidden;
   height: auto;
   aspect-ratio: 3/2;
+  border-radius: var(--radius-lg);
 }
 
 .article-page .imageElement,
