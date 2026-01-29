@@ -1,3 +1,5 @@
+// Path: netlify/functions/updateRecipe.js
+
 import { getMongoClient } from "./utils/mongoClient.js";
 import { verifyToken, getTokenFromHeader, headers } from './utils/auth.js';
 import { generateUniqueSlug } from './utils/slugGenerator.js';
@@ -177,20 +179,22 @@ export async function handler(event) {
       const updateFields = {
         ...processedUpdates,
         ...slugUpdates,
-        author: processedUpdates.author || {
-          auth0Id: decoded.sub,
-          username: user.username,
-          name: decoded.name,
-          email: decoded.email
-        },
         version: newVersion,
         updatedAt: updatedAt || new Date().toISOString(),
       };
 
-      // ✅ ALWAYS use frontend author if provided
+      // ✅ Clean author object - keep auth0Id for ownership, remove email
       if (updates.author) {
         updateFields.author = {
-          ...updates.author,
+          auth0Id: updates.author.auth0Id || auth0Id,
+          name: updates.author.name,
+          username: user.username
+          // NO email - that's the privacy issue
+        };
+      } else {
+        updateFields.author = {
+          auth0Id: auth0Id,
+          name: decoded.name,
           username: user.username
         };
       }
@@ -253,13 +257,13 @@ export async function handler(event) {
         ...processedUpdates,
         slug,
         fullSlug,
-        author: processedUpdates.author || {
-          auth0Id: decoded.sub,
-          username: user.username,
-          name: name,
-          email: email
+        author: {
+          auth0Id: auth0Id,
+          name: processedUpdates.author?.name || name,
+          username: user.username
+          // NO email - that's the privacy issue
         },
-        displayAuthor: processedUpdates.displayAuthor || decoded.name,
+        displayAuthor: processedUpdates.displayAuthor || name,
         isPublic: processedUpdates.isPublic !== undefined ? processedUpdates.isPublic : true,
         images: processedUpdates.images || [],
         version: 1,

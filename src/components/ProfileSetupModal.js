@@ -1,4 +1,4 @@
-// ProfileSetupModal.js
+// Path: src/components/ProfileSetupModal.js
 // First-time user profile setup modal - Accessible Dialog Version
 
 import { getToken } from '../auth/auth0.js';
@@ -291,8 +291,8 @@ export class ProfileSetupModal {
 
       const user = await response.json();
       
-      // Store user profile
-      localStorage.setItem('userProfile', JSON.stringify(user));
+      // ✅ CHANGED: Only store username (safe data, no PII)
+      localStorage.setItem('username', user.username);
 
       // Success - close and reload
       this.close();

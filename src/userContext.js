@@ -1,4 +1,4 @@
-// userContext.js
+// Path: src/userContext.js
 // Manages user profile state, loading, and impersonation
 
 import { getToken, isAuthenticated, getUser as getAuth0User } from './auth/auth0.js';
@@ -28,14 +28,11 @@ export async function loadUserProfile(skipFetch = false) {
       return null;
     }
 
-    // Try localStorage first (faster)
-    const cached = localStorage.getItem('userProfile');
-    if (cached) {
-      currentUserProfile = JSON.parse(cached);
-    }
+    // ✅ CHANGED: Only check for username in localStorage (safe data)
+    const cachedUsername = localStorage.getItem('username');
     
-    // ✅ Skip fetch if requested or if we have cache
-    if (skipFetch || cached) {
+    // ✅ Skip fetch if requested AND we have cached username
+    if (skipFetch && cachedUsername && currentUserProfile) {
       // ✅ NEW: Check if user is superadmin
       if (currentUserProfile) {
         currentUserProfile.isSuperadmin = SUPERADMINS.includes(currentUserProfile.email);
@@ -48,17 +45,16 @@ export async function loadUserProfile(skipFetch = false) {
     }
     
     // Fetch fresh profile from API
-
-
-const idToken = await getIdTokenClaims();
-console.log("idToken: ", idToken);
-const response = await fetch('/.netlify/functions/user-profile', {
-  headers: {
-    'Authorization': `Bearer ${idToken.__raw}` // Use ID token instead
-  }
-});
-console.log('response',response);
-   if (response.status === 404) {
+    const idToken = await getIdTokenClaims();
+    console.log("idToken: ", idToken);
+    const response = await fetch('/.netlify/functions/user-profile', {
+      headers: {
+        'Authorization': `Bearer ${idToken.__raw}` // Use ID token instead
+      }
+    });
+    console.log('response',response);
+    
+    if (response.status === 404) {
       // Profile doesn't exist - show setup modal
       const data = await response.json();
       if (data.needsSetup) {
@@ -90,9 +86,10 @@ console.log('response',response);
     // ✅ NEW: Add superadmin flag
     profile.isSuperadmin = SUPERADMINS.includes(profile.email);
     
-    // Update cache
+    // ✅ CHANGED: Store only username in localStorage (safe data)
+    // Keep full profile in memory only
     currentUserProfile = profile;
-    localStorage.setItem('userProfile', JSON.stringify(profile));
+    localStorage.setItem('username', profile.username);
 
     console.log('✓ User profile loaded:', profile.username);
     
@@ -243,9 +240,9 @@ export async function updateUserProfile(updates) {
     // ✅ Preserve superadmin flag
     profile.isSuperadmin = SUPERADMINS.includes(profile.email);
     
-    // Update cache
+    // ✅ CHANGED: Update memory and only store username
     currentUserProfile = profile;
-    localStorage.setItem('userProfile', JSON.stringify(profile));
+    localStorage.setItem('username', profile.username);
 
     return profile;
   } catch (error) {
@@ -262,7 +259,8 @@ export function clearUserProfile() {
     actualUser: null,
     effectiveUser: null
   };
-  localStorage.removeItem('userProfile');
+  localStorage.removeItem('userProfile'); // Clean up old key
+  localStorage.removeItem('username');
   sessionStorage.removeItem('impersonation');
 }
 

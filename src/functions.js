@@ -83,19 +83,17 @@ const openDirectionsDialogue = async (id, text) => {
   let recipes = await loadRecipesFromLocalStorage();
   let recipeId = location.hash.substring(1);
   let recItem = recipes.find((recipe) => recipe.id === recipeId);
-  if (recItem && recItem.name) {
-
-} else {
-    console.log("No name for this recipe yet")
-}
+  
+  if (!recItem || !recItem.name) {
+    console.log("No name for this recipe yet");
+  }
 
   const textBox = document.getElementById("enter-next-step");
   textBox.value = text ?? '';
 
-  // Attach input listener ONCE
+  // ✅ Update just the text in the DOM as you type
   textBox.oninput = async function (e) {
     const newText = e.target.value;
-    console.log("Input event fired:", newText);
 
     await syncRecipeUpdate(recipeId, recipe => {
       recipe.directions = recipe.directions.map(d =>
@@ -103,13 +101,10 @@ const openDirectionsDialogue = async (id, text) => {
       );
     });
 
-    // Re-render directions list from updated localStorage
-    const updatedRecipes = await loadRecipesFromLocalStorage();
-    const updatedRec = updatedRecipes.find(r => r.id === recipeId);
-    if (updatedRec) {
-      const directionsList = document.getElementById("directions-list");
-      directionsList.innerHTML = '';
-      listDirections(updatedRec.directions);
+    // Update ONLY the specific direction's text
+    const directionItem = document.querySelector(`li[data-id="${id}"] span`);
+    if (directionItem) {
+      directionItem.textContent = newText;
     }
   };
 
@@ -119,9 +114,19 @@ const openDirectionsDialogue = async (id, text) => {
   });
 
   const closeDialog = document.querySelector(".dialog-close-button");
-  closeDialog.addEventListener('click', function (e) {
+  closeDialog.addEventListener('click', async function (e) {
     e.preventDefault();
     modal.close("Cancelled");
+    
+    // ✅ Re-render full list when closing to ensure everything is synced
+    const updatedRecipes = await loadRecipesFromLocalStorage();
+    const updatedRec = updatedRecipes.find(r => r.id === recipeId);
+    if (updatedRec) {
+      const directionsList = document.getElementById("directions-list");
+      directionsList.innerHTML = '';
+      listDirections(updatedRec.directions);
+    }
+    
     document.querySelector('#add-step').focus();
   });
 };

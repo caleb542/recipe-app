@@ -1,3 +1,5 @@
+// Path: src/backend/updateRecipeInDatabase.js
+
 import { getToken, getUser } from '../auth/auth0.js'; // Adjust path as needed
 import { getUserProfile } from '../userContext.js'; 
 
@@ -19,31 +21,23 @@ export async function updateRecipeInDatabase(recItem, updates) {
     // Get user info for new recipes
     const user = await getUser();
     const profile = getUserProfile(); 
-console.log('🔍 Full Auth0 user:', user);
-console.log('🔍 Full profile:', profile);
-console.log('📧 user.email specifically:', user.email);  // ← ADD THIS
-console.log('📦 Author object being sent:', {
-  auth0Id: user.sub,
-  name: profile?.profile?.displayName || user.name || user.email || 'Unknown User',
-  username: profile?.username || null,
-  email: user.email || null
-});  // ← ADD THIS
+
+    console.log('🔍 Full Auth0 user:', user);
+    console.log('🔍 Full profile:', profile);
+
     const payload = {
-  id,
-  updates: {
-    ...updates,
-    // ✅ Use profile data instead of Auth0 data
-    author: updates.author || {
-      auth0Id: user.sub,
-      name: profile?.profile?.displayName || user.name || user.email || 'Unknown User',
-      username: profile?.username || null,
-      email: user.email || null
-    },
-    // ✅ Add isPublic if not present
-    isPublic: updates.isPublic !== undefined ? updates.isPublic : true
-  },
-  updatedAt: new Date().toISOString()
-};
+      id,
+      updates: {
+        ...updates,
+        // ✅ ONLY send author name - no email, no authId for privacy
+        author: updates.author || {
+          name: profile?.profile?.displayName || user.name || user.email || 'Unknown User'
+        },
+        // ✅ Add isPublic if not present
+        isPublic: updates.isPublic !== undefined ? updates.isPublic : true
+      },
+      updatedAt: new Date().toISOString()
+    };
 
     console.log('📦 Payload:', payload);
 

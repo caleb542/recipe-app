@@ -25,7 +25,15 @@ import { setupVideoHelper } from './helpers/setupVideoHelper.js';
 import { loadHeader } from './components/HeaderComponent.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
 
-
+// Monkey-patch localStorage to catch who's setting userProfile
+const originalSetItem = localStorage.setItem;
+localStorage.setItem = function(key, value) {
+  if (key === 'userProfile') {
+    console.error('🚨 CAUGHT: Something is setting userProfile!');
+    console.trace(); // This will show the stack trace
+  }
+  return originalSetItem.apply(this, arguments);
+};
 loadHeader();
 hideWarning();
 // Initialize auth
