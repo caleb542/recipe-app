@@ -38,17 +38,7 @@ import { loadUserProfile, getUserProfile } from './userContext.js';
 import { loadHeader } from './components/HeaderComponent.js';
 import { appendSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
-// Monkey-patch localStorage to catch who's setting userProfile
-// TRAP: Catch who's setting userProfile
-// const originalSetItem = localStorage.setItem;
-// localStorage.setItem = function(key, value) {
-//   if (key === 'userProfile') {
-//     console.error('🚨 CAUGHT: Something is setting userProfile!');
-//     console.trace();
-//     debugger; // This will pause execution so you can see the exact line
-//   }
-//   return originalSetItem.apply(this, arguments);
-// };
+
 // Load shared header FIRST
 await loadHeader();
 hideWarning();
