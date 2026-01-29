@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { loadRecipes, loadRecipesFromLocalStorage, saveRecipes } from '../functions.js';
 import { openDirectionsDialogue, editDirection, removeDirection } from '../functions.js';
 import { syncRecipeUpdate } from './syncRecipe.js'
+import { sanitizeHTML, sanitizeText } from '../utils/sanitize.js'; 
 
 /**
  * Render all directions for a given recipe
@@ -16,16 +17,16 @@ function listDirections(directions) {
     li.classList.add('direction-step');
     li.dataset.id = step.id;
     li.innerHTML = `
-    <label for="${step.id}"></ <span>${step.text}</span></label> 
+  <label for="${step.id}"><span>${sanitizeText(step.text)}</span></label> 
 
-      <button id="${step.id}" data-id="${step.id}" class="item-buttons edit-direction">
-        <i class="fa fa-pencil" aria-hidden="true"></i> Edit
-      </button> 
+  <button id="${step.id}" data-id="${step.id}" class="item-buttons edit-direction">
+    <i class="fa fa-pencil" aria-hidden="true"></i> Edit
+  </button> 
 
-      <button class="item-buttons remove-direction" data-name="${step.id}" data-id="${step.id}">
-        <i class="fa fa-trash-can"></i> Delete
-      </button>
-    `;
+  <button class="item-buttons remove-direction" data-name="${step.id}" data-id="${step.id}">
+    <i class="fa fa-trash-can"></i> Delete
+  </button>
+`;
     return li;
   });
 

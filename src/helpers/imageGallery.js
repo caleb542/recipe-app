@@ -4,6 +4,7 @@ import { loadRecipes, saveRecipes } from '../functions.js';
 import { optimizeImage, IMAGE_PRESETS } from './imageOptimizer.js';
 import { generateFileHash, checkDuplicateByFilename } from './duplicateCheck.js';
 import { findExistingImage, registerImage, unregisterImageFromRecipe, getImageRegistry } from './globalImageRegistry.js';
+import { sanitizeHTML, sanitizeText } from '../utils/sanitize.js';
 
 const CLOUDINARY_CLOUD_NAME = 'day1f5nz8';
 const CLOUDINARY_UPLOAD_PRESET = 'recipe_images';
@@ -371,18 +372,18 @@ function formatAttribution(image) {
   
   // Unsplash-specific format (required by their guidelines)
   if (image.source === 'unsplash') {
-    return `Photo by <a href="${attr.photographerUrl}" target="_blank" rel="noopener">${attr.photographer}</a> on <a href="https://unsplash.com/?utm_source=recipe_me&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a>`;
+    return sanitizeHTML(`Photo by <a href="${attr.photographerUrl}" target="_blank" rel="noopener">${attr.photographer}</a> on <a href="https://unsplash.com/?utm_source=recipe_me&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a>`);
   }
   
   // User-added attribution
   if (attr.customCredit) {
-    return attr.customCredit;
+    return sanitizeHTML(attr.customCredit);
   }
   
-  let text = `Photo by ${attr.photographer}`;
+  let text = `Photo by sanitizeText(${attr.photographer})`;
   
   if (attr.photographerUrl) {
-    text = `<a href="${attr.photographerUrl}" target="_blank" rel="noopener">${text}</a>`;
+    text = sanitizeHTML(`<a href="${attr.photographerUrl}" target="_blank" rel="noopener">${text}</a>`);
   }
   
   return text;
@@ -397,14 +398,14 @@ function formatAttributionText(image) {
   const attr = image.attribution;
   
   if (image.source === 'unsplash') {
-    return `Photo by ${attr.photographer} on Unsplash`;
+    return `Photo by ${sanitizeText(attr.photographer)} on Unsplash`;
   }
   
   if (attr.customCredit) {
-    return attr.customCredit;
+    return sanitizeText(attr.customCredit);
   }
   
-  return `Photo by ${attr.photographer}`;
+  return `Photo by ${sanitizeText(attr.photographer)}`;
 }
 
 /**
@@ -455,7 +456,7 @@ function showAttributionDialog(currentAttribution) {
             type="text" 
             id="photographer-name" 
             placeholder="e.g., Jane Smith Photography"
-            value="${currentAttribution?.photographer || ''}"
+            value="sanitizeText(${currentAttribution?.photographer || ''})"
           >
         </div>
         
@@ -465,7 +466,7 @@ function showAttributionDialog(currentAttribution) {
             type="url" 
             id="photographer-url" 
             placeholder="https://janesmith.com"
-            value="${currentAttribution?.photographerUrl || ''}"
+            value="sanitizeText(${currentAttribution?.photographerUrl || ''})"
           >
         </div>
         
@@ -475,7 +476,7 @@ function showAttributionDialog(currentAttribution) {
             type="text" 
             id="custom-credit" 
             placeholder="e.g., Photography by Jane Smith"
-            value="${currentAttribution?.customCredit || ''}"
+            value="sanitizeText(${currentAttribution?.customCredit || ''})"
           >
           <small>If blank, will auto-generate from photographer name</small>
         </div>

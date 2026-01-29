@@ -2,6 +2,7 @@ import { deleteRecipeFromDatabase } from '../backend/deleteRecipeFromDatabase.js
 import { updateRecipeInDatabase } from '../backend/updateRecipeInDatabase.js';
 import { loadRecipesFromLocalStorage } from '../functions.js';
 import { Notyf } from 'notyf';
+import { sanitizeHTML, sanitizeText } from '../utils/sanitize.js';
 
 const notyf = new Notyf();
 
@@ -22,7 +23,7 @@ async function showIncompleteWarning(warnings) {
       <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <h2 style="color: #856404; margin-top: 0;">⚠️ Recipe Incomplete</h2>
         <p style="font-size: 1.1rem; margin: 1rem 0; color: #333;">
-          Your recipe is missing: <strong style="color: #856404;">${warnings.join(', ')}</strong>
+          Your recipe is missing: <strong style="color: #856404;">${sanitizeText(warnings.join(', '))}</strong>
         </p>
         <p style="color: #666; margin-bottom: 1.5rem;">
           Recipes without these fields may be confusing or incomplete for readers.

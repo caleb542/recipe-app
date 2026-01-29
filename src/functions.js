@@ -10,7 +10,8 @@ import {
 
 import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
 import { updateRecipeInDatabase } from './backend/updateRecipeInDatabase.js';
-import { syncRecipeUpdate } from './helpers/syncRecipe.js'
+import { syncRecipeUpdate } from './helpers/syncRecipe.js';
+import { sanitizeHTML, sanitizeText } from './utils/sanitize.js';
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 const convertTimestamp = (rDate) => {
     if (typeof rDate === 'object') {
@@ -38,7 +39,7 @@ const listDirections = (directions) => {
 
     directions.forEach((step, index) => {
         const li = document.createElement('li')
-        li.innerHTML = `<label for="${step.id}"></ <span>${step.text}</span></label> 
+        li.innerHTML = `<label for="${step.id}"></ <span>${sanitizeText(step.text)}</span></label> 
 
       <button id="${step.id}" data-id="${step.id}" class="item-buttons edit-direction">
         <i class="fa fa-pencil" aria-hidden="true"></i> Edit
@@ -46,7 +47,7 @@ const listDirections = (directions) => {
 
       <button class="item-buttons remove-direction" data-name="${step.id}" data-id="${step.id}">
         <i class="fa fa-trash-can"></i> Delete
-      </button>`
+      </button>`;
         directionsList.appendChild(li)
     })
 
@@ -499,7 +500,7 @@ export async function renderImageSelector(keyword, pageNumber, recipeId) {
             <img src="${photo.urls.small}" alt="${photo.alt_description || ''}" />
             <div class="photo-info">
               <div class="photo-credit">
-                Photo by <a href="${photo.user.links.html}?utm_source=recipe_me&utm_medium=referral" target="_blank" rel="noopener">${photo.user.name}</a>
+                Photo by <a href="${photo.user.links.html}?utm_source=recipe_me&utm_medium=referral" target="_blank" rel="noopener">${sanitizeText(photo.user.name)}</a>
               </div>
               <button 
                 class="select-photo-btn ${alreadyAdded ? 'btn-already-added' : ''}"

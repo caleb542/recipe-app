@@ -2,6 +2,7 @@
 // Community tips, variations, and helpful context - NOT reviews
 
 import { getToken } from '../auth/auth0.js';
+import { sanitizeHTML, sanitizeText } from '../utils/sanitize.js';
 
 export class CommunityNotes {
   constructor(container, recipeId) {
@@ -140,7 +141,7 @@ export class CommunityNotes {
           </div>
           <div class="your-note-content">
             <div class="note-rating">${'⭐'.repeat(userRating)}</div>
-            <p class="note-text">${this.escapeHtml(userNote)}</p>
+            <p class="note-text">${sanitizeText(userNote)}</p>
           </div>
         </div>
       `;
@@ -168,8 +169,8 @@ export class CommunityNotes {
 
       // Make username clickable if we have the username field
       const userNameDisplay = comment.username 
-        ? `<a href="/profile.html?username=${encodeURIComponent(comment.username)}" class="author-name-link">${this.escapeHtml(comment.userName || 'Anonymous Cook')}</a>`
-        : `<div class="author-name">${this.escapeHtml(comment.userName || 'Anonymous Cook')}</div>`;
+        ? `<a href="/profile.html?username=${encodeURIComponent(comment.username)}" class="author-name-link">${sanitizeText(comment.userName || 'Anonymous Cook')}</a>`
+        : `<div class="author-name">${sanitizeText(comment.userName || 'Anonymous Cook')}</div>`;
 
       return `
         <article class="note-card">
@@ -189,7 +190,7 @@ export class CommunityNotes {
             </div>
           </div>
           <div class="note-body">
-            <p class="note-text">${this.escapeHtml(comment.comment)}</p>
+            <p class="note-text">${sanitizeText(comment.comment)}</p>
           </div>
         </article>
       `;
