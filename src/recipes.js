@@ -8,30 +8,30 @@ import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
 import { generateRecipeBadges } from './components/RecipeBadges.js';
 import { isAuthenticated, getUser, isAuthor } from './auth/auth0.js';
 
-let listRecipes = async () => {
+let listRecipes = async (recipesParam, currentUserId = null) => {
   let recipes = await getRecipesFromDatabase();
   saveRecipes(recipes);
   recipes = await loadRecipes();
 
   // ✅ Get current user (with fallback for public pages)
-  let authenticated = false;
+  let authenticated = !!currentUserId;
   let currentUserId = null;
   
-  try {
-    authenticated = await isAuthenticated();
-    if (authenticated) {
-      console.log("✅ AUTHENTICATED")
-      const user = await getUser();
-      console.log("✅ USER:", user);
-      currentUserId = user?.sub;
-      console.log('Cur User ID: ', currentUserId);
-    }
-  } catch (error) {
-    // Auth0 not initialized - this is fine for public pages
-    console.log('Auth not initialized (public page)');
-    authenticated = false;
-    currentUserId = null;
-  }
+  // try {
+  //   authenticated = await isAuthenticated();
+  //   if (authenticated) {
+  //     console.log("✅ AUTHENTICATED")
+  //     const user = await getUser();
+  //     console.log("✅ USER:", user);
+  //     currentUserId = user?.sub;
+  //     console.log('Cur User ID: ', currentUserId);
+  //   }
+  // } catch (error) {
+  //   // Auth0 not initialized - this is fine for public pages
+  //   console.log('Auth not initialized (public page)');
+  //   authenticated = false;
+  //   currentUserId = null;
+  // }
 
   const filters = getFilters();
   recipes = sortRecipes(filters.sortBy, recipes);
