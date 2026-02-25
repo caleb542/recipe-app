@@ -1161,7 +1161,7 @@ button {
 /* Container */
 
 .container {
-    width: clamp(400px, 100%, 1024px);
+    width: clamp(400px, 100%, 1366px);
     position: relative;
     margin: 0 auto;
     padding: 0 0rem;
@@ -2344,7 +2344,7 @@ h3 {
 }
 
 .home-page .imageElement {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0;
 }
 
 .photoInfo {
@@ -3605,6 +3605,7 @@ form#update #ingredients>ul {
 
     .home-page article h1 {
         font-size: 1rem;
+        text-wrap: pretty;
     }
 
     .home-page article p {

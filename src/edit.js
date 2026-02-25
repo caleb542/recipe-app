@@ -1,7 +1,8 @@
-// Entry point for Recipe Editor
+// /src/edit.js - Entry point for Recipe Editor
 import { v4 as uuidv4 } from 'uuid';
 import { loadRecipes, saveRecipes, hideWarning } from './functions.js';
 import '@toast-ui/editor/dist/toastui-editor.css';
+import { showQuickAddModal } from './helpers/quickAdd.js';
 
 // Helpers
 import { populateFields, wireFieldListeners } from './helpers/fields.js';
@@ -24,10 +25,12 @@ import { initStatusToggle, getCurrentPublishedState } from './helpers/statusTogg
 import { setupVideoHelper } from './helpers/setupVideoHelper.js';
 import { loadHeader } from './components/HeaderComponent.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
+// import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+
 
 
 loadHeader();
-hideWarning();
+
 // Initialize auth
 await initAuth0();
 await loadUserProfile();
@@ -63,6 +66,8 @@ function setUrlBase() {
 
 export async function initEdit(recipeId) {
   const recipes = await loadRecipes();
+  
+hideWarning();
   const recipe = recipes.find(r => r.id === recipeId);
 
   if (!recipe) {
@@ -188,6 +193,9 @@ export async function initCreate() {
   saveRecipes(recipes);
   localStorage.setItem('editingRecipe', JSON.stringify(newRecipe));
 
+   // ✅ Show Quick Add modal FIRST
+  showQuickAddModal(newRecipeId);
+  
   // Orchestration: call helpers
   populateFields(newRecipe);
   setupSlugEditor(newRecipe, currentUser);
@@ -213,6 +221,7 @@ export async function initCreate() {
   setupAccessibility();
   hamburger(); // menu toggle
 }
+
 /**
  * Generate a URL-safe slug from text
  */

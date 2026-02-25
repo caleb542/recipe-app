@@ -13,16 +13,24 @@ let listRecipes = async () => {
   saveRecipes(recipes);
   recipes = await loadRecipes();
 
-  // ✅ Get current user
-  const authenticated = await isAuthenticated();
+  // ✅ Get current user (with fallback for public pages)
+  let authenticated = false;
   let currentUserId = null;
   
-  if (authenticated) {
-    console.log("✅ AUTHENTICATED")
-    const user = await getUser();
-     console.log("✅ USER:", user);
-    currentUserId = user?.sub;
-    console.log('Cur User ID: ', currentUserId);
+  try {
+    authenticated = await isAuthenticated();
+    if (authenticated) {
+      console.log("✅ AUTHENTICATED")
+      const user = await getUser();
+      console.log("✅ USER:", user);
+      currentUserId = user?.sub;
+      console.log('Cur User ID: ', currentUserId);
+    }
+  } catch (error) {
+    // Auth0 not initialized - this is fine for public pages
+    console.log('Auth not initialized (public page)');
+    authenticated = false;
+    currentUserId = null;
   }
 
   const filters = getFilters();
@@ -101,7 +109,7 @@ let listRecipes = async () => {
 
       // ✅ FIXED: Use simple slug format
       const recipeLink = recipe.fullSlug 
-        ? `/${recipe.fullSlug}`           // New: /carbonara
+        ? `/article/${recipe.fullSlug}`           // New: /carbonara
         : `/article.html#${recipe.id}`;   // Fallback: old hash format
 
       let cardAnchor = document.createElement('a');

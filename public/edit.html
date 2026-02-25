@@ -23,10 +23,11 @@
 </head>
 
 <body class="edit-page">
+   
     <div class="page-container">
         <header></header>
         <div class="content-wrap">
-           
+            
             <div class="heading-h2-container edit-header">
                     <div class="edit-header__actions">
                     
@@ -257,23 +258,204 @@
                         </div>
 
                         <div class="form-group checklist">
-                            <h2>Categories</h2>
-                            <ul>
-                                <li>
-                                    <div class="form-group"><label class="checkbox" for="drinks">Drinks</label><input type="checkbox" name="category" id="drinks" value="Drinks"></div>
-                                    </li>
-                                <li>
-                                    <div class="form-group">
-                                        <label class="checkbox"  for="desserts">Desserts</label><input type="checkbox" name="category" id="desserts" value="desserts">
-                                    </div></li>
-                                <li><div class="form-group">
-                                    <label class="checkbox"  for="appetizers">Appetizers</label><input  type="checkbox" name="category" id="appetizers" value="appetizers">
-                                </div></li>
-                                <li><div class="form-group"><label class="checkbox"  for="meals">Meals</label><input type="checkbox" name="category" id="meals" value="meals"></div></li>
-                                <li><div class="form-group"><label class="checkbox"  for="breakfast">Breakfast</label><input type="checkbox" name="category" id="breakfast" value="breakfast"></div></li>
-                                <li><div class="form-group"><label class="checkbox"  for="lunch">Lunch</label><input type="checkbox" name="category" id="lunch"></div></li>
-                                <li><div class="form-group"><label class="checkbox"  for="dinner">Dinner</label><input type="checkbox" name="category" id="dinner" value="dinner"></div></li>
-                            </ul>
+                            <!-- Categories Section for edit.html -->
+                            <div class="form-section categories-section">
+                                <h3>Categories</h3>
+                                <p class="help-text">Select all that apply (multiple selections allowed)</p>
+                                
+                                <!-- Course -->
+                                <div class="category-group">
+                                    <h4>Course</h4>
+                                    <div class="checkbox-grid">
+                                        <label>
+                                            <input type="checkbox" name="category" value="Breakfast & Brunch">
+                                            <span>Breakfast & Brunch</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Appetizers & Starters">
+                                            <span>Appetizers & Starters</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Finger Foods & Party Snacks">
+                                            <span>Finger Foods & Party Snacks</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Main Dishes">
+                                            <span>Main Dishes</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Side Dishes">
+                                            <span>Side Dishes</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Soups & Salads">
+                                            <span>Soups & Salads</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Desserts & Sweets">
+                                            <span>Desserts & Sweets</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Drinks -->
+                                <div class="category-group">
+                                    <h4>Drinks</h4>
+                                    <div class="checkbox-grid">
+                                        <label>
+                                            <input type="checkbox" name="category" value="Cocktails">
+                                            <span>Cocktails</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Mocktails & Non-Alcoholic">
+                                            <span>Mocktails & Non-Alcoholic</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Hot Beverages">
+                                            <span>Hot Beverages</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Cuisine -->
+                                <div class="category-group">
+                                    <h4>Cuisine</h4>
+                                    <div class="checkbox-grid">
+                                        <label>
+                                            <input type="checkbox" name="category" value="Italian">
+                                            <span>Italian</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Mexican">
+                                            <span>Mexican</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Asian">
+                                            <span>Asian</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Mediterranean">
+                                            <span>Mediterranean</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="American">
+                                            <span>American</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="French">
+                                            <span>French</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dietary -->
+                                <div class="category-group">
+                                    <h4>Dietary</h4>
+                                    <div class="checkbox-grid">
+                                        <label>
+                                            <input type="checkbox" name="category" value="Vegetarian">
+                                            <span>Vegetarian</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Vegan">
+                                            <span>Vegan</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Gluten-Free">
+                                            <span>Gluten-Free</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Dairy-Free">
+                                            <span>Dairy-Free</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Nut-Free">
+                                            <span>Nut-Free</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Keto">
+                                            <span>Keto</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Occasions -->
+                                <div class="category-group">
+                                    <h4>Occasions</h4>
+                                    <div class="checkbox-grid">
+                                        <label>
+                                            <input type="checkbox" name="category" value="Quick & Easy">
+                                            <span>Quick & Easy (under 30 min)</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Party & Entertaining">
+                                            <span>Party & Entertaining</span>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="category" value="Holiday & Special Occasions">
+                                            <span>Holiday & Special Occasions</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <style>
+                            .categories-section {
+                                margin: 2rem 0;
+                            }
+
+                            .category-group {
+                                margin-bottom: 2rem;
+                            }
+
+                            .category-group h4 {
+                                font-size: 0.875rem;
+                                font-weight: 700;
+                                color: #6b7280;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                                margin-bottom: 0.75rem;
+                                padding-bottom: 0.5rem;
+                                border-bottom: 2px solid #fbbf24;
+                            }
+
+                            .checkbox-grid {
+                                display: grid;
+                                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                                gap: 0.75rem;
+                            }
+
+                            .checkbox-grid label {
+                                display: flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                                cursor: pointer;
+                                padding: 0.5rem;
+                                border-radius: 0.25rem;
+                                transition: background-color 0.2s;
+                            }
+
+                            .checkbox-grid label:hover {
+                                background-color: #f9fafb;
+                            }
+
+                            .checkbox-grid input[type="checkbox"] {
+                                width: 1.25rem;
+                                height: 1.25rem;
+                                cursor: pointer;
+                            }
+
+                            .checkbox-grid span {
+                                font-size: 0.95rem;
+                                color: #374151;
+                            }
+
+                            .help-text {
+                                color: #6b7280;
+                                font-size: 0.875rem;
+                                margin-bottom: 1.5rem;
+                            }
+                            </style>
                         </div>
                         </div>
                          <div class="form-group">

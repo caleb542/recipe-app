@@ -1,4 +1,4 @@
-# netlify.toml - NO CACHE VERSION FOR DEBUGGING
+# netlify.toml - Recipe Me Configuration
 
 [build.environment]
 SECRETS_SCAN_OMIT_KEYS = "AUTH0_CLIENT_ID,AUTH0_DOMAIN"
@@ -11,7 +11,6 @@ functions = "netlify/functions"
 autoLaunch = false
 framework = "#static" 
 
-
 [functions]
 directory = "netlify/functions"
 node_bundler = "esbuild"
@@ -21,57 +20,201 @@ external_node_modules = ["mongodb"]
 publish = "public"
 command = "npm run build"
 
+
 # ========================================
-# CLEAN URL REDIRECTS
+# AUTH0 CALLBACK - Must be first
 # ========================================
 
-# Static pages - serve as-is
-# [[redirects]]
-#  from = "/index.html"
-#  to = "/index.html"
-#  status = 200
+[[redirects]]
+  from = "/callback"
+  to = "/callback.html"
+  status = 200
+  force = true
 
-# [[redirects]]
-#  from = "/edit.html"
-#  to = "/edit.html"
-#  status = 200
 
-# [[redirects]]
-#  from = "/profile.html"
-#  to = "/profile.html"
-#  status = 200
+# ========================================
+# PROFILE PAGES
+# ========================================
 
-# [[redirects]]
-#  from = "/article.html"
-#  to = "/article.html"
-#  status = 200
+[[redirects]]
+  from = "/@:username"
+  to = "/profile.html?username=:username"
+  status = 200
+  force = false
 
-# [[redirects]]
-#  from = "/admin.html"
-#  to = "/admin.html"
-#  status = 200
 
-# Auth0 callback
-# [[redirects]]
-#  from = "/callback"
-#  to = "/callback.html"
-#  status = 200
-#  force = true
+# ========================================
+# CATEGORY PAGES - COURSE (7)
+# ========================================
 
-# Simple slug-based recipe URLs
+[[redirects]]
+  from = "/category/breakfast-and-brunch"
+  to = "/category.html?category=breakfast-and-brunch"
+  status = 200
+
+[[redirects]]
+  from = "/category/appetizers-and-starters"
+  to = "/category.html?category=appetizers-and-starters"
+  status = 200
+
+[[redirects]]
+  from = "/category/finger-foods-and-party-snacks"
+  to = "/category.html?category=finger-foods-and-party-snacks"
+  status = 200
+
+[[redirects]]
+  from = "/category/main-dishes"
+  to = "/category.html?category=main-dishes"
+  status = 200
+
+[[redirects]]
+  from = "/category/side-dishes"
+  to = "/category.html?category=side-dishes"
+  status = 200
+
+[[redirects]]
+  from = "/category/soups-and-salads"
+  to = "/category.html?category=soups-and-salads"
+  status = 200
+
+[[redirects]]
+  from = "/category/desserts-and-sweets"
+  to = "/category.html?category=desserts-and-sweets"
+  status = 200
+
+# ========================================
+# CATEGORY PAGES - DRINKS (3)
+# ========================================
+
+[[redirects]]
+  from = "/category/cocktails"
+  to = "/category.html?category=cocktails"
+  status = 200
+
+[[redirects]]
+  from = "/category/mocktails-and-non-alcoholic"
+  to = "/category.html?category=mocktails-and-non-alcoholic"
+  status = 200
+
+[[redirects]]
+  from = "/category/hot-beverages"
+  to = "/category.html?category=hot-beverages"
+  status = 200
+
+# ========================================
+# CATEGORY PAGES - CUISINE (6)
+# ========================================
+
+[[redirects]]
+  from = "/category/italian"
+  to = "/category.html?category=italian"
+  status = 200
+
+[[redirects]]
+  from = "/category/mexican"
+  to = "/category.html?category=mexican"
+  status = 200
+
+[[redirects]]
+  from = "/category/asian"
+  to = "/category.html?category=asian"
+  status = 200
+
+[[redirects]]
+  from = "/category/mediterranean"
+  to = "/category.html?category=mediterranean"
+  status = 200
+
+[[redirects]]
+  from = "/category/american"
+  to = "/category.html?category=american"
+  status = 200
+
+[[redirects]]
+  from = "/category/french"
+  to = "/category.html?category=french"
+  status = 200
+
+# ========================================
+# CATEGORY PAGES - DIETARY (6)
+# ========================================
+
+[[redirects]]
+  from = "/category/vegetarian"
+  to = "/category.html?category=vegetarian"
+  status = 200
+
+[[redirects]]
+  from = "/category/vegan"
+  to = "/category.html?category=vegan"
+  status = 200
+
+[[redirects]]
+  from = "/category/gluten-free"
+  to = "/category.html?category=gluten-free"
+  status = 200
+
+[[redirects]]
+  from = "/category/dairy-free"
+  to = "/category.html?category=dairy-free"
+  status = 200
+
+[[redirects]]
+  from = "/category/nut-free"
+  to = "/category.html?category=nut-free"
+  status = 200
+
+[[redirects]]
+  from = "/category/keto"
+  to = "/category.html?category=keto"
+  status = 200
+
+# ========================================
+# CATEGORY PAGES - OCCASIONS (3)
+# ========================================
+
+[[redirects]]
+  from = "/category/quick-and-easy"
+  to = "/category.html?category=quick-and-easy"
+  status = 200
+
+[[redirects]]
+  from = "/category/party-and-entertaining"
+  to = "/category.html?category=party-and-entertaining"
+  status = 200
+
+[[redirects]]
+  from = "/category/holiday-and-special-occasions"
+  to = "/category.html?category=holiday-and-special-occasions"
+  status = 200
+
+
+# ========================================
+# RECIPE PAGES (Username-based slugs)
+# These come AFTER categories
+# ========================================
+
+[[redirects]]
+  from = "/article/:slug"
+  to = "/article.html?slug=:slug"
+  status = 200
+  force = false
+
 #[[redirects]]
-#  from = "/:slug"
-#  to = "/article.html?slug=:slug"
+#  from = "/@:username/:slug/edit"
+#  to = "/edit.html?slug=:slug"
 #  status = 200
 #  force = false
 
-# ========================================
-# NO CACHE HEADERS (FOR DEBUGGING)
-# ========================================
+# Legacy support for /@username/slug format
+[[redirects]]
+  from = "/@:username/:slug"
+  to = "/article.html?slug=:slug"
+  status = 200
+  force = false
 
-# [[headers]]
-#  for = "/*"
-#  [headers.values]
-#    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
-#    Pragma = "no-cache"
-#    Expires = "0"
+
+# ========================================
+# FALLBACK - Removed the /* catch-all
+# Let 404s be 404s
+# ========================================

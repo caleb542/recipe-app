@@ -1,0 +1,54 @@
+.share-popover {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    padding: 8px;
+    min-width: 200px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.share-popover button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+    text-align: left;
+    transition: background 0.15s ease;
+}
+
+.share-popover button:hover {
+    background: #f5f5f5;
+}
+
+.share-popover button i {
+    width: 18px;
+    text-align: center;
+    color: #666;
+}
+
+/* Brand colours on icons */
+.share-popover button:has(.fa-google) i       { color: #EA4335; }
+.share-popover button:has(.fa-whatsapp) i     { color: #25D366; }
+.share-popover button:has(.fa-telegram) i     { color: #2AABEE; }
+.share-popover button:has(.fa-comment-sms) i  { color: #007AFF; }
+.share-popover button:has(.fa-envelope) i     { color: #6B7280; }
+.share-popover button:has(.fa-copy) i         { color: #6B7280; }
+
+/* Make sure the share button is positioned relatively so popover anchors to it */
+#share-list {
+    position: relative;
+}

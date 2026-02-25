@@ -1,0 +1,358 @@
+<!-- /public/partials/header-template.html -->
+
+<!-- ============================================ -->
+<!-- TIER 1: Dev Notice + Logo + Search + Auth   -->
+<!-- ============================================ -->
+
+<div class="dev-notice">
+    <p><span><i class="fa fa-warning --color-warning-bg"></i></span> Active Development: Migrating infrastructure. Some features may be unstable.&nbsp;<a href="https://github.com/caleb542/recipe-app">View code</a></p>
+    <span id="hide-this-header" role="button" aria-label="Hide this warning"><i class="fa fa-times"></i></span>       
+</div>
+
+<div class="top-bar">
+    <div class="top-bar-left">
+        <h1 class="nav-bar-logo"><a href="/">Recipe Me</a></h1>
+        <!-- Search bar - only visible on homepage -->
+        <div class="top-bar-search homepage-only">
+            <i class="fa fa-search search-icon"></i>
+            <input type="text" id="search-filter" placeholder="Search recipes, ingredients, authors..." aria-label="Search recipes">
+        </div>
+    </div>
+    
+    <div class="top-bar-right">        
+        <div class="top-bar-user">
+            <button id="login-btn" class="primary sm">Login</button>
+            <div id="user-info" style="display: none;">
+                <div class="user-specific">
+                    <div id="user-avatar-container"></div>
+                    <span id="user-name"></span>
+                </div>
+                <button id="logout-btn">Logout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- TIER 2: Navigation with Box Pattern         -->
+<!-- ============================================ -->
+
+<nav class="main-nav" aria-label="Main navigation">
+    <div class="nav-bar">
+        <ul class="nav-list">
+            
+            <!-- Course Menu -->
+            <li class="nav-item has-dropdown" data-open="false">
+                <button 
+                    class="nav-link" 
+                    aria-expanded="false" 
+                    aria-controls="course-menu"
+                    aria-haspopup="true"
+                >
+                    Course <i class="fa fa-chevron-down"></i>
+                </button>
+                
+                <div id="course-menu" class="mega-menu-panel">
+                    <div class="mega-panel-grid">
+                        <div class="mega-panel-section">
+                            <h3 class="mega-section-title">Morning & Starters</h3>
+                            <ul class="mega-link-list">
+                                <li>
+                                    <a href="/category/breakfast-and-brunch" class="mega-link">
+                                        <span class="mega-link-title">Breakfast & Brunch</span>
+                                        <span class="mega-link-desc">Start your day deliciously</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/appetizers-and-starters" class="mega-link">
+                                        <span class="mega-link-title">Appetizers & Starters</span>
+                                        <span class="mega-link-desc">Perfect beginnings</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/finger-foods-and-party-snacks" class="mega-link">
+                                        <span class="mega-link-title">Finger Foods & Party Snacks</span>
+                                        <span class="mega-link-desc">Bite-sized delights</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mega-panel-section">
+                            <h3 class="mega-section-title">Main Courses</h3>
+                            <ul class="mega-link-list">
+                                <li>
+                                    <a href="/category/main-dishes" class="mega-link">
+                                        <span class="mega-link-title">Main Dishes</span>
+                                        <span class="mega-link-desc">Hearty centerpieces</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/side-dishes" class="mega-link">
+                                        <span class="mega-link-title">Side Dishes</span>
+                                        <span class="mega-link-desc">Perfect pairings</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/soups-and-salads" class="mega-link">
+                                        <span class="mega-link-title">Soups & Salads</span>
+                                        <span class="mega-link-desc">Fresh & comforting</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mega-panel-section">
+                            <h3 class="mega-section-title">Sweet Endings</h3>
+                            <ul class="mega-link-list">
+                                <li>
+                                    <a href="/category/desserts-and-sweets" class="mega-link">
+                                        <span class="mega-link-title">Desserts & Sweets</span>
+                                        <span class="mega-link-desc">Indulgent treats</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            
+            <!-- Drinks Menu -->
+            <li class="nav-item has-dropdown" data-open="false">
+                <button 
+                    class="nav-link" 
+                    aria-expanded="false" 
+                    aria-controls="drinks-menu"
+                    aria-haspopup="true"
+                >
+                    Drinks <i class="fa fa-chevron-down"></i>
+                </button>
+                
+                <div id="drinks-menu" class="mega-menu-panel">
+                    <div class="mega-panel-grid">
+                        <div class="mega-panel-section">
+                            <h3 class="mega-section-title">Beverages</h3>
+                            <ul class="mega-link-list">
+                                <li>
+                                    <a href="/category/cocktails" class="mega-link">
+                                        <span class="mega-link-title">Cocktails</span>
+                                        <span class="mega-link-desc">Craft cocktails & mixed drinks</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/mocktails-and-non-alcoholic" class="mega-link">
+                                        <span class="mega-link-title">Mocktails & Non-Alcoholic</span>
+                                        <span class="mega-link-desc">Alcohol-free refreshments</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/hot-beverages" class="mega-link">
+                                        <span class="mega-link-title">Hot Beverages</span>
+                                        <span class="mega-link-desc">Warming drinks</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            
+            <!-- Cuisine Menu -->
+            <li class="nav-item has-dropdown" data-open="false">
+                <button 
+                    class="nav-link" 
+                    aria-expanded="false" 
+                    aria-controls="cuisine-menu"
+                    aria-haspopup="true"
+                >
+                    Cuisine <i class="fa fa-chevron-down"></i>
+                </button>
+                
+                <div id="cuisine-menu" class="mega-menu-panel">
+                    <div class="mega-panel-grid">
+                        <div class="mega-panel-section">
+                            <h3 class="mega-section-title">World Flavors</h3>
+                            <ul class="mega-link-list">
+                                <li>
+                                    <a href="/category/italian" class="mega-link">
+                                        <span class="mega-link-title">Italian</span>
+                                        <span class="mega-link-desc">Pasta, pizza & more</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/mexican" class="mega-link">
+                                        <span class="mega-link-title">Mexican</span>
+                                        <span class="mega-link-desc">Bold & vibrant flavors</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/asian" class="mega-link">
+                                        <span class="mega-link-title">Asian</span>
+                                        <span class="mega-link-desc">Eastern culinary traditions</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mega-panel-section">
+                            <ul class="mega-link-list">
+                                <li>
+                                    <a href="/category/mediterranean" class="mega-link">
+                                        <span class="mega-link-title">Mediterranean</span>
+                                        <span class="mega-link-desc">Fresh & healthy</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/american" class="mega-link">
+                                        <span class="mega-link-title">American</span>
+                                        <span class="mega-link-desc">Classic comfort food</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/french" class="mega-link">
+                                        <span class="mega-link-title">French</span>
+                                        <span class="mega-link-desc">Refined & elegant</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            
+            <!-- Dietary Menu -->
+            <li class="nav-item has-dropdown" data-open="false">
+                <button 
+                    class="nav-link" 
+                    aria-expanded="false" 
+                    aria-controls="dietary-menu"
+                    aria-haspopup="true"
+                >
+                    Dietary <i class="fa fa-chevron-down"></i>
+                </button>
+                
+                <div id="dietary-menu" class="mega-menu-panel">
+                    <div class="mega-panel-grid">
+                        <div class="mega-panel-section">
+                            <h3 class="mega-section-title">Special Diets</h3>
+                            <ul class="mega-link-list">
+                                <li>
+                                    <a href="/category/vegetarian" class="mega-link">
+                                        <span class="mega-link-title">Vegetarian</span>
+                                        <span class="mega-link-desc">Meat-free meals</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/vegan" class="mega-link">
+                                        <span class="mega-link-title">Vegan</span>
+                                        <span class="mega-link-desc">Plant-based recipes</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/gluten-free" class="mega-link">
+                                        <span class="mega-link-title">Gluten-Free</span>
+                                        <span class="mega-link-desc">No gluten ingredients</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mega-panel-section">
+                            <ul class="mega-link-list">
+                                <li>
+                                    <a href="/category/dairy-free" class="mega-link">
+                                        <span class="mega-link-title">Dairy-Free</span>
+                                        <span class="mega-link-desc">No dairy products</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/nut-free" class="mega-link">
+                                        <span class="mega-link-title">Nut-Free</span>
+                                        <span class="mega-link-desc">Safe for allergies</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/keto" class="mega-link">
+                                        <span class="mega-link-title">Keto</span>
+                                        <span class="mega-link-desc">Low-carb, high-fat</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            
+            <!-- Occasions Menu -->
+            <li class="nav-item has-dropdown" data-open="false">
+                <button 
+                    class="nav-link" 
+                    aria-expanded="false" 
+                    aria-controls="occasions-menu"
+                    aria-haspopup="true"
+                >
+                    Occasions <i class="fa fa-chevron-down"></i>
+                </button>
+                
+                <div id="occasions-menu" class="mega-menu-panel">
+                    <div class="mega-panel-grid">
+                        <div class="mega-panel-section">
+                            <h3 class="mega-section-title">Special Events</h3>
+                            <ul class="mega-link-list">
+                                <li>
+                                    <a href="/category/party-and-entertaining" class="mega-link">
+                                        <span class="mega-link-title">Party & Entertaining</span>
+                                        <span class="mega-link-desc">Crowd-pleasing recipes</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/category/holiday-and-special-occasions" class="mega-link">
+                                        <span class="mega-link-title">Holiday & Special Occasions</span>
+                                        <span class="mega-link-desc">Festive celebrations</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            
+            <!-- Quick & Easy (direct link) -->
+            <li class="nav-item">
+                <a href="/category/quick-and-easy" class="nav-link">Quick & Easy</a>
+            </li>
+            
+            <!-- Create Recipe -->
+            <li class="nav-item">
+                <a href="/edit.html" class="nav-link">
+                    <i class="fa fa-plus"></i> Create Recipe
+                </a>
+            </li>
+            
+            <!-- THE BOX - persistent container -->
+            <div class="mega-menu-box"></div>
+        </ul>
+        
+        <!-- Mobile Menu Toggle -->
+        <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open the menu">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </button>
+    </div>
+</nav>
+
+<!-- Backdrop -->
+<div class="mega-menu-backdrop"></div>
+
+<!-- Mobile Navigation Drawer (collapsed by default) -->
+<nav id="mobile-nav" class="mobile-nav" hidden>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/edit.html">Create Recipe</a></li>
+        <li><a href="/category/quick-and-easy">Quick & Easy</a></li>
+        <li class="mobile-nav-divider">Browse</li>
+        <li><a href="/category/desserts-and-sweets">Desserts</a></li>
+        <li><a href="/category/cocktails">Cocktails</a></li>
+        <li><a href="/category/italian">Italian</a></li>
+        <li><a href="/category/vegetarian">Vegetarian</a></li>
+    </ul>
+</nav>

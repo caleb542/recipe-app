@@ -8,7 +8,9 @@ import { findExistingImage, registerImage } from './helpers/globalImageRegistry.
 import { loadHeader } from './components/HeaderComponent.js';
 import { hideWarning } from './functions.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
-import { appendSpinner, removeSpinner } from './components/SpinnerUtils.js';
+import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
+
 
 const CLOUDINARY_CLOUD_NAME = 'day1f5nz8';
 const CLOUDINARY_UPLOAD_PRESET = 'recipe_images';
@@ -18,8 +20,10 @@ let currentProfile = null;
 let newAvatarUrl = null; // Store temporarily until save
 
 async function init() {
+  showSpinner();
   await loadHeader()
   hideWarning ()
+  setupSanityMegaMenu()
   // Initialize Auth0
   await initAuth0();
   await loadUserProfile();
@@ -31,11 +35,13 @@ async function init() {
 
   if (!username) {
     showError('No username provided');
+    removeSpinner();
     return;
   }
 
   // Load and display profile
   await loadAndDisplayProfile(username);
+  removeSpinner(1500);
 }
 function formatDate(dateValue) {
   if (!dateValue) return 'Unknown date';
@@ -67,7 +73,7 @@ function formatDate(dateValue) {
 }
 async function loadAndDisplayProfile(username) {
   const container = document.getElementById('profile-container');
-  appendSpinner(container);
+  
   try {
     // ✅ Get auth token if user is logged in
     const token = await getToken();
@@ -92,13 +98,14 @@ async function loadAndDisplayProfile(username) {
     }
 
     const profile = await response.json();
-    removeSpinner();
+   
     currentProfile = profile; // Store globally
     displayProfile(profile);
 
   } catch (error) {
     console.error('Error loading profile:', error);
     showError('Failed to load profile');
+    removeSpinner();
   }
 }
 

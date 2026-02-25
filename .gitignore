@@ -8,6 +8,8 @@ public/scripts/*.js
 public/scripts/*.js.map
 public/scripts/*.css
 public/scripts/*.css.map
+ron.html
+ron.css
 
 # EXCEPT these HTML files (need to be tracked)
 !public/scripts/*.html

@@ -118,7 +118,7 @@
      SURFACE COLORS (Backgrounds, Cards, etc.)
      ---------------------------------------------------------------------------- */
   
-  --surface-background: #ffffff;      /* Main page background */
+  --surface-background: #f5f5f5;      /* Main page background */
   --surface-foreground: #000000;      /* Main text color */
   --surface-card: #ffffff;            /* Card backgrounds */
   --surface-elevated: #ffffff;        /* Modals, dropdowns */
@@ -225,6 +225,12 @@
   --radius-xl: 16px;
   --radius-2xl: 24px;
   --radius-full: 9999px;
+
+   --radius-sm-top: 4px 4px 0 0;
+   --radius-md-top: 8px 8px 0 0;
+   --radius-xl-top: 16px 16px 0 0;
+   --radius-2xl-top: 24px 24px 0 0;
+
   
   /* ----------------------------------------------------------------------------
      SHADOWS

@@ -1,0 +1,282 @@
+/* ===================================
+   RICH MEGA MENU NAVIGATION
+   Elegant multi-dropdown with slide transitions
+   =================================== */
+
+/* Rich Mega Menu Container */
+.rich-mega-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  pointer-events: none;
+  
+  &[data-active-menu]:not([data-active-menu=""]) {
+    pointer-events: auto;
+  }
+}
+
+/* Backdrop */
+.mega-menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  
+  .rich-mega-menu[data-active-menu]:not([data-active-menu=""]) & {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Menu Container */
+.mega-menu-container {
+  position: relative;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  .rich-mega-menu[data-active-menu]:not([data-active-menu=""]) & {
+    max-height: 600px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Content Wrapper */
+.mega-menu-content-wrapper {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  min-height: 300px;
+}
+
+/* Menu Panels */
+.mega-menu-panel {
+  position: absolute;
+  top: 3rem;
+  left: 2rem;
+  right: 2rem;
+  opacity: 0;
+  transform: translateX(120px);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  
+  /* Active panel */
+  .rich-mega-menu[data-active-menu="course"] &[data-panel="course"],
+  .rich-mega-menu[data-active-menu="drinks"] &[data-panel="drinks"],
+  .rich-mega-menu[data-active-menu="cuisine"] &[data-panel="cuisine"],
+  .rich-mega-menu[data-active-menu="dietary"] &[data-panel="dietary"],
+  .rich-mega-menu[data-active-menu="occasions"] &[data-panel="occasions"] {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+  
+  /* Panel that's being left (slides out left) */
+  &.exiting {
+    opacity: 0;
+    transform: translateX(-120px);
+  }
+}
+
+/* Panel Grid Layout */
+.mega-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 3rem;
+}
+
+/* Panel Sections */
+.mega-panel-section {
+  h3.mega-section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    // border-bottom: 2px solid #fbbf24;
+    text-decoration: 2px solid #ff0000;
+  }
+}
+
+/* Link Lists */
+.mega-link-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  
+  li {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Rich Links */
+.mega-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #f9fafb;
+    transform: translateX(4px);
+  }
+  
+  .mega-link-title {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+  }
+  
+  .mega-link-desc {
+    display: block;
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+  
+  &:hover .mega-link-title {
+    color: #fbbf24;
+  }
+}
+
+/* Nav Triggers */
+.nav-item.has-mega-dropdown {
+  .nav-link.mega-trigger {
+    position: relative;
+    
+    &[aria-expanded="true"] {
+      color: #fbbf24;
+      
+      i.fa-chevron-down {
+        transform: rotate(180deg);
+      }
+    }
+    
+    i.fa-chevron-down {
+      font-size: 0.75rem;
+      margin-left: 0.25rem;
+      transition: transform 0.3s ease;
+    }
+  }
+}
+
+/* Hover States */
+.nav-item.has-mega-dropdown:hover {
+  .nav-link.mega-trigger {
+    color: #fbbf24;
+  }
+}
+
+/* Visual Enhancements - Optional Rich Content */
+.mega-panel-section {
+  /* Featured Image (optional) */
+  .mega-featured-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Recipe Count Badge (optional) */
+  .mega-recipe-count {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    margin-left: 0.5rem;
+  }
+  
+  /* Featured Label (optional) */
+  .mega-featured-label {
+    display: inline-block;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: #fbbf24;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Loading State Animation */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(120px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-120px);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+  .mega-panel-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .rich-mega-menu {
+    display: none; /* Use mobile nav instead */
+  }
+  
+  .nav-item.has-mega-dropdown {
+    display: none;
+  }
+}
+
+/* Accessibility */
+.mega-link:focus {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.nav-link.mega-trigger:focus {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+/* Performance Optimization */
+.mega-menu-panel {
+  will-change: transform, opacity;
+}
+
+.mega-menu-container {
+  will-change: max-height, opacity, transform;
+}

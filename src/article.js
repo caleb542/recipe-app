@@ -9,10 +9,39 @@ import { CommunityNotes } from './components/CommunityNotes.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { autoEmbedVideos } from './helpers/youtubeEmbed.js';
 import { loadHeader } from './components/HeaderComponent.js';
-import { appendSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
+import { setupSanityMegaMenu } from "./components/MegaMenuSanity.js";
 
 
+
+const CATEGORIES = {
+  'breakfast-and-brunch': 'Breakfast & Brunch',
+  'appetizers-and-starters': 'Appetizers & Starters',
+  'finger-foods-and-party-snacks': 'Finger Foods & Party Snacks',
+  'main-dishes': 'Main Dishes',
+  'side-dishes': 'Side Dishes',
+  'soups-and-salads': 'Soups & Salads',
+  'desserts-and-sweets': 'Desserts & Sweets',
+  'cocktails': 'Cocktails',
+  'mocktails-and-non-alcoholic': 'Mocktails & Non-Alcoholic',
+  'hot-beverages': 'Hot Beverages',
+  'italian': 'Italian',
+  'mexican': 'Mexican',
+  'asian': 'Asian',
+  'mediterranean': 'Mediterranean',
+  'american': 'American',
+  'french': 'French',
+  'vegetarian': 'Vegetarian',
+  'vegan': 'Vegan',
+  'gluten-free': 'Gluten-Free',
+  'dairy-free': 'Dairy-Free',
+  'nut-free': 'Nut-Free',
+  'keto': 'Keto',
+  'quick-and-easy': 'Quick & Easy',
+  'party-and-entertaining': 'Party & Entertaining',
+  'holiday-and-special-occasions': 'Holiday & Special Occasions'
+};
 
 // ✅ Wait for DOM before doing anything
 if (document.readyState === 'loading') {
@@ -30,9 +59,12 @@ slug = urlParams.get('slug');
 
 // If not in query, extract from pathname
 if (!slug && window.location.pathname !== '/' && window.location.pathname !== '/article.html') {
-  slug = window.location.pathname.substring(1);
-  if (slug.endsWith('/')) {
-    slug = slug.slice(0, -1);
+  // Strip /article/ prefix if present
+  slug = window.location.pathname.replace(/^\/article\//, '').replace(/\/$/, '');
+  
+  // If no /article/ prefix, just remove leading slash
+  if (slug === window.location.pathname.substring(1)) {
+    slug = window.location.pathname.substring(1).replace(/\/$/, '');
   }
 }
 
@@ -47,6 +79,7 @@ let articleHydrated = false;
 
 await loadHeader();
 hideWarning();
+setupSanityMegaMenu();
 
 // ✅ Query DOM for container
 const container = document.querySelector(".template-container");
@@ -58,7 +91,7 @@ if (!container) {
 }
 
 console.log("✅ Container found:", container);
-appendSpinner(container);
+showSpinner();
 
 // Initialize Auth0
 await initAuth0();
@@ -89,7 +122,7 @@ async function fetchRecipes() {
     await hydrateArticle(recipes);
   } else {
     // No recipe specified
-    removeSpinner(0);
+    removeSpinner(400);
     location.assign("/index.html");
   }
 }
@@ -172,11 +205,14 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
 
   // Hydrate fields safely
   const articleTitle = tpl.querySelector(".article__title");
+    // Render breadcrumbs
+  renderBreadcrumbs(recItem);
+
   if (articleTitle) {
     articleTitle.textContent = recItem.name;
     document.title = `Recipe Me - ${recItem.name}`;
   }
-
+ 
   const d = tpl.querySelector(".dates");
   if (d) d.innerHTML = `<date>${recItem.createdAt[0]}</date>`;
 
@@ -300,7 +336,12 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         const amt = document.createElement("span");
-        amt.textContent = `${ingr.amount} ${ingr.unit || ingr.measureWord} ${ingr.name} ${ingr.description}`;
+
+        const parts = [
+          ingr.amount, ingr.unit || ingr.measureWord, ingr.name, ingr.description
+        ].filter(part => part && String(part).trim());
+        amt.textContent = parts.join(' ');
+
         label.append(checkbox, amt);
         li.appendChild(label);
         checklist.appendChild(li);
@@ -353,6 +394,7 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
   // Hamburger menu
   hamburger();
   articleHydrated = true;
+  removeSpinner(1500);
 }
 
 /**
@@ -379,7 +421,43 @@ function formatImageAttribution(image) {
   
   return attr.photographer;
 }
-
+/**
+ * Render breadcrumbs based on referrer
+ */
+function renderBreadcrumbs(recipe) {
+  const breadcrumbContainer = document.getElementById('breadcrumbs');
+  if (!breadcrumbContainer) return;
+  
+  const referrer = document.referrer;
+  let breadcrumbHTML = '<nav aria-label="Breadcrumb" class="breadcrumb"><a href="/">Home</a>';
+  
+  // Check if came from a category page
+  if (referrer.includes('/category/')) {
+    const match = referrer.match(/\/category\/([^/?#]+)/);
+    if (match) {
+      const categorySlug = match[1];
+      const categoryName = CATEGORIES[categorySlug];
+      
+      if (categoryName) {
+        breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/category/${categorySlug}">${categoryName}</a>`;
+      }
+    }
+  }
+  // Check if came from profile page
+  else if (referrer.includes('/@')) {
+    const match = referrer.match(/\/@([^/?#]+)/);
+    if (match) {
+      const username = match[1];
+      breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/@${username}">@${username}</a>`;
+    }
+  }
+  
+  // Always end with current recipe name
+  breadcrumbHTML += ` <span aria-hidden="true">›</span> <span aria-current="page">${recipe.name}</span>`;
+  breadcrumbHTML += '</nav>';
+  
+  breadcrumbContainer.innerHTML = breadcrumbHTML;
+}
 // Like functionality
 async function initializeLikes(recipeId, container) {
   const likeButton = container.querySelector("#like-button");

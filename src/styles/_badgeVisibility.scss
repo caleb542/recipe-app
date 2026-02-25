@@ -1,0 +1,87 @@
+/* ===================================
+   BADGE VISIBILITY CONTROLS
+   Badge show/hide toggle system
+   =================================== */
+
+/**
+ * Hide all recipe badges when badges-hidden class is on body
+ * This is controlled by localStorage preference
+ */
+body.badges-hidden .recipe-badges {
+  display: none !important;
+}
+
+/**
+ * Badge visibility toggle button in header
+ * Eye icon that shows/hides recipe status badges
+ */
+.badge-visibility-toggle {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-left: 1rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  will-change: transform; 
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  i {
+    transition: opacity 0.2s ease;
+  }
+  
+  /* Tooltip for the toggle button */
+  position: relative;
+  
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -35px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 1000;
+  }
+  
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .badge-visibility-toggle {
+    font-size: 1rem;
+    padding: 0.4rem;
+    margin-left: 0.5rem;
+    
+    &::after {
+      display: none; /* Hide tooltip on mobile */
+    }
+  }
+}
+
+/* Future-proofing: Can also hide express editing controls */
+body.controls-hidden .express-edit-controls {
+  display: none !important;
+}

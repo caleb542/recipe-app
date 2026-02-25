@@ -197,7 +197,7 @@ console.log('💾 Slug being saved:', baseSlug);
 
       // ✅ CHANGED: Redirect to new slug URL if available
       const redirectUrl = result.recipe?.fullSlug 
-        ? `/${result.recipe.fullSlug}`
+        ? `/article/${result.recipe.fullSlug}`
         : `/article.html#${recipe.id}`;
 
       setTimeout(() => {

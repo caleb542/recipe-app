@@ -123,8 +123,8 @@ p {
 
 /* Container - max-width wrapper */
 .container {
-  width: 100%;
-  max-width: 1280px;
+  // width: 100%;
+  // max-width: 1280px;
   margin: 0 auto;
   padding: 0 var(--space-6);
 }
@@ -304,19 +304,6 @@ button:disabled {
    CARDS
    ============================================================================ */
 
-.card {
-  background: var(--surface-card);
-  border: 1px solid var(--surface-border);
-  border-radius: var(--radius-lg);
-  // padding: var(--space-6);
-  // box-shadow: var(--shadow-sm);
-  transition: all var(--transition-base);
-}
-
-.card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
 
 .card-flat {
   box-shadow: none;

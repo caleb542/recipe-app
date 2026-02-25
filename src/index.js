@@ -35,15 +35,24 @@ import { initAuth0, login, isAuthenticated, getUser } from './auth/auth0.js';
 
 import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
-import { loadHeader } from './components/HeaderComponent.js';
-import { appendSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
+import { loadFooter } from './components/FooterComponent.js';
+
+import { initBadgeVisibility } from './utils/badgeVisibility.js';
+import { loadHeader, injectBadgeToggle } from './components/HeaderComponent.js';
+import { renderBadgeToggle, initBadgeToggle } from './components/BadgeToggleButton.js';
+import { generateRecipeBadges } from './components/RecipeBadges.js';
+import { setupSanityMegaMenu, openMegaMenu, closeMegaMenu } from './components/MegaMenuSanity.js';
 
 // Load shared header FIRST
 await loadHeader();
 hideWarning();
+console.log('🔍 After loadHeader, checking box:', document.querySelector('.mega-menu-box'));
+setupSanityMegaMenu();
+await loadFooter();
 const container = document.getElementById("spinner-container");
-appendSpinner(container);
+showSpinner(container);
 
 // Then initialize auth
 await initAuth0();
@@ -60,6 +69,7 @@ setupAuthListeners();
 initRoleBasedUI();
 initImpersonationBanner();
 
+
 // Get overlay elements
 const overlay = document.getElementById("static-landing-page");
 const browseBtn = document.getElementById('browse-btn');
@@ -71,115 +81,7 @@ const isFirstTime = localStorage.getItem('firstTime') !== 'false';
 
 // ✅ Declare recipes variable
 let recipes;
-const getCategories = async () => {
-  let categoryCounts = {};
-  let uncategorizedCount = 0;
-  
-  console.log('🔍 getCategories called');
-  console.log('🔍 recipes:', recipes);
-  console.log('🔍 recipes is array?', Array.isArray(recipes));
 
-  // ✅ Get current user (same as listRecipes)
-  const authenticated = await isAuthenticated();
-  let currentUserId = null;
-  
-  if (authenticated) {
-    const user = await getUser();
-    currentUserId = user?.sub;
-    console.log('Current User ID for categories:', currentUserId);
-  }
-
-  if (Array.isArray(recipes)) {
-    // ✅ Filter recipes using SAME logic as listRecipes
-    const visibleRecipes = recipes.filter(recipe => {
-      const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
-      const hasDirections = recipe.directions && recipe.directions.length > 0;
-      const isComplete = hasIngredients && hasDirections;
-      
-      // Show complete recipes
-      if (isComplete) return true;
-      
-      // Show incomplete recipes only if you're the author AND it's unpublished
-      const isAuthor = currentUserId && recipe.author?.auth0Id === currentUserId;
-      return !recipe.isPublic && isAuthor;
-    });
-
-    console.log('🔍 Visible recipes after filtering:', visibleRecipes.length);
-
-    // ✅ Now count categories from VISIBLE recipes only
-    visibleRecipes.forEach((recipe) => {
-      console.log('Recipe:', recipe.name, 'Categories:', recipe.categories);
-      
-      if (Array.isArray(recipe.categories) && recipe.categories.length > 0) {
-        recipe.categories.forEach(cat => {
-          categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
-        });
-      } else {
-        uncategorizedCount++;
-      }
-    });
-    
-    console.log('🔍 categoryCounts:', categoryCounts);
-    console.log('🔍 uncategorizedCount:', uncategorizedCount);
-
-    let categories = Object.keys(categoryCounts).map(cat => ({
-      name: cat,
-      count: categoryCounts[cat]
-    }));
-    
-    categories.sort((a, b) => a.name.localeCompare(b.name));
-    
-    // ✅ Use visibleRecipes.length for "All" count
-    categories.unshift({
-      name: "All",
-      count: visibleRecipes.length
-    });
-    
-    if (uncategorizedCount > 0) {
-      categories.push({
-        name: "Uncategorized",
-        count: uncategorizedCount
-      });
-    }
-    
-    console.log('🔍 Final categories array:', categories);
-
-    const categoriesCloud = document.querySelector("#categories-cloud section");
-    console.log('🔍 categoriesCloud element:', categoriesCloud);
-    
-    if (!categoriesCloud) {
-      console.warn('⚠️ Categories cloud element not found');
-      return;
-    }
-    
-    categoriesCloud.innerHTML = '';
-    categoriesCloud.setAttribute("tabindex", "0");
-    categoriesCloud.setAttribute("role", "radiogroup");
-
-    categories.forEach((cat, index) => {
-      const label = document.createElement("label");
-      label.setAttribute("role", "radio");
-      label.setAttribute("for", `cat-${index}`);
-      label.textContent = `${cat.name} (${cat.count})`;
-
-      const radio = document.createElement("input");
-      radio.type = "radio";
-      radio.name = "category";
-      radio.id = `cat-${index}`;
-      radio.value = cat.name;
-      radio.classList.add("sort", "radio");
-      
-      if (cat.name === "All") {
-        radio.checked = true;
-      }
-
-      label.appendChild(radio);
-      categoriesCloud.appendChild(label);
-    });
-  } else {
-    console.warn("Recipes not available yet:", recipes);
-  }
-};
 
 // ✅ Hide immediately if not first time OR already logged in
 if (!isFirstTime || authenticated) {
@@ -187,13 +89,20 @@ if (!isFirstTime || authenticated) {
   await updateAuthUI();
   setupAuthListeners();
   recipes = await loadRecipes(true); // ✅ Force fresh fetch
-  await getCategories();
+  // await getCategories();
   await listRecipes(recipes);
-  removeSpinner(200);
+  removeSpinner(1500);
+
+  initBadgeVisibility();
+  injectBadgeToggle();
+  initBadgeToggle();
 } else {
   // Show splash for first-time visitors
   overlay.style.display = "flex";
   removeSpinner(200);
+
+
+ 
   // Browse without login
   browseBtn.addEventListener('click', async () => { // ✅ Make async
     localStorage.setItem('firstTime', 'false');
@@ -201,12 +110,15 @@ if (!isFirstTime || authenticated) {
     await updateAuthUI(); // ✅ Add await
     setupAuthListeners();
     recipes = await loadRecipes(true);
-    await getCategories();
+    // await getCategories();
     await listRecipes(recipes);
     
+  initBadgeVisibility();
+  injectBadgeToggle();
+  initBadgeToggle();
+
 
   });
-  
   // Login to create
   splashLoginBtn.addEventListener('click', async () => {
     localStorage.setItem('firstTime', 'false');

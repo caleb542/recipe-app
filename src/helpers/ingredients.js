@@ -26,11 +26,20 @@ async function listIngredients(recipeId) {
  * Render a single ingredient <li>
  */
 function renderIngredientItem(ingred, recipeId) {
-
   const li = document.createElement('li');
+  
+  // Build display text, filtering out empty values
+const parts = [
+    ingred.amount,
+    ingred.unit || ingred.measureWord,
+    ingred.name
+].filter(part => part !== undefined && part !== null && String(part).trim() !== '' && part !== 'undefined');
+  
+  const displayText = parts.join(' ');
+  
   li.innerHTML = `
     <label class="ingredient-label" for="${ingred.id}">
-        ${ingred.amount} ${ingred.unit || ingred.measureWord} ${ingred.name}
+        ${displayText}
     </label>   
     <button id="${ingred.id}" data-id="${ingred.id}" class="item-buttons edit-ingredient"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button> 
    

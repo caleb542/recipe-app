@@ -2,7 +2,7 @@
    RECIPE ME - MAIN STYLESHEET
    Modular SCSS architecture
    ======================================== */
-
+@use './design-tokens.css';
 // Import design tokens first
 // Import component files
 @use './styles/base';
@@ -18,9 +18,13 @@
 @use './styles/recipe-badges';
 @use './styles/recipe-me';
 @use './styles/loaders';
+@use './styles/footer';
+@use './styles/badgeVisibility';
+@use './styles/megamenubox';
+@use './styles/quickAddModal';
+@use './styles/share-popover';
+@use './styles/print';
 
-
-@import './design-tokens.css';
 // Import Google Fonts
 @import url('https://fonts.googleapis.com/css2?family=Paytone+One&family=Roboto&family=Monsieur+La+Doulaise&family=Parisienne&display=swap');
 
@@ -57,13 +61,17 @@ $desktopCardHeight: 400px;
 
 /* Container */
 .container {
-    width: clamp(400px, 100%, 1024px);
+    width: clamp(400px, 100%, 1366px);
     position: relative;
     margin: 0 auto;
     padding: 0 0rem;
     display: flex;
     flex-direction: column;
+    height:auto;
+    min-height:20dvh;
     z-index: 1;
+    transition:all 1s;
+    padding:1rem 0;
 }
 
 .page-container {
@@ -88,9 +96,11 @@ article {
 
 .article-page article {
     height: auto;
-    width: clip(300px, 100%, 1366px);
+    width: clamp(300px, 100%, 844px);
     margin: 0 auto;
     margin-top: 2rem;
+    background-color:#ffffff;
+    padding:40px;
 }
 
 .home-page article {
@@ -269,6 +279,7 @@ article h1 {
     font-size: 1.2rem;
     padding: 0.5rem 0 0.45rem 0;
     line-height: 1.25;
+    text-wrap: pretty;
 }
 
 .article__title {
@@ -282,9 +293,7 @@ article h1 {
     z-index: 4;
 }
 
-.article-page .recipe-article{
-    background-color: #f6fbfa;
-}
+
 /* Lists & Checklists */
 .lists {
     display: grid;
@@ -315,7 +324,7 @@ article h1 {
     padding: 1em 0;
 }
 .list-container {
-   filter: drop-shadow(0px 4px 6px black);
+   filter: drop-shadow(-4px 4px 1px rgba(0, 0, 0, 0.2));
 
 }
 .shoppinglist-container {
@@ -330,7 +339,7 @@ article h1 {
     border: 0;
     // clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 80% 85%, 60% 100%, 40% 85%, 20% 100%, 0% 85%);
     // clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 95% 90%, 90% 100%, 85% 90%, 80% 100%, 75% 90%, 70% 100%, 65% 90%, 60% 100%, 55% 90%, 50% 100%, 45% 90%, 40% 100%, 35% 90%, 30% 100%, 25% 90%, 20% 100%, 25% 90%, 20% 100%, 15% 90%, 10% 100%, 5% 90%, 0% 100%);
-    clip-path: shape(from 0% 0%, line to 100% 0%, line to 100% 100%, curve to 80% 97% with 90% 89%, curve to 60% 89% with 70% 100%, curve to 50% 100% with 60% 87%,  curve to 0% 100% with 10% 90%);
+    // clip-path: shape(from 0% 0%, line to 100% 0%, line to 100% 100%, curve to 80% 97% with 90% 89%, curve to 60% 89% with 70% 100%, curve to 50% 100% with 60% 87%,  curve to 0% 100% with 10% 90%);
 }
 
 .shoppinglist-container.hide {
@@ -946,6 +955,7 @@ footer.page-footer {
 
     .home-page article h1 {
         font-size: 1rem;
+        text-wrap:pretty;
     }
 
     .home-page article p {
@@ -996,3 +1006,8 @@ footer.page-footer {
         display: none;
     }
 }
+/*
+// @use './styles/richMegaMenu';
+// @use './styles/megamenu-semantic';
+// @use './styles/megamenu-animated';
+*/
