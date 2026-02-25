@@ -15,23 +15,6 @@ let listRecipes = async (recipesParam, currentUserId = null) => {
 
   // ✅ Get current user (with fallback for public pages)
   let authenticated = !!currentUserId;
-  let currentUserId = null;
-  
-  // try {
-  //   authenticated = await isAuthenticated();
-  //   if (authenticated) {
-  //     console.log("✅ AUTHENTICATED")
-  //     const user = await getUser();
-  //     console.log("✅ USER:", user);
-  //     currentUserId = user?.sub;
-  //     console.log('Cur User ID: ', currentUserId);
-  //   }
-  // } catch (error) {
-  //   // Auth0 not initialized - this is fine for public pages
-  //   console.log('Auth not initialized (public page)');
-  //   authenticated = false;
-  //   currentUserId = null;
-  // }
 
   const filters = getFilters();
   recipes = sortRecipes(filters.sortBy, recipes);

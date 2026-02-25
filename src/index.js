@@ -89,9 +89,13 @@ if (!isFirstTime || authenticated) {
   await updateAuthUI();
   setupAuthListeners();
   recipes = await loadRecipes(true); // ✅ Force fresh fetch
-  const currentUser = authenticated ? await getUser() : null;
-  // await getCategories();
-  await listRecipes(recipes, currentUser?.sub);
+  let currentUser = null;
+try {
+    currentUser = authenticated ? await getUser() : null;
+} catch (e) {
+    console.warn('Could not get user:', e.message);
+}
+await listRecipes(recipes, currentUser?.sub);
   removeSpinner(1500);
 
   initBadgeVisibility();
