@@ -14,8 +14,8 @@
 
  
     <script src="https://kit.fontawesome.com/610bdb1969.js" crossorigin="anonymous"></script>
-<link href="/scripts/index.css" rel="stylesheet" media="screen" />
-<link href="/scripts/edit.css" rel="stylesheet" media="screen" />
+<link href="/scripts/index.css" rel="stylesheet" />
+<link href="/scripts/edit.css" rel="stylesheet" />
 
 
 
@@ -27,7 +27,36 @@
     <div class="page-container">
         <header></header>
         <div class="content-wrap">
+            <!-- Quick Add Section (collapsible) -->
+<div class="quick-add-section">
+    <details open>
+        <summary>
+            <h3>🚀 Quick Add</h3>
+            <p>Import from URL or paste recipe text</p>
+        </summary>
+        
+        <div class="quick-add-content">
+            <div class="quick-add-input-group">
+                <input 
+                    type="text" 
+                    id="quick-add-input" 
+                    placeholder="Paste recipe URL or start typing recipe text..."
+                    class="quick-add-input"
+                />
+                <button id="quick-add-parse-btn" class="btn-parse">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Parse Recipe
+                </button>
+            </div>
             
+            <div id="quick-add-status" class="quick-add-status"></div>
+            
+            <p class="quick-add-hint">
+                💡 Tip: Paste a URL from AllRecipes, Food Network, etc., or paste the full recipe text
+            </p>
+        </div>
+    </details>
+</div>
             <div class="heading-h2-container edit-header">
                     <div class="edit-header__actions">
                     
