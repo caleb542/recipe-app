@@ -85,12 +85,13 @@ let recipes;
 
 // ✅ Hide immediately if not first time OR already logged in
 if (!isFirstTime || authenticated) {
-  overlay.style.display = 'none';
+    overlay.style.display = 'none';
   await updateAuthUI();
   setupAuthListeners();
   recipes = await loadRecipes(true); // ✅ Force fresh fetch
+  const currentUser = authenticated ? await getUser() : null;
   // await getCategories();
-  await listRecipes(recipes);
+  await listRecipes(recipes, currentUser?.sub);
   removeSpinner(1500);
 
   initBadgeVisibility();
