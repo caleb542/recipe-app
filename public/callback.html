@@ -34,6 +34,22 @@
         <div class="spinner"></div>
         <p>Completing login...</p>
     </div>
-    <script type="module" src="/scripts/index-bundle.js"></script>
+    <!-- <script type="module" src="/scripts/index-bundle.js"></script> -->
+    <script type="module">
+    import { initAuth0, handleRedirectCallback } from '/scripts/auth-bundle.js';
+    
+    async function handleCallback() {
+        await initAuth0();
+        
+        // Handle the Auth0 redirect
+        const result = await handleRedirectCallback();
+        
+        // Return to the page they were on, or homepage as fallback
+        const returnTo = result?.appState?.returnTo || '/';
+        window.location.replace(returnTo);
+    }
+    
+    handleCallback();
+</script>
 </body>
 </html>
