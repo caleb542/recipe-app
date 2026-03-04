@@ -59,7 +59,7 @@ async function init() {
     console.log('Search params:', window.location.search);
     
     // Load header and footer (public page - no auth required)
-    await loadHeader();
+
     await loadHeader();
     hideWarning();
     await loadFooter();
