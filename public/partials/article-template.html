@@ -1,7 +1,13 @@
 <template class="article-template" id="article-template">
     <div id="breadcrumbs"></div>
     <article class="recipe-article">
-        <div class="">
+      
+        <div class="article-block">
+            <a id="edit-recipe-btn" class="article-edit-button">
+              <i class="fa-sharp fa-solid fa-pen-to-square"></i>
+              <span class="-hide-text">Edit Recipe</span>
+            </a>
+
             <h2 class="article__title"></h2>
             <!-- Rating -->
             <p class="author"></p>
@@ -52,10 +58,7 @@
                 <div class="checklist-container">
                     <div class="checklistHeader" id="recipe">
                         <h3>Recipe</h3>
-                        <a id="edit-recipe-btn" class="cta-update btn" title="Edit recipe">
-                            <i class="fa-sharp fa-solid fa-pen-to-square"></i>
-                            <span class="hide-text">Edit</span>
-                        </a>
+                        
                     </div>
                     <ul class="checklist"></ul>
                 </div>

@@ -164,7 +164,7 @@ console.log('💾 Slug being saved:', baseSlug);
     
     const updates = {
       name: recipe.name || '',
-      article: recipe.article || '',
+      article: window.toastEditor ? window.toastEditor.getMarkdown() : recipe.article || '',
       createdAt: recipe.createdAt || '',
       author: recipe.author || '',
       displayAuthor: recipe.displayAuthor || '',

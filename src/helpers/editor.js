@@ -105,6 +105,7 @@ addImageBlobHook: async (blob, callback) => {
   });
 
   window.toastEditor = toastEditor;
+  window.editorInstance = toastEditor;
   return toastEditor;
 }
 
