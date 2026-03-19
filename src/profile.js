@@ -168,7 +168,7 @@ function displayProfile(profile) {
       ` : ''}
         </div>
         <div>
-      <h3>Stats</h3>
+      <h4>Stats</h4>
       <ul class="profile-stats">
         <li class="stat">
           <div class="stat-value">${profile.stats.recipesCreated}</div>
@@ -273,7 +273,7 @@ function displayProfile(profile) {
  */
 function renderRecipeCard(recipe, isPublished) {
   return `
-    <a href="${isPublished ? '/article.html' : '/edit.html'}#${recipe.id}" class="recipe-card ${!isPublished ? 'recipe-card-draft' : ''}">
+    <div class="recipe-card ${!isPublished ? 'recipe-card-draft' : ''}">
       ${!isPublished ? `
         <div class="recipe-card-status">
           <span class="status-badge draft-badge">
@@ -281,7 +281,8 @@ function renderRecipeCard(recipe, isPublished) {
           </span>
         </div>
       ` : ''}
-     ${recipe.featuredImage ? `
+      <div>
+       ${recipe.featuredImage ? `
         <div class="recipe-card-image">
           <img src="${recipe.featuredImage}" alt="${escapeHtml(recipe.name)}" loading="lazy">
         </div>
@@ -297,12 +298,14 @@ function renderRecipeCard(recipe, isPublished) {
         ` : ''}
         ${recipe.categories && recipe.categories.length > 0 ? `
           <div class="recipe-card-tags">
+          Categories:
             ${recipe.categories.slice(0, 3).map(cat => `
               <span class="recipe-tag">${escapeHtml(cat)}</span>
             `).join('')}
           </div>
         ` : ''}
        <div class="recipe-card-meta">
+       Created:
           <span class="recipe-date">
             <i class="fa-solid fa-calendar"></i>
             ${formatDate(recipe.createdAt)}
@@ -314,7 +317,18 @@ function renderRecipeCard(recipe, isPublished) {
           ` : ''}
         </div>
       </div>
-    </a>
+      </div>
+    
+      <div class="profile-recipe-card-links">
+        <a class="btn-primary" href="${'/edit.html'}#${recipe.id}">
+        Edit
+        </a>
+         <a class="btn-secondary" href="${'/article.html'}#${recipe.id}">
+       View Article
+        </a>
+      </div>
+
+    </div>
   `;
 }
 

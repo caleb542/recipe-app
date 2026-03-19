@@ -8,44 +8,10 @@ import { loadRecipes, getFeaturedImage } from './functions.js';
 import { hideWarning } from './functions.js';
 import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { setupSanityMegaMenu, openMegaMenu, closeMegaMenu } from './components/MegaMenuSanity.js';
+import { CATEGORIES } from './helpers/categories.js';
 
 // Category slug → display name mapping
-const CATEGORIES = {
-  // Course
-  'breakfast-and-brunch': 'Breakfast & Brunch',
-  'appetizers-and-starters': 'Appetizers & Starters',
-  'finger-foods-and-party-snacks': 'Finger Foods & Party Snacks',
-  'main-dishes': 'Main Dishes',
-  'side-dishes': 'Side Dishes',
-  'soups-and-salads': 'Soups & Salads',
-  'desserts-and-sweets': 'Desserts & Sweets',
-  
-  // Drinks
-  'cocktails': 'Cocktails',
-  'mocktails-and-non-alcoholic': 'Mocktails & Non-Alcoholic',
-  'hot-beverages': 'Hot Beverages',
-  
-  // Cuisine
-  'italian': 'Italian',
-  'mexican': 'Mexican',
-  'asian': 'Asian',
-  'mediterranean': 'Mediterranean',
-  'american': 'American',
-  'french': 'French',
-  
-  // Dietary
-  'vegetarian': 'Vegetarian',
-  'vegan': 'Vegan',
-  'gluten-free': 'Gluten-Free',
-  'dairy-free': 'Dairy-Free',
-  'nut-free': 'Nut-Free',
-  'keto': 'Keto',
-  
-  // Occasions
-  'quick-and-easy': 'Quick & Easy',
-  'party-and-entertaining': 'Party & Entertaining',
-  'holiday-and-special-occasions': 'Holiday & Special Occasions'
-};
+
 
 let allRecipes = [];
 let filteredRecipes = [];
@@ -238,7 +204,7 @@ function renderRecipes() {
     const featuredImage = recipe.images?.find(img => img.isFeatured) || recipe.images?.[0];
     const photoURL = featuredImage?.url || recipe.photoURL || '/images/pexels-mali-maeder-1.jpg';
     
-    const recipeLink = `/article/${recipe.slug || recipe._id}`;
+    const recipeLink = `/article/${recipe.slug || recipe._id}?from=${currentCategory}`;
     
     return `
       <a href="${recipeLink}" class="card home">
