@@ -403,41 +403,35 @@ const hamburger = () => {
     
     hamburger.addEventListener('click', function (e) {
 
-        e.preventDefault()
+        // e.preventDefault()
         toggleMenu();
+
     })
 
 }
 const toggleMenu = () => {
-    let toggle = document.getElementById('menu-toggle')
-    let menu = document.querySelector('nav');
-    let status = toggle.getAttribute('aria-label');
-    let nav = document.querySelector('nav');
-
-    if (status.toLowerCase() === 'open the menu') {
-        toggle.setAttribute('aria-label', 'close the menu');
-        nav.classList.remove('hide')
-        nav.classList.add('open')
-        nav.setAttribute('aria-expanded', 'true')
-        const a = document.querySelectorAll('nav a')
-        a.forEach(anchor => {
-            let tabindex = anchor.getAttribute('tabindex')
-            tabindex === "-1" ? anchor.setAttribute('tabindex', "0") : anchor.setAttribute('tabindex', "-1")
-        })
-
-    }
-    if (status.toLowerCase() === 'close the menu') {
-        toggle.setAttribute('aria-label', 'Open the menu');
-        nav.classList.add('hide')
-        nav.classList.remove('open')
-        nav.setAttribute('aria-expanded', false)
-        const a = document.querySelectorAll('nav a')
-        a.forEach(anchor => {
-            let tabindex = anchor.getAttribute('tabindex')
-            tabindex === "0" ? anchor.setAttribute('tabindex', "-1") : anchor.setAttribute('tabindex', "0")
-        })
-    }
-}
+  const toggle = document.getElementById('menu-toggle');
+  const mobileNav = document.getElementById('mobile-nav');
+  
+  if (!toggle || !mobileNav) return;
+  
+   const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+  const icon = toggle.querySelector('i');
+  
+  if (isOpen) {
+    mobileNav.close();
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open the menu');
+    if (icon) { icon.classList.replace('fa-times', 'fa-bars'); }
+    document.body.classList.remove('nav-open');
+  } else {
+    mobileNav.show();
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Close the menu');
+    if (icon) { icon.classList.replace('fa-bars', 'fa-times'); }
+    document.body.classList.add('nav-open');
+  }
+};
 const addToExistingRecipes = () => {
     const newRecipe = loadNewRecipeFromLocalStorage()
     let recipes = loadRecipes()

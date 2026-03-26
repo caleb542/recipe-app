@@ -42,152 +42,15 @@ command = "npm run build"
   status = 200
   force = false
 
-
 # ========================================
-# CATEGORY PAGES - COURSE (7)
-# ========================================
-
-[[redirects]]
-  from = "/category/breakfast-and-brunch"
-  to = "/category.html?category=breakfast-and-brunch"
-  status = 200
-
-[[redirects]]
-  from = "/category/appetizers-and-starters"
-  to = "/category.html?category=appetizers-and-starters"
-  status = 200
-
-[[redirects]]
-  from = "/category/finger-foods-and-party-snacks"
-  to = "/category.html?category=finger-foods-and-party-snacks"
-  status = 200
-
-[[redirects]]
-  from = "/category/main-dishes"
-  to = "/category.html?category=main-dishes"
-  status = 200
-
-[[redirects]]
-  from = "/category/side-dishes"
-  to = "/category.html?category=side-dishes"
-  status = 200
-
-[[redirects]]
-  from = "/category/soups-and-salads"
-  to = "/category.html?category=soups-and-salads"
-  status = 200
-
-[[redirects]]
-  from = "/category/desserts-and-sweets"
-  to = "/category.html?category=desserts-and-sweets"
-  status = 200
-
-# ========================================
-# CATEGORY PAGES - DRINKS (3)
+# RECIPE PAGES (Username-based slugs)
+# These come AFTER categories
 # ========================================
 
 [[redirects]]
-  from = "/category/cocktails"
-  to = "/category.html?category=cocktails"
+  from = "/category/:slug"
+  to = "/category.html?category=:slug"
   status = 200
-
-[[redirects]]
-  from = "/category/mocktails-and-non-alcoholic"
-  to = "/category.html?category=mocktails-and-non-alcoholic"
-  status = 200
-
-[[redirects]]
-  from = "/category/hot-beverages"
-  to = "/category.html?category=hot-beverages"
-  status = 200
-
-# ========================================
-# CATEGORY PAGES - CUISINE (6)
-# ========================================
-
-[[redirects]]
-  from = "/category/italian"
-  to = "/category.html?category=italian"
-  status = 200
-
-[[redirects]]
-  from = "/category/mexican"
-  to = "/category.html?category=mexican"
-  status = 200
-
-[[redirects]]
-  from = "/category/asian"
-  to = "/category.html?category=asian"
-  status = 200
-
-[[redirects]]
-  from = "/category/mediterranean"
-  to = "/category.html?category=mediterranean"
-  status = 200
-
-[[redirects]]
-  from = "/category/american"
-  to = "/category.html?category=american"
-  status = 200
-
-[[redirects]]
-  from = "/category/french"
-  to = "/category.html?category=french"
-  status = 200
-
-# ========================================
-# CATEGORY PAGES - DIETARY (6)
-# ========================================
-
-[[redirects]]
-  from = "/category/vegetarian"
-  to = "/category.html?category=vegetarian"
-  status = 200
-
-[[redirects]]
-  from = "/category/vegan"
-  to = "/category.html?category=vegan"
-  status = 200
-
-[[redirects]]
-  from = "/category/gluten-free"
-  to = "/category.html?category=gluten-free"
-  status = 200
-
-[[redirects]]
-  from = "/category/dairy-free"
-  to = "/category.html?category=dairy-free"
-  status = 200
-
-[[redirects]]
-  from = "/category/nut-free"
-  to = "/category.html?category=nut-free"
-  status = 200
-
-[[redirects]]
-  from = "/category/keto"
-  to = "/category.html?category=keto"
-  status = 200
-
-# ========================================
-# CATEGORY PAGES - OCCASIONS (3)
-# ========================================
-
-[[redirects]]
-  from = "/category/quick-and-easy"
-  to = "/category.html?category=quick-and-easy"
-  status = 200
-
-[[redirects]]
-  from = "/category/party-and-entertaining"
-  to = "/category.html?category=party-and-entertaining"
-  status = 200
-
-[[redirects]]
-  from = "/category/holiday-and-special-occasions"
-  to = "/category.html?category=holiday-and-special-occasions"
-  status = 200
-
 
 # ========================================
 # RECIPE PAGES (Username-based slugs)

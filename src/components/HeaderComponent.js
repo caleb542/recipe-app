@@ -4,11 +4,12 @@
  * Loads header HTML from partial and injects it into pages
  * Ensures consistent navigation across all pages
  */
+import { buildNav, setupSanityMegaMenu } from './MegaMenuSanity.js';
 import { isSuperadmin } from '../userContext.js';
 import { renderBadgeToggle } from './BadgeToggleButton.js';
-// import { setupRichMegaMenu } from './RichMegaMenu.js';
-// import { setupAnimatedMegaMenu } from './MegaMenuAnimated.js';
-import { setupSanityMegaMenu } from './MegaMenuSanity.js';
+import { buildMobileNav } from './MobileNav.js';
+
+
 export async function loadHeader() {
   try {
     const response = await fetch('/partials/header-template.html');
@@ -20,26 +21,43 @@ export async function loadHeader() {
     const headerHTML = await response.text();
     
     // Find or create header element
-    let headerElement = document.querySelector('.page-container > header');
-    
-    if (!headerElement) {
-      // Create header if it doesn't exist
-      headerElement = document.createElement('header');
-      const contentWrap = document.querySelector('.content-wrap') || document.body;
-      contentWrap.insertBefore(headerElement, contentWrap.firstChild);
-    }
-    
-    // Inject the header HTML
-    headerElement.innerHTML = headerHTML;
-    
+let headerElement = document.querySelector('.page-container > header');
 
-    
-    // ✅ Add admin link if user is superadmin
+if (!headerElement) {
+  headerElement = document.createElement('header');
+  const pageContainer = document.querySelector('.page-container');
+  if (pageContainer) {
+    pageContainer.insertBefore(headerElement, pageContainer.firstChild);
+  } else {
+    document.body.insertBefore(headerElement, document.body.firstChild);
+  }
+}
+
+// Inject the header HTML
+headerElement.innerHTML = headerHTML;
+
+// Inject mobile overlay as direct child of body
+if(document.getElementById('nav-overlay')){
+  const overlay = document.getElementById('nav-overlay')
+  overlay.id = 'nav-overlay';
+  overlay.className = 'nav-overlay';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', () => {
+    const toggle = document.getElementById('menu-toggle');
+    if (toggle) toggle.click();
+  });
+}
+  
+  
+    // Add admin link if superadmin
     addAdminLinkIfSuperadmin(headerElement);
+
+    // Build nav from DB then setup interactions
+    await buildNav();
+    setupSanityMegaMenu();
     
-    // console.log('✓ Header loaded');
-        // ✅ Setup animated  mega menu interactions
-    // setupSanityMegaMenu();
+    await buildMobileNav();
+    
     return true;
     
   } catch (error) {
@@ -49,12 +67,11 @@ export async function loadHeader() {
 }
 
 /**
- * ✅ Add admin link to navigation if user is superadmin
+ * Add admin link to navigation if user is superadmin
  */
 function addAdminLinkIfSuperadmin(headerElement) {
   if (!isSuperadmin()) return;
   
-  // Find the navigation menu
   const navList = headerElement.querySelector('.nav-list');
   
   if (!navList) {
@@ -62,10 +79,8 @@ function addAdminLinkIfSuperadmin(headerElement) {
     return;
   }
   
-  // Check if admin link already exists
   if (navList.querySelector('.admin-link')) return;
   
-  // Create admin nav item
   const adminItem = document.createElement('li');
   adminItem.className = 'nav-item';
   
@@ -77,14 +92,12 @@ function addAdminLinkIfSuperadmin(headerElement) {
     <span>Admin</span>
   `;
   
-  // Add active state if on admin page
   if (window.location.pathname === '/admin.html' || window.location.pathname === '/admin') {
     adminLink.classList.add('active');
   }
   
   adminItem.appendChild(adminLink);
   
-  // Insert before the last item (typically Create Recipe)
   const lastItem = navList.querySelector('li:last-child');
   if (lastItem) {
     navList.insertBefore(adminItem, lastItem);
@@ -110,7 +123,6 @@ export function injectBadgeToggle() {
     return;
   }
   
-  // Check if toggle already exists
   const existingToggle = document.getElementById('badgeToggle');
   console.log('🔍 Existing toggle:', existingToggle);
   
@@ -119,28 +131,23 @@ export function injectBadgeToggle() {
     return;
   }
   
-  // Get the toggle HTML
   const toggleHTML = renderBadgeToggle();
   console.log('🔍 toggleHTML from renderBadgeToggle():', toggleHTML);
   console.log('🔍 toggleHTML length:', toggleHTML?.length);
   
   if (toggleHTML) {
-    // Create temporary container to parse HTML
     const temp = document.createElement('div');
     temp.innerHTML = toggleHTML;
     const toggleButton = temp.firstElementChild;
     console.log('🔍 Parsed toggle button element:', toggleButton);
     
-    // Find the logout button
     const logoutBtn = userInfo.querySelector('#logout-btn');
     console.log('🔍 Logout button found:', logoutBtn);
     
     if (logoutBtn) {
-      // Insert toggle BEFORE logout button
       userInfo.insertBefore(toggleButton, logoutBtn);
       console.log('✅ Badge toggle inserted before logout button');
     } else {
-      // Fallback: append to user info
       userInfo.appendChild(toggleButton);
       console.log('✅ Badge toggle appended to user info (no logout button found)');
     }
@@ -153,12 +160,7 @@ export function injectBadgeToggle() {
 
 /**
  * Initialize header with auth state and event listeners
- * Call this after loadHeader() and after auth initialization
  */
 export function initHeader() {
-  // This function is for any header-specific initialization
-  // Auth UI updates are handled by updateAuthUI()
-  // Role-based UI updates are handled by initRoleBasedUI()
-  
   console.log('✓ Header initialized');
 }

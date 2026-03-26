@@ -1,4 +1,5 @@
 import "./style.scss";
+import 'notyf/notyf.min.css'; 
 import {
   stringify,
   v4 as uuidv4
@@ -17,6 +18,7 @@ import {
 import {
   unsplashme
 } from "./unsplash.js";
+import { loadCuratedSections } from './components/CuratedSections.js';
 
 import { initRoleBasedUI } from './auth/roleUI.js';
 import {
@@ -81,6 +83,7 @@ const isFirstTime = localStorage.getItem('firstTime') !== 'false';
 
 // ✅ Declare recipes variable
 let recipes;
+let currentUser = null;
 
 
 // ✅ Hide immediately if not first time OR already logged in
@@ -89,14 +92,16 @@ if (!isFirstTime || authenticated) {
   await updateAuthUI();
   setupAuthListeners();
   recipes = await loadRecipes(true); // ✅ Force fresh fetch
-  let currentUser = null;
+ 
 try {
     currentUser = authenticated ? await getUser() : null;
 } catch (e) {
     console.warn('Could not get user:', e.message);
 }
+await loadCuratedSections();
+removeSpinner(1500);
 await listRecipes(recipes, currentUser?.sub);
-  removeSpinner(1500);
+ 
 
   initBadgeVisibility();
   injectBadgeToggle();
@@ -116,7 +121,8 @@ await listRecipes(recipes, currentUser?.sub);
     setupAuthListeners();
     recipes = await loadRecipes(true);
     // await getCategories();
-    await listRecipes(recipes);
+    await loadCuratedSections();
+    await listRecipes(recipes, currentUser?.sub);
     
   initBadgeVisibility();
   injectBadgeToggle();
@@ -141,7 +147,7 @@ document.querySelector('#search-filter').addEventListener('input', (e) => {
   setFilters({
     searchText: e.target.value
   })
-  listRecipes(recipes)
+  listRecipes(recipes, currentUser?.sub)
 })
 
 document.querySelector('#filter-by').addEventListener('change', (e) => {
@@ -149,7 +155,7 @@ document.querySelector('#filter-by').addEventListener('change', (e) => {
   setFilters({
     sortBy: e.target.value
   })
-  listRecipes(recipes) // ✅ Pass recipes
+  listRecipes(recipes, currentUser?.sub) // ✅ Pass recipes
 })
 
 document.addEventListener("change", (e) => {

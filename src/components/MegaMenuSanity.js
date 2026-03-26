@@ -2,6 +2,71 @@
  * MEGA MENU - SANITY NAV PATTERN
  * Measures content, sets box dimensions dynamically
  */
+export async function buildNav() {
+  try {
+    const res = await fetch('/.netlify/functions/get-categories');
+    const { grouped } = await res.json();
+
+    const navList = document.getElementById('nav-list');
+    if (!navList) return;
+
+    const activeGroups = Object.entries(grouped).filter(([group, cats]) =>
+      cats.some(cat => cat.recipeCount > 0)
+    );
+
+    const dropdownHTML = activeGroups.map(([group, cats]) => {
+      const activeCats = cats.filter(cat => cat.recipeCount > 0);
+      const groupId = group.toLowerCase() + '-menu';
+
+      // Sub-group by sectionTitle
+      const sections = activeCats.reduce((acc, cat) => {
+        const title = cat.sectionTitle || group;
+        if (!acc[title]) acc[title] = [];
+        acc[title].push(cat);
+        return acc;
+      }, {});
+
+      const sectionsHTML = Object.entries(sections).map(([sectionTitle, sectionCats]) => `
+        <div class="mega-panel-section">
+          <h3 class="mega-section-title">${sectionTitle}</h3>
+          <ul class="mega-link-list">
+            ${sectionCats.map(cat => `
+              <li>
+                <a href="/category/${cat.slug}" class="mega-link">
+                  <span class="mega-link-title">${cat.name}</span>
+                  ${cat.description ? `<span class="mega-link-desc">${cat.description}</span>` : ''}
+                </a>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      `).join('');
+
+      return `
+        <li class="nav-item has-dropdown" data-open="false">
+          <button
+            class="nav-link"
+            aria-expanded="false"
+            aria-controls="${groupId}"
+            aria-haspopup="true"
+          >
+            ${group} <i class="fa fa-chevron-down"></i>
+          </button>
+          <div id="${groupId}" class="mega-menu-panel">
+            <div class="mega-panel-grid">
+              ${sectionsHTML}
+            </div>
+          </div>
+        </li>
+      `;
+    }).join('');
+
+    navList.insertAdjacentHTML('afterbegin', dropdownHTML);
+
+  } catch (error) {
+    console.error('Failed to build nav:', error);
+  }
+}
 
 /**
  * Setup mega menu interactions
@@ -72,6 +137,27 @@ export function setupSanityMegaMenu() {
 
   // Measure all panels on init
   getMeasurements();
+function openPanel(item, button, panelId) {
+  getMeasurements();
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  
+  const w = panel.getAttribute('data-width');
+  const h = panel.getAttribute('data-height');
+  
+  item.setAttribute('data-open', 'true');
+  item.classList.remove('leaving');
+  panel.style.visibility = 'visible';
+  panel.style.zIndex = '1';
+  panel.classList.add('is-active');
+  
+  box.classList.add('is-active');
+  box.style.width = `${Math.max(w, navBar.offsetWidth)}px`;
+  box.style.height = `${Math.max(h, 400)}px`;
+  
+  backdrop.classList.add('is-visible');
+  button.setAttribute('aria-expanded', 'true');
+}
 
   navItems.forEach((item) => {
     const button = item.querySelector('.nav-link[aria-controls]');
@@ -80,62 +166,36 @@ export function setupSanityMegaMenu() {
     if (!button || !panelId) return;
 
     // Mouse enter - open menu
-    item.addEventListener('mouseenter', (e) => {
-      // Close ALL other menus first
-      navItems.forEach(otherItem => {
-        if (otherItem !== item && otherItem.getAttribute('data-open') === 'true') {
-          otherItem.setAttribute('data-open', 'false');
-          otherItem.classList.add('leaving');
-          
-          const otherButton = otherItem.querySelector('.nav-link[aria-controls]');
-          const otherPanelId = otherButton?.getAttribute('aria-controls');
-          const otherPanel = document.getElementById(otherPanelId);
-          
-          if (otherPanel) {
-            otherPanel.classList.remove('is-active');
-            otherPanel.style.visibility = 'hidden';
-          }
-          
-          otherButton?.setAttribute('aria-expanded', 'false');
+    let hoverTimer;
+
+item.addEventListener('mouseenter', (e) => {
+  clearTimeout(hoverTimer);
+  const anyOpen = Array.from(navItems).some(i => i.getAttribute('data-open') === 'true');
+  if (!anyOpen) return;
+  if (item.getAttribute('data-open') === 'true') return;
+  
+  hoverTimer = setTimeout(() => {
+    // Close sibling panels only — don't touch the box
+    navItems.forEach(otherItem => {
+      if (otherItem !== item) {
+        otherItem.setAttribute('data-open', 'false');
+        const otherButton = otherItem.querySelector('.nav-link[aria-controls]');
+        const otherPanelId = otherButton?.getAttribute('aria-controls');
+        const otherPanel = document.getElementById(otherPanelId);
+        if (otherPanel) {
+          otherPanel.classList.remove('is-active');
+          otherPanel.style.visibility = 'hidden';
         }
-      });
-
-      // Don't re-open if already open
-      if (item.getAttribute('data-open') === 'true') return;
-
-      item.setAttribute('data-open', 'true');
-      item.classList.remove('leaving');
-      
-      // Remeasure in case content changed
-      getMeasurements();
-      
-      // Find the panel
-      const panel = document.getElementById(panelId);
-      if (!panel) return;
-      
-      // Get dimensions
-      const w = panel.getAttribute('data-width');
-      const h = panel.getAttribute('data-height');
-      
-      // Show panel
-      panel.style.visibility = 'visible';
-      panel.style.zIndex = '1';
-      panel.classList.add('is-active');
-      
-      // Size the box to content
-      box.classList.add('is-active');
-      box.style.width = `${Math.max(w, navBar.offsetWidth)}px`;
-      box.style.height = `${Math.max(h, 400)}px`;
-      // box.style.transition = 'all 0.5s';
-      
-      // Show backdrop
-      backdrop.classList.add('is-visible');
-      
-      // Update button state
-      button.setAttribute('aria-expanded', 'true');
-      
-      console.log(`Opened ${panelId}: ${w}x${h}`);
+        otherButton?.setAttribute('aria-expanded', 'false');
+      }
     });
+    openPanel(item, button, panelId);
+  }, 150);
+});
+
+item.addEventListener('mouseleave', () => {
+  clearTimeout(hoverTimer);
+});
 
     // Focus in (keyboard navigation)
 item.addEventListener('focusin', (e) => {
@@ -210,11 +270,10 @@ item.addEventListener('focusout', (e) => {
       const isOpen = item.getAttribute('data-open') === 'true';
       
       if (isOpen) {
-        // Already open - do nothing (don't toggle closed)
-        return;
+      
       } else {
-        // Closed - open it (mouseenter will handle closing others)
-        item.dispatchEvent(new Event('mouseenter'));
+        closeAllMenus();
+        openPanel(item, button, panelId);
       }
     });
   });

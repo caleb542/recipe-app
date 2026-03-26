@@ -19,6 +19,7 @@ export const CATEGORIES = {
   'asian': 'Asian',
   'mediterranean': 'Mediterranean',
   'american': 'American',
+  'irish': 'Irish',
   'french': 'French',
   
   // Dietary

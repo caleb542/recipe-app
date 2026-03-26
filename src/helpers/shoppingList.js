@@ -1,5 +1,16 @@
 import { updateLocalStorage } from '../functions.js';
 
+
+import { Notyf } from 'notyf';
+let notyf = new Notyf({
+    duration: 2000,
+    position: { x: 'right', y: 'bottom' },
+    
+});
+
+
+
+
 export function setupShoppingList(recItem, recipeId) {
     const checkboxes = document.querySelectorAll('.checklist li input');
     const list = document.querySelector('.shopping-list');
@@ -9,75 +20,102 @@ export function setupShoppingList(recItem, recipeId) {
         return `Shopping list for ${recipeName}:\n\n` + shoppingListArr.join('\n');
     }
 
-    function showSharePopover(recipeName, anchorEl) {
-        document.querySelector('.share-popover')?.remove();
+function showSharePopover(recipeName, anchorEl) {
+  document.querySelector('.share-popover')?.remove();
 
-        const text = getShareText(recipeName);
-        const subject = encodeURIComponent(`Shopping list for ${recipeName}`);
-        const body = encodeURIComponent(text);
-        const encoded = encodeURIComponent(text);
+  const text = getShareText(recipeName);
+  const subject = encodeURIComponent(`Shopping list for ${recipeName}`);
+  const body = encodeURIComponent(text);
+  const encoded = encodeURIComponent(text);
 
-        const options = [
-            {
-                label: 'Gmail',
-                icon: 'fa-brands fa-google',
-                action: () => window.open(`https://mail.google.com/mail/?view=cm&su=${subject}&body=${body}`, '_blank')
-            },
-            {
-                label: 'Default Mail App',
-                icon: 'fa-solid fa-envelope',
-                action: () => window.location.href = `mailto:?subject=${subject}&body=${body}`
-            },
-            {
-                label: 'WhatsApp',
-                icon: 'fa-brands fa-whatsapp',
-                action: () => window.open(`https://wa.me/?text=${encoded}`, '_blank')
-            },
-            {
-                label: 'Telegram',
-                icon: 'fa-brands fa-telegram',
-                action: () => window.open(`https://t.me/share/url?text=${encoded}`, '_blank')
-            },
-            {
-                label: 'SMS',
-                icon: 'fa-solid fa-comment-sms',
-                action: () => window.location.href = `sms:?body=${encoded}`
-            },
-            {
-                label: 'Copy to Clipboard',
-                icon: 'fa-solid fa-copy',
-                action: async () => {
-                    await navigator.clipboard.writeText(text);
-                    notyf?.success('Copied to clipboard!');
-                    document.querySelector('.share-popover')?.remove();
-                }
-            }
-        ];
-
-        const popover = document.createElement('div');
-        popover.className = 'share-popover';
-
-        options.forEach(({ label, icon, action }) => {
-            const btn = document.createElement('button');
-            btn.innerHTML = `<i class="fa ${icon}"></i> ${label}`;
-            btn.addEventListener('click', () => {
-                action();
-                popover.remove();
-            });
-            popover.appendChild(btn);
-        });
-
-        setTimeout(() => {
-            document.addEventListener('click', function handler(e) {
-                if (!popover.contains(e.target)) {
-                    popover.remove();
-                    document.removeEventListener('click', handler);
-                }
-            });
-        }, 0);
-
-        anchorEl.appendChild(popover);
+  const options = [
+  {
+    label: 'Copy to Clipboard',
+    icon: 'fa-solid fa-copy',
+    action: async () => {
+      await navigator.clipboard.writeText(text);
+      notyf.success("Copied to clipboard!");
+      console.log('notyf:', notyf.success);
+      document.querySelector('.share-popover')?.remove();
     }
+  },
+  {
+    label: 'Gmail',
+    icon: 'fa-brands fa-google',
+    action: () => window.open(`https://mail.google.com/mail/?view=cm&su=${subject}&body=${body}`, '_blank')
+  },
+  {
+    label: 'Default Mail App',
+    icon: 'fa-solid fa-envelope',
+    action: () => window.location.href = `mailto:?subject=${subject}&body=${body}`
+  },
+  {
+    label: 'WhatsApp',
+    icon: 'fa-brands fa-whatsapp',
+    action: () => window.open(`https://wa.me/?text=${encoded}`, '_blank')
+  },
+  {
+    label: 'SMS',
+    icon: 'fa-solid fa-comment-sms',
+    action: () => window.location.href = `sms:?body=${encoded}`
+  }
+];
+
+  const popover = document.createElement('div');
+  popover.className = 'share-popover';
+
+  options.forEach(({ label, icon, action }) => {
+    const btn = document.createElement('button');
+    btn.innerHTML = `<i class="${icon}"></i> ${label}`;
+    btn.addEventListener('click', () => {
+      action();
+      popover.remove();
+    });
+    popover.appendChild(btn);
+  });
+
+  // Position relative to anchor button
+const rect = anchorEl.getBoundingClientRect();
+popover.style.position = 'fixed';
+popover.style.visibility = 'hidden';
+popover.style.zIndex = '9999';
+popover.style.left = `${rect.left}px`;
+document.body.appendChild(popover);
+
+const popoverRect = popover.getBoundingClientRect();
+const spaceBelow = window.innerHeight - rect.bottom;
+
+if (spaceBelow >= popoverRect.height + 8) {
+  popover.style.top = `${rect.bottom + 8}px`;
+} else {
+  popover.style.top = `${rect.top - popoverRect.height - 8}px`;
+}
+
+const rightEdge = rect.left + popoverRect.width;
+if (rightEdge > window.innerWidth) {
+  popover.style.left = `${window.innerWidth - popoverRect.width - 16}px`;
+}
+
+popover.style.visibility = 'visible';
+
+  setTimeout(() => {
+    document.addEventListener('click', function handler(e) {
+      if (!popover.contains(e.target)) {
+        popover.remove();
+        document.removeEventListener('click', handler);
+      }
+    });
+  }, 0);
+
+  const scrollHandler = () => {
+    popover.remove();
+    window.removeEventListener('scroll', scrollHandler);
+    };
+
+ window.addEventListener('scroll', scrollHandler, { passive: true });
+
+  
+}
 
     async function handleShare(recipeName) {
         const shareBtn = document.getElementById('share-list');
@@ -126,11 +164,16 @@ function renderShoppingList(recipeName) {
         moreBtn.classList.add('share-btn', 'share-btn--more');
         moreBtn.id = 'share-list-more';
         moreBtn.title = 'More sharing options';
-        moreBtn.innerHTML = `<i class="fa fa-solid fa-ellipsis"></i> <span>More options</span>`;
+        moreBtn.innerHTML = `<i class="fa fa-solid fa-ellipsis"></i> <span>More sharing options</span>`;
         moreBtn.addEventListener('click', () => showSharePopover(recipeName, moreBtn));
 
-        list.appendChild(shareBtn);
-        list.appendChild(moreBtn);
+        const container = document.querySelector('.shoppinglist-container');
+        const shareButtonContainer = document.createElement("div");
+        shareButtonContainer.classList.add("share-button-container");
+        container.appendChild(shareButtonContainer);
+        shareButtonContainer.appendChild(shareBtn);
+        shareButtonContainer.appendChild(moreBtn);
+
     }
 }
 

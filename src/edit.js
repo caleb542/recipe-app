@@ -5,7 +5,7 @@ import '@toast-ui/editor/dist/toastui-editor.css';
 import { showQuickAddModal } from './helpers/quickAdd.js';
 
 // Helpers
-import { populateFields, wireFieldListeners } from './helpers/fields.js';
+import { populateFields, wireFieldListeners, loadCategories } from './helpers/fields.js';
 import { listDirections, setupDirections } from './helpers/directions.js';
 import { setupTagsUI } from './helpers/tagsUI.js';
 import { listIngredients, setupIngredientDelegation, addIngredient } from './helpers/ingredients.js';
@@ -25,11 +25,11 @@ import { initStatusToggle, getCurrentPublishedState } from './helpers/statusTogg
 import { setupVideoHelper } from './helpers/setupVideoHelper.js';
 import { loadHeader } from './components/HeaderComponent.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
-// import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
-
-
 
 loadHeader();
+
+// Edit page always needs fresh data — clear the cache timestamp
+localStorage.removeItem('recipes_timestamp');
 
 // Initialize auth
 await initAuth0();
@@ -45,6 +45,7 @@ if (!authenticated) {
   alert('Please log in to edit recipes');
   window.location.href = '/index.html';
 }
+
 
 /**
  * Initialize editing for an existing recipe
@@ -109,6 +110,7 @@ hideWarning();
   localStorage.setItem('editingRecipe', JSON.stringify(recipe));
 
   // Orchestration: call helpers
+  await loadCategories(recipe.categories || []);
   populateFields(recipe);
   setupSlugEditor(recipe, currentUser)
 

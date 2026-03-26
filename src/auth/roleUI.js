@@ -123,7 +123,7 @@ export const addSuperadminIndicator = (recipe, cardElement) => {
  * Update all UI elements based on current user permissions
  */
 export const updateRoleBasedUI = () => {
-  showAdminBadge();
+  // showAdminBadge();
   
   // You can add more UI updates here as needed
   // For example, showing/hiding admin menu items, etc.

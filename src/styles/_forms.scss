@@ -418,3 +418,120 @@ label.article-checklist-items:hover {
     color: #666;
     font-size: 0.85rem;
 }
+
+.cuisine-tag-input {
+  position: relative;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.5rem;
+  min-height: 44px;
+  cursor: text;
+  background: white;
+
+  &:focus-within {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.15);
+  }
+}
+
+.cuisine-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 0.375rem;
+}
+
+.cuisine-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #e8f4fd;
+  color: #185fa5;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.cuisine-tag-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #185fa5;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.6;
+
+  &:hover { opacity: 1; }
+}
+
+#cuisine-search {
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  width: 100%;
+  min-width: 120px;
+  padding: 0.125rem 0.25rem;
+  background: transparent;
+}
+
+.cuisine-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.cuisine-option {
+  padding: 0.625rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+
+  &:hover {
+    background: #f0f7ff;
+    color: #185fa5;
+  }
+}
+
+.category-hint {
+  font-size: 0.8rem;
+  color: #888;
+  margin: 0 0 0.625rem;
+  line-height: 1.5;
+}
+
+.category-hint-examples {
+  display: block;
+  color: #aaa;
+  font-style: italic;
+  margin-top: 0.125rem;
+}
+
+.cuisine-option {
+  padding: 0.625rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.1s;
+
+  &:hover,
+  &.focused {
+    background: #f0f7ff;
+    color: #185fa5;
+  }
+
+  &.focused {
+    outline: none;
+  }
+}

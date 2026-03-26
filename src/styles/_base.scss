@@ -13,6 +13,7 @@
 html {
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
+    scroll-padding-top: 160px;
 }
 
 body {
@@ -63,6 +64,9 @@ a {
 
 button {
     cursor: pointer;
+    border:0;
+    background-color: unset;
+    
 }
 
 textarea:focus,

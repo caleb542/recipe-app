@@ -162,6 +162,7 @@ async function handleQuickAdd(input, recipeId, modal) {
         }
         
         // Populate form with parsed data
+
         console.log('📝 Populating form...');
         await populateParsedRecipe(parsedRecipe, recipeId);
         console.log('✅ Form populated');
@@ -335,6 +336,12 @@ function parseIngredientLine(line) {
  * Populate form with parsed recipe data
  */
 async function populateParsedRecipe(parsedRecipe, recipeId) {
+
+    const raw = localStorage.getItem('recipes');
+  const parsed = JSON.parse(raw || '[]');
+  console.log('📦 Raw localStorage recipe count:', parsed.length);
+  console.log('📦 Recipe IDs in localStorage:', parsed.map(r => r.id));
+    
     console.log('📝 Populating form with parsed recipe:', parsedRecipe);
     
     const recipes = await loadRecipes();

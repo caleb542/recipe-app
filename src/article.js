@@ -79,6 +79,8 @@ let likesInitialized = false;
 let articleHydrated = false;
 
 await loadHeader();
+await loadCategoriesMap();
+
 hideWarning();
 setupSanityMegaMenu();
 
@@ -104,6 +106,21 @@ if (authenticated) {
 await updateAuthUI();
 setupAuthListeners();
 initImpersonationBanner();
+
+let CATEGORIES_MAP = {};
+
+async function loadCategoriesMap() {
+  try {
+    const res = await fetch('/.netlify/functions/get-categories');
+    const { categories } = await res.json();
+    categories.forEach(cat => {
+      CATEGORIES_MAP[cat.slug] = cat.name;
+    });
+  } catch (e) {
+    console.warn('Could not load categories map, falling back to static:', e);
+    CATEGORIES_MAP = { ...CATEGORIES }; // fallback to hardcoded
+  }
+}
 
 // Add storage listener
 window.addEventListener("storage", e => {
@@ -445,20 +462,23 @@ function renderBreadcrumbs(recipe) {
 
   let breadcrumbHTML = '<nav aria-label="Breadcrumb" class="breadcrumb"><a href="/">Home</a>';
 
-  if (fromCategory && CATEGORIES[fromCategory]) {
-    breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/category/${fromCategory}">${CATEGORIES[fromCategory]}</a>`;
-  }
+if (fromCategory && CATEGORIES_MAP[fromCategory]) {
+  breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/category/${fromCategory}">${CATEGORIES_MAP[fromCategory]}</a>`;
+}
 
   breadcrumbHTML += ` <span aria-hidden="true">›</span> <span aria-current="page">${recipe.name}</span>`;
   breadcrumbHTML += '</nav>';
 
   // Also-in tags — exclude the category already in the trail
-  const otherCategories = (recipe.categories || []).filter(cat => cat !== fromCategory);
+const otherCategories = (recipe.categories || []).filter(cat => {
+  const catSlug = Object.keys(CATEGORIES_MAP).find(key => CATEGORIES_MAP[key] === cat) || cat;
+  return catSlug !== fromCategory;
+});
 
 if (otherCategories.length > 0) {
   breadcrumbHTML += `<p class="also-in">Also in: ${
     otherCategories.map(cat => {
-      const slug = Object.keys(CATEGORIES).find(key => CATEGORIES[key] === cat) || cat;
+      const slug = Object.keys(CATEGORIES_MAP).find(key => CATEGORIES_MAP[key] === cat) || cat;
       return `<a href="/category/${slug}">${cat}</a>`;
     }).join(' · ')
   }</p>`;

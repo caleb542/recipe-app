@@ -23,6 +23,10 @@
 @use './styles/megamenubox';
 @use './styles/quickAddModal';
 @use './styles/share-popover';
+@use './styles/avatar-dropdown';
+@use './styles/curated-sections';
+@use './styles/hero';
+@use './styles/mobile';
 @use './styles/print';
 
 // Import Google Fonts
@@ -61,7 +65,8 @@ $desktopCardHeight: 400px;
 
 /* Container */
 .container {
-    width: clamp(400px, 100%, 1366px);
+    width: 100%;
+    max-width: 1366px;
     position: relative;
     margin: 0 auto;
     padding: 0 0rem;
@@ -81,8 +86,11 @@ $desktopCardHeight: 400px;
 }
 
 .content-wrap {
-    padding-bottom: 12rem;
-    max-width: 100%;
+  width: 100%;
+  max-width: 1366px;
+  margin: 0 auto;
+  padding-bottom: 12rem;
+  
 }
 
 /* Article Styles */
@@ -301,7 +309,7 @@ article h1 {
     gap: 2em;
     margin: 2em 0;
     height: auto;
-    overflow: hidden;
+   
 }
 
 .checklist-container {
@@ -328,7 +336,7 @@ article h1 {
 
 }
 .shoppinglist-container {
-    padding: 1rem 1rem 3rem 1rem;
+    padding: 1rem 1rem 1rem 1rem;
     background: $cSet2_bg;
     min-height: 8rem;
     border: 0;
@@ -830,31 +838,6 @@ footer.page-footer {
     height: 10rem;
 }
 
-/* Hero */
-.homepage-hero {
-    background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../public/images/hero3.jpg');
-    min-height: 400px;
-    height: auto;
-    background-repeat: no-repeat;
-    background-size: cover;
-    width: 100%;
-    position: relative;
-    padding: 2rem;
-    display: grid;
-}
-
-.homepage-hero h2 {
-    color: #fff;
-    font-size: 3.25rem;
-    font-weight: normal;
-    font-family: 'Abril Fatface', serif;
-    text-align: center;
-}
-
-.hero-header {
-    align-content: center;
-}
-
 .warning {
     padding: 1rem 2rem;
     color: #2d2d2d;
@@ -907,146 +890,7 @@ footer.page-footer {
     z-index: 5;
 }
 
-/* ========================================
-   MOBILE RESPONSIVE STYLES
-   ======================================== */
 
-@media screen and (min-width:300px) and (max-width:768px) {
-    /* Header adjustments */
-    .header-top {
-        min-height: unset;
-        height: auto;
-        box-shadow: 0 0 7px 0px #aaa;
-    }
-
-    .home-page .header-top {
-        min-height: 5rem;
-    }
-
-    .header__title {
-        padding: 0rem 1rem;
-    }
-
-    .menu-toggle {
-        padding: 0rem 0rem;
-        margin: 2rem 2rem 0rem 0;
-    }
-
-    h1.header__title a {
-        font-size: 1.5rem;
-        top: 0;
-    }
-
-    .article__title {
-        font-weight: 600;
-        position: relative;
-        top: 50%;
-        margin: 0;
-        
-        width: 100%;
-        left: 0;
-        font-size: 2.25rem;
-        transform: translate(0);
-        margin-bottom: 1rem;
-        text-align: left;
-        line-height: 1.25;
-    }
-
-    /* Social buttons mobile */
-    .social-buttons-container {
-        height: 0.5rem;
-        margin-bottom: 0rem;
-    }
-
-    .social-buttons {
-        width: 60%;
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .social-buttons li > button {
-        padding: 0 0rem;
-        justify-content: flex-end;
-        gap: 0.15rem;
-    }
-
-    .social-buttons li > button i {
-        padding: 0.25rem;
-    }
-
-    /* Recipe grid mobile */
-    div#recipes {
-        grid-template-columns: 1fr;
-        column-gap: 3rem;
-    }
-
-    /* Cards mobile */
-    .home-page .card .text-area {
-        position: relative;
-        padding: 0;
-        height: auto;
-        overflow: hidden;
-    }
-
-    .home-page article {
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        padding: 1rem 2rem;
-    }
-
-    .home-page article h1 {
-        font-size: 1rem;
-        text-wrap:pretty;
-    }
-
-    .home-page article p {
-        font-size: 1.125rem;
-        display: block;
-        font-size: 0.875rem;
-        padding: 0 0 1rem 0;
-        line-height: 1.25;
-        font-weight: normal;
-        -webkit-line-clamp: 3;
-        max-height: 52px;
-        text-overflow: ellipsis;
-        white-space: normal;
-        overflow: hidden;
-        -webkit-box-orient: vertical;
-        display: -webkit-box;
-    }
-
-    /* Lists mobile */
-    .lists {
-        grid-template-columns: 1fr;
-    }
-
-    .shoppinglist-container {
-        width: 100vw;
-        left: 0;
-        padding: 0 2rem;
-        position: relative;
-        margin-left: -2rem;
-    }
-
-    .shopping-list li:last-child {
-        margin-bottom: 6rem;
-    }
-
-    /* Auth section mobile */
-    .auth-section {
-        order: -1;
-        margin-right: 0.5rem;
-    }
-
-    #login-btn, #logout-btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
-    }
-
-    #user-name {
-        display: none;
-    }
-}
 
 .recipe-article {
     anchor-name:--page-edit-anchor;
@@ -1104,7 +948,7 @@ a.article-edit-button {
     }
 }
 .article-block {
-    width: clamp(400px, 100%, 1024px);
+    width: clamp(400px, 100%, 1366px);
      padding:40px;
 }
 #breadcrumbs {
@@ -1127,4 +971,42 @@ a.article-edit-button {
 
 .also-in a:hover {
   text-decoration: underline;
+}
+
+
+.profile-page .btn-primary,
+.profile-page .btn-secondary{
+    padding: 0.5rem 1.5rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.5s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.profile-page .btn-primary:hover,
+.article-page .btn-secondary:hover {
+  background: #2980b9;
+  text-decoration: none;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+// ----------------------------------------
+// HEADER — Glassmorphic override
+// ----------------------------------------
+
+header {
+  background: rgba(15, 15, 15, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.15) !important;
 }

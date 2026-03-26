@@ -1,0 +1,199 @@
+.avatar-dropdown {
+  position: fixed;
+  z-index: 1005;
+  min-width: 220px;
+  background: rgba(20, 20, 20, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+
+  // Grows from top-right (avatar position)
+  transform-origin: top right;
+
+   animation: avatarDropdownOpen 0.5s ease-out forwards;
+}
+
+@keyframes avatarDropdownOpen {
+  0% {
+    opacity: 0;
+    transform: scale(0.15);
+    border-radius: 50%;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+    border-radius: 20px;
+  }
+  65% {
+    transform: scale(0.96);
+    border-radius: 18px;
+  }
+  75% {
+    transform: scale(1.04);
+    border-radius: 17px;
+  }
+  85% {
+    transform: scale(0.98);
+  }
+  92% {
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    border-radius: 16px;
+  }
+}
+@keyframes avatarDropdownClose {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    border-radius: 16px;
+  }
+ 50% {
+    opacity: 1;
+    transform: scale(1.04);
+    border-radius: 20px;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.15);
+    border-radius: 50%;
+  }
+}
+@keyframes avatarGulp {
+  0% { 
+    transform: scale(1); 
+    box-shadow: 0 0 0 0.25rem hsla(199, 54%, 73%, 0.5);
+    filter: brightness(1);
+  }
+  20% { 
+    transform: scale(1.55); 
+    box-shadow: 0 0 0 0.05rem hsla(199, 54%, 23%, 0.6);  
+    filter: brightness(1.25);
+  }
+  61% { 
+    transform: scale(1.65);
+    box-shadow: 0 0 0 0.02rem hsla(199, 54%, 15%, 0.8);  
+    filter: brightness(1.35);
+  }
+  62% { 
+    transform: scale(1.63);  /* cliff edge tip */
+  }
+  75% { 
+    transform: scale(0.82); 
+    filter: brightness(0.9);
+    box-shadow: none;
+  }
+  85% { transform: scale(1.08); }
+  92% { transform: scale(0.97); }
+  100% { 
+    transform: scale(1); 
+    box-shadow: 0 0 0 0.25rem hsla(199, 54%, 73%, 0.5);
+    filter: brightness(1);
+  }
+}
+// Profile header section
+.avatar-dropdown-header {
+  padding: 1.25rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+
+  .avatar-dropdown-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+
+    &.initials {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: white;
+    }
+  }
+}
+
+.avatar-dropdown-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  text-align: center;
+}
+
+.avatar-dropdown-role {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+
+  &.is-superadmin {
+    color: #f59e0b;
+    font-weight: 600;
+  }
+}
+
+// Divider
+.avatar-dropdown-divider {
+  height: 0.5px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0.25rem 0;
+}
+
+// Menu items
+.avatar-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+
+  i {
+    width: 14px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+    transition: color 0.15s;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 1);
+
+    i { color: rgba(255, 255, 255, 0.7); }
+  }
+}
+
+.avatar-dropdown-signout {
+  color: rgba(229, 62, 62, 0.85);
+
+  i { color: rgba(229, 62, 62, 0.6); }
+
+  &:hover {
+    background: rgba(229, 62, 62, 0.1);
+    color: rgb(229, 62, 62);
+
+    i { color: rgb(229, 62, 62); }
+  }
+}

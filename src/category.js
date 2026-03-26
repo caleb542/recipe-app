@@ -1,126 +1,78 @@
-// src/category.js
-// Category page - displays filtered recipes by category
-
 import { loadHeader } from './components/HeaderComponent.js';
 import { loadFooter } from './components/FooterComponent.js';
 import { listRecipes } from './recipes.js';
 import { loadRecipes, getFeaturedImage } from './functions.js';
 import { hideWarning } from './functions.js';
 import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
-import { setupSanityMegaMenu, openMegaMenu, closeMegaMenu } from './components/MegaMenuSanity.js';
-import { CATEGORIES } from './helpers/categories.js';
-
-// Category slug → display name mapping
-
+import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
 
 let allRecipes = [];
 let filteredRecipes = [];
 let currentCategory = '';
 let currentSlug = '';
+let CATEGORIES_MAP = {};
+
+async function loadCategoriesMap() {
+  try {
+    const res = await fetch('/.netlify/functions/get-categories');
+    const { categories } = await res.json();
+    categories.forEach(cat => {
+      CATEGORIES_MAP[cat.slug] = cat.name;
+    });
+  } catch (e) {
+    console.warn('Could not load categories map:', e);
+  }
+}
 
 async function init() {
   try {
-    console.log('Category page initializing...');
-    console.log('Current URL:', window.location.href);
-    console.log('Search params:', window.location.search);
-    
-    // Load header and footer (public page - no auth required)
-
     await loadHeader();
     hideWarning();
     await loadFooter();
-    
-    // Get category from URL
+    await loadCategoriesMap();
+
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('category');
-    
-    console.log('Category slug from params:', slug);
-    
-    // If slug is null, the redirect might not be working
-    // Try to extract from pathname as fallback
+
     if (!slug) {
-      const pathname = window.location.pathname;
-      console.log('No slug in params, checking pathname:', pathname);
-      
-     // Extract slug from pathname (e.g., /category/breakfast-and-brunch → breakfast-and-brunch)
-  currentSlug = pathname.replace(/^\/category\//, '').replace(/\/$/, '');
-  console.log('Extracted slug from pathname:', currentSlug);
+      currentSlug = window.location.pathname
+        .replace(/^\/category\//, '')
+        .replace(/\/$/, '');
     } else {
-       
       currentSlug = slug;
-      console.log('Failed Current Slug Test: Extracted slug from pathname:', currentSlug);
     }
-    
-    currentCategory = CATEGORIES[currentSlug];
-    
+
+    currentCategory = CATEGORIES_MAP[currentSlug];
+
     if (!currentCategory) {
       console.error('Category not found for slug:', currentSlug);
-      console.log('Available categories:', Object.keys(CATEGORIES));
+      removeSpinner(0);
       renderError(`Category "${currentSlug}" not found`);
       return;
     }
-    
-    console.log('Category name:', currentCategory);
-    
-    // Update page title
+
     document.title = `${currentCategory} - Recipe Me`;
-    
-    // Setup Megamenu
-    setupSanityMegaMenu()
-    
-    // Render breadcrumbs
+    setupSanityMegaMenu();
     renderBreadcrumbs(currentCategory, currentSlug);
-    
-    // Load recipes
+
     showSpinner();
-  
 
-    allRecipes = await loadRecipes();  // ← Use loadRecipes
-
-    // filter for complete + public recipes only:
+    allRecipes = await loadRecipes();
     allRecipes = allRecipes.filter(recipe => {
       const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
       const hasDirections = recipe.directions && recipe.directions.length > 0;
-      const isComplete = hasIngredients && hasDirections;
-      const isPublic = recipe.isPublic !== false; // Default to true if undefined
-
-      return isComplete && isPublic;
+      return hasIngredients && hasDirections && recipe.isPublic !== false;
     });
 
-console.log('Total recipes loaded:', allRecipes.length);
-    console.log('Total recipes loaded:', allRecipes.length);
-    
-    // Debug: Log first recipe's categories
-    if (allRecipes.length > 0) {
-      console.log('Sample recipe categories:', allRecipes[0].categories);
-    }
-    
-    // Filter by category
     filteredRecipes = allRecipes.filter(recipe => {
-      if (!recipe.categories) {
-        return false;
-      }
-      const match = recipe.categories.includes(currentCategory);
-      if (match) {
-        console.log('Match found:', recipe.name, recipe.categories);
-      }
-      return match;
+      if (!recipe.categories) return false;
+      return recipe.categories.includes(currentCategory);
     });
-    
-    console.log('Filtered recipes:', filteredRecipes.length);
-    
 
-    
-    // Render hero after filtering (so we have count)
     renderHero(currentCategory);
-    
-    // Render recipes
     renderRecipes();
-    
-    // RemoveSpinner
     removeSpinner(1500);
 
-    // Setup sort listener
     const sortSelect = document.getElementById('filter-by');
     if (sortSelect) {
       sortSelect.addEventListener('change', (e) => {
@@ -128,9 +80,10 @@ console.log('Total recipes loaded:', allRecipes.length);
         renderRecipes();
       });
     }
-    
+
   } catch (error) {
     console.error('Category page error:', error);
+    removeSpinner(0);
     renderError('Failed to load category page: ' + error.message);
   }
 }
@@ -153,7 +106,6 @@ function renderHero(categoryName) {
   if (!hero) return;
   
   const count = filteredRecipes.length;
-  
   hero.innerHTML = `
     <div class="category-hero">
       <h1>${categoryName}</h1>
@@ -180,13 +132,11 @@ function sortRecipes(sortBy) {
 function renderRecipes() {
   const count = filteredRecipes.length;
   const container = document.getElementById('recipes');
-  container.setAttribute("data-count", count);
-  if (!container) {
-    console.error('Recipes container not found');
-    return;
-  }
+  if (!container) return;
   
-  if (filteredRecipes.length === 0) {
+  container.setAttribute('data-count', count);
+
+  if (!filteredRecipes.length) {
     container.innerHTML = `
       <div class="empty-state" style="padding: 4rem 2rem; text-align: center;">
         <i class="fa fa-utensils" style="font-size: 3rem; color: #ccc;"></i>
@@ -197,15 +147,12 @@ function renderRecipes() {
     `;
     return;
   }
-  
-  // Use the same card structure as homepage
+
   container.innerHTML = filteredRecipes.map(recipe => {
-    // Get featured image (same logic as recipes.js)
     const featuredImage = recipe.images?.find(img => img.isFeatured) || recipe.images?.[0];
     const photoURL = featuredImage?.url || recipe.photoURL || '/images/pexels-mali-maeder-1.jpg';
-    
-    const recipeLink = `/article/${recipe.slug || recipe._id}?from=${currentCategory}`;
-    
+    const recipeLink = `/article/${recipe.slug || recipe._id}?from=${currentSlug}`;
+
     return `
       <a href="${recipeLink}" class="card home">
         <article>
@@ -219,8 +166,6 @@ function renderRecipes() {
       </a>
     `;
   }).join('');
-
-
 }
 
 function renderError(message) {
@@ -228,7 +173,7 @@ function renderError(message) {
   if (hero) {
     hero.innerHTML = `
       <div class="error-state" style="padding: 4rem 2rem; text-align: center;">
-        <h1>Error</h1>
+        <h1>Oops</h1>
         <p>${message}</p>
         <a href="/" class="btn-primary">Go Home</a>
       </div>
@@ -236,7 +181,4 @@ function renderError(message) {
   }
 }
 
-
-
-// Initialize
 init();

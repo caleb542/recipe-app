@@ -1019,6 +1019,7 @@ html {
 }
 
 body {
+
     font: normal normal 400 18px/28px 'Source Sans Pro', sans-serif;
     -webkit-font-smoothing: antialiased;
     // font-family: 'Poppins',sans-serif;
@@ -1111,7 +1112,7 @@ nav {
 
 }
 
-nav ul {
+nav ul:not[hidden] {
     width: 100%;
     display: flex;
     justify-content: center;
@@ -3398,10 +3399,7 @@ form#update #ingredients>ul {
         padding: 0rem 1rem;
     }
 
-    .menu-toggle {
-        padding: 0rem 0rem;
-        margin: 2rem 2rem 0rem 0;
-    }
+
 
     h1.header__title a {
         font-size: 1.5rem;
