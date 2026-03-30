@@ -45,7 +45,7 @@ import { setupSanityMegaMenu, openMegaMenu, closeMegaMenu } from './components/M
 
 // Load shared header FIRST
 await loadHeader();
-hideWarning();
+// hideWarning();
 console.log('🔍 After loadHeader, checking box:', document.querySelector('.mega-menu-box'));
 setupSanityMegaMenu();
 await loadFooter();
