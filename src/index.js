@@ -106,6 +106,8 @@ await listRecipes(recipes, currentUser?.sub);
   // Show splash for first-time visitors
   overlay.style.display = "flex";
   removeSpinner(200);
+   // Warm the cache while user reads the splash
+  recipes = loadRecipes(); // fire and forget - no await
 
 
  
@@ -115,7 +117,7 @@ await listRecipes(recipes, currentUser?.sub);
     overlay.classList.add('hidden');
     await updateAuthUI(); // ✅ Add await
     setupAuthListeners();
-    recipes = await loadRecipes();
+    // recipes = await loadRecipes();
     // await getCategories();
     await loadCuratedSections();
     await listRecipes(recipes, currentUser?.sub);
