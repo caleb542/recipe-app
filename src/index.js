@@ -1,9 +1,6 @@
 import "./style.scss";
 import 'notyf/notyf.min.css'; 
-import {
-  stringify,
-  v4 as uuidv4
-} from 'uuid';
+import { stringify, v4 as uuidv4 } from 'uuid';
 import {
   createApi
 } from './unsplash.js'
@@ -91,7 +88,7 @@ if (!isFirstTime || authenticated) {
     overlay.style.display = 'none';
   await updateAuthUI();
   setupAuthListeners();
-  recipes = await loadRecipes(true); // ✅ Force fresh fetch
+  recipes = await loadRecipes(); // ✅ Force fresh fetch
  
 try {
     currentUser = authenticated ? await getUser() : null;
@@ -119,7 +116,7 @@ await listRecipes(recipes, currentUser?.sub);
     overlay.classList.add('hidden');
     await updateAuthUI(); // ✅ Add await
     setupAuthListeners();
-    recipes = await loadRecipes(true);
+    recipes = await loadRecipes();
     // await getCategories();
     await loadCuratedSections();
     await listRecipes(recipes, currentUser?.sub);

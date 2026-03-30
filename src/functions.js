@@ -81,7 +81,7 @@ const openDirectionsDialogue = async (id, text) => {
   const modal = document.querySelector('#add-directions');
   modal.showModal();
 
-  let recipes = await loadRecipesFromLocalStorage();
+  // let recipes = await loadRecipesFromLocalStorage();
   let recipeId = location.hash.substring(1);
   let recItem = recipes.find((recipe) => recipe.id === recipeId);
   
@@ -264,7 +264,8 @@ const loadRecipes = async (forceRefresh = false) => {
   const timestamp = localStorage.getItem('recipes_timestamp');
   
   // ✅ Check if cache is fresh (5 minutes)
-  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  // const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
   const isCacheFresh = timestamp && (Date.now() - parseInt(timestamp)) < CACHE_DURATION;
   
   // ✅ Use cache if available and fresh

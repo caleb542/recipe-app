@@ -10,9 +10,10 @@ nav {
  overflow-x:clip;
 }
 nav.main-nav {
-  width:100%;
-  background-color: #1f2937;
-   
+  width: 100%;
+  background: rgba(28, 28, 28, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 /* Navigation bar */
 .nav-bar {
