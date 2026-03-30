@@ -20,6 +20,7 @@ import { loadCuratedSections } from './components/CuratedSections.js';
 import { initRoleBasedUI } from './auth/roleUI.js';
 import {
   loadRecipes,
+  loadCategories,
   getTimestamp,
   saveRecipes,
   toggleMenu,
@@ -106,28 +107,26 @@ await listRecipes(recipes, currentUser?.sub);
   // Show splash for first-time visitors
   overlay.style.display = "flex";
   removeSpinner(200);
-   // Warm the cache while user reads the splash
-  recipes = loadRecipes(); // fire and forget - no await
+  // Warm the cache while user reads the splash
+  loadRecipes();    // fire and forget - no await
+  loadCategories(); // fire and forget - no await
 
 
  
   // Browse without login
-  browseBtn.addEventListener('click', async () => { // ✅ Make async
-    localStorage.setItem('firstTime', 'false');
-    overlay.classList.add('hidden');
-    await updateAuthUI(); // ✅ Add await
-    setupAuthListeners();
-    // recipes = await loadRecipes();
-    // await getCategories();
-    await loadCuratedSections();
-    await listRecipes(recipes, currentUser?.sub);
-    
+ browseBtn.addEventListener('click', async () => {
+  localStorage.setItem('firstTime', 'false');
+  overlay.classList.add('hidden');
+  await updateAuthUI();
+  setupAuthListeners();
+  recipes = await loadRecipes(); // hits localStorage, already warm
+  await loadCuratedSections();
+  await listRecipes(recipes, currentUser?.sub);
+  
   initBadgeVisibility();
   injectBadgeToggle();
   initBadgeToggle();
-
-
-  });
+});
   // Login to create
   splashLoginBtn.addEventListener('click', async () => {
     localStorage.setItem('firstTime', 'false');
