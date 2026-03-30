@@ -9,9 +9,7 @@ import { generateRecipeBadges } from './components/RecipeBadges.js';
 import { isAuthenticated, getUser, isAuthor } from './auth/auth0.js';
 
 let listRecipes = async (recipesParam, currentUserId = null) => {
-  let recipes = await getRecipesFromDatabase();
-  saveRecipes(recipes);
-  recipes = await loadRecipes();
+ let recipes = await loadRecipes();
 
   // ✅ Get current user (with fallback for public pages)
   let authenticated = !!currentUserId;
