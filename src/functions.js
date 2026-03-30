@@ -81,7 +81,7 @@ const openDirectionsDialogue = async (id, text) => {
   const modal = document.querySelector('#add-directions');
   modal.showModal();
 
-  // let recipes = await loadRecipesFromLocalStorage();
+  let recipes = await loadRecipesFromLocalStorage();
   let recipeId = location.hash.substring(1);
   let recItem = recipes.find((recipe) => recipe.id === recipeId);
   
@@ -445,7 +445,7 @@ const addToExistingRecipes = () => {
 
 }
 
-let recipes = await loadRecipes()
+// let recipes = await loadRecipes()
 
 // In unsplash images
 
