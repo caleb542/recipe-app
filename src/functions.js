@@ -303,7 +303,25 @@ const loadRecipes = async (forceRefresh = false) => {
   return recipes;
 };
 
+const loadCategories = async (forceRefresh = false) => {
+  const raw = localStorage.getItem('categories');
+  const timestamp = localStorage.getItem('categories_timestamp');
+  
+  const CACHE_DURATION = 24 * 60 * 60 * 1000;
+  const isCacheFresh = timestamp && (Date.now() - parseInt(timestamp)) < CACHE_DURATION;
+  
+  if (raw && !forceRefresh && isCacheFresh) {
+    return JSON.parse(raw);
+  }
 
+  const res = await fetch('/.netlify/functions/get-categories');
+  const data = await res.json(); // { categories, grouped }
+  
+  localStorage.setItem('categories', JSON.stringify(data));
+  localStorage.setItem('categories_timestamp', Date.now().toString());
+  
+  return data;
+};
 
 
 const loadRecipesFromLocalStorage = async () => {
@@ -602,6 +620,7 @@ export {
     saveRecipes,
     getTimestamp,
     loadRecipes,
+    loadCategories,
     loadRecipesFromLocalStorage,
     loadNewRecipeFromLocalStorage,
     saveNewRecipeToLocalStorage,

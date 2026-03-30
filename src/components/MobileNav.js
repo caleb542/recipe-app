@@ -1,12 +1,12 @@
 import { CATEGORIES } from '../helpers/categories.js';
+import { loadCategories } from '../functions.js';
 
 export async function buildMobileNav() {
   const mobileNav = document.getElementById('mobile-nav');
   if (!mobileNav) return;
 
   try {
-    const res = await fetch('/.netlify/functions/get-categories');
-    const { grouped } = await res.json();
+   const { grouped } = await loadCategories();
 
     // Filter groups to only those with at least one active category
     const activeGroups = Object.entries(grouped).filter(([, cats]) =>

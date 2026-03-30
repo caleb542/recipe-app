@@ -1,26 +1,10 @@
-import { getFeaturedImage } from '../functions.js';
+import { loadCategories, loadRecipes, getFeaturedImage } from '../functions.js';
 
 const HOMEPAGE_SECTIONS = [
-  {
-    categorySlug: 'desserts-and-sweets',
-    label: 'Something Sweet',
-    count: 4
-  },
-  {
-    categorySlug: 'drinks',
-    label: 'Drinks',
-    count: 3
-  },
-  {
-    categorySlug: 'appetizers-and-starters',
-    label: 'Appetizers & Starters',
-    count: 6
-  },
-  {
-    categorySlug: 'quick-and-easy',
-    label: 'Quick & Easy',
-    count: 4
-  },
+  { categorySlug: 'desserts-and-sweets', categoryName: 'Desserts & Sweets', label: 'Something Sweet', count: 4 },
+  { categorySlug: 'drinks', categoryName: 'Drinks', label: 'Drinks', count: 3 },
+  { categorySlug: 'appetizers-and-starters', categoryName: 'Appetizers & Starters', label: 'Appetizers & Starters', count: 6 },
+  { categorySlug: 'quick-and-easy', categoryName: 'Quick & Easy', label: 'Quick & Easy', count: 4 },
 ];
 
 async function fetchSectionRecipes(slug, count) {
@@ -37,9 +21,7 @@ async function fetchSectionRecipes(slug, count) {
 
 async function fetchCategoryMeta(slug) {
   try {
-    const res = await fetch(`/.netlify/functions/get-categories`);
-    if (!res.ok) return null;
-    const { categories } = await res.json();
+   const { categories } = await loadCategories();
     return categories.find(c => c.slug === slug) || null;
   } catch {
     return null;
@@ -138,25 +120,43 @@ export async function loadCuratedSections() {
   container.innerHTML = '';
 
   try {
-    // Fetch everything in parallel
-    const [worldItems, categoriesRes, ...recipesResults] = await Promise.all([
-      fetchWorldFlavours(),
-      fetch('/.netlify/functions/get-categories'),
-      ...HOMEPAGE_SECTIONS.map(section =>
-        fetchSectionRecipes(section.categorySlug, section.count)
-      )
+    const [{ categories, grouped }, recipes] = await Promise.all([
+      loadCategories(),
+      loadRecipes()
     ]);
 
-    const { categories } = await categoriesRes.json();
+    // World Flavours — use Cuisine group, one recipe per cuisine
+    const cuisineNames = new Set(
+      (grouped.Cuisine || [])
+        .filter(c => c.recipeCount > 0)
+        .map(c => c.name)
+    );
+
+    const cuisineMap = {};
+    recipes.forEach(recipe => {
+      if (!recipe.categories?.length) return;
+      recipe.categories.forEach(cat => {
+        if (cuisineNames.has(cat) && !cuisineMap[cat]) {
+          cuisineMap[cat] = recipe;
+        }
+      });
+    });
+
+    const worldItems = Object.entries(cuisineMap).map(([cuisineName, recipe]) => ({
+      recipe, cuisineName
+    }));
 
     const worldHTML = renderWorldFlavoursSection(worldItems);
 
+    // Curated sections — filter by display name
     const sectionsHTML = HOMEPAGE_SECTIONS
-      .map((section, i) => ({
-        section,
-        recipes: recipesResults[i],
-        meta: categories.find(c => c.slug === section.categorySlug)
-      }))
+      .map(section => {
+        const sectionRecipes = recipes
+          .filter(r => r.categories?.includes(section.categoryName))
+          .slice(0, section.count);
+        const meta = categories.find(c => c.slug === section.categorySlug);
+        return { section, recipes: sectionRecipes, meta };
+      })
       .filter(({ recipes }) => recipes.length > 0)
       .map(({ section, recipes, meta }) => renderSection(section, recipes, meta))
       .join('');

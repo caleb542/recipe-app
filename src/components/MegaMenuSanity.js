@@ -2,10 +2,12 @@
  * MEGA MENU - SANITY NAV PATTERN
  * Measures content, sets box dimensions dynamically
  */
+import { loadCategories } from '../functions.js';
+
 export async function buildNav() {
   try {
-    const res = await fetch('/.netlify/functions/get-categories');
-    const { grouped } = await res.json();
+    const { grouped } = await loadCategories();
+
 
     const navList = document.getElementById('nav-list');
     if (!navList) return;
