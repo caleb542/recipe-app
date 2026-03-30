@@ -28,7 +28,6 @@ import {
   loadRecipesFromLocalStorage,
   hideWarning
 } from './functions.js'
-// import { getRecipesFromDatabase } from "./backend/getRecipesFromDatabase.js";
 
 import { initAuth0, login, isAuthenticated, getUser } from './auth/auth0.js';
 

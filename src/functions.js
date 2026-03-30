@@ -12,6 +12,8 @@ import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
 import { updateRecipeInDatabase } from './backend/updateRecipeInDatabase.js';
 import { syncRecipeUpdate } from './helpers/syncRecipe.js';
 import { sanitizeHTML, sanitizeText } from './utils/sanitize.js';
+import { selectUnsplashImageForGallery } from './helpers/featureImage.js';
+
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 const convertTimestamp = (rDate) => {
     if (typeof rDate === 'object') {
@@ -449,7 +451,7 @@ const addToExistingRecipes = () => {
 
 // In unsplash images
 
-import { selectUnsplashImageForGallery } from './helpers/featureImage.js';
+
 
 export async function renderImageSelector(keyword, pageNumber, recipeId) {
   const modal = document.getElementById('select-images');
