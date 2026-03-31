@@ -225,28 +225,44 @@
     // SORT BAR
     // ----------------------------------------
 
-    .sort-bar {
-      width: 100%;
-      padding: 0 1rem;
-      margin-top: 0.5rem;
-      justify-content: flex-end;
-      min-width: 0;
+   .sort-bar {
+  width: 100%;
+  padding: 0 1rem;
+  margin-top: 0.5rem;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.sort-controls {
+  gap: 8px;
+  flex-direction: column; // stack search above sort on mobile
+  align-items: stretch;
+  width: 100%;
+
+  .search-control {
+    width: 100%;
+
+    input[type="text"] {
+      font-size: 0.875rem;
     }
+  }
 
-    .sort-controls {
-      gap: 8px;
+  .sort-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
-      select {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
-      }
+  select {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
 
-      label {
-        font-size: 0.875rem;
-        padding: 0.5rem 0;
-      }
-    }
-
+  label {
+    font-size: 0.875rem;
+    padding: 0.5rem 0;
+  }
+}
     .mobile-nav-list {
   list-style: none;
   padding: 0;

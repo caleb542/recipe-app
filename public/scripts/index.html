@@ -95,24 +95,33 @@
                     Recipes worth cooking — from people who genuinely love to     cook. 
                     No ads, no clutter, no life stories before the ingredients.
                     </p>
-                    <a href="#curated-sections" class="homepage-hero-cta">Explore Recipes</a>
+                     <a href="#curated-sections" class="homepage-hero-cta">Explore Categories</a>
+                    <a href="#all-recipes" class="homepage-hero-cta inverted-hero-cta">All Recipes</a>
                 </div>
-                </div>  
+            </div>  
              <!-- Sections -->
             <div id="curated-sections"></div>
             <!-- All Recipes section -->
-            <div class="all-recipes-header">
-            <h2>All Recipes</h2>
+            <div id="all-recipes" class="all-recipes-header">
+            <h2 >All Recipes</h2>
             </div>
             <!-- Sort Bar -->
             <div class="sort-bar">
                 <div class="sort-controls">
-                    <label for="filter-by">Sort:</label>
-                    <select id="filter-by">
-                        <option value="byEdited">Last modified</option>
-                        <option value="byCreated">Created date</option>
-                        <option value="alphabetical">Alphabetical</option>
-                    </select>
+                     <!-- Search bar - only visible on homepage -->
+                    <div class="search-control">
+                        <i class="fa fa-search search-icon"></i>
+                        <input type="text" id="search-filter" placeholder="Filter All Recipes" aria-label="Search recipes">
+                    </div>
+                    <div class="sort-control">
+                        <label for="filter-by">Sort:</label>
+                        <select id="filter-by">
+                            <option value="byEdited">Last modified</option>
+                            <option value="byCreated">Created date</option>
+                            <option value="alphabetical">Alphabetical</option>
+                        </select>
+                    </div>
+                    
                 </div>
                 <!-- <a href="/edit.html" class="btn-primary btn-sm">
                     <i class="fa fa-plus"></i> Add Recipe
