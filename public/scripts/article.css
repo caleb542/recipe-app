@@ -1529,15 +1529,6 @@ nav.hide {
   padding-right: 2rem;
 }
 
-.search-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #666;
-  pointer-events: none;
-}
-
 .sort-fieldset {
   flex: 0 0 200px;
   border: none;
@@ -1720,14 +1711,19 @@ nav.hide {
   display: flex;
   align-items: center;
   gap: 8px;
+  height: 44px;
+  border: 1px solid #000;
+  box-sizing: border-box;
+  padding: 1rem;
 }
 .search-control .search-icon {
-  color: #555;
-  flex-shrink: 0;
+  position: unset;
+  color: rgb(50, 50, 50);
+  pointer-events: none;
 }
 .search-control input[type=text] {
-  border: 1px solid #000;
   outline: none;
+  border: none;
   width: 100%;
   font-size: 1rem;
   background: transparent;
@@ -1735,9 +1731,6 @@ nav.hide {
   display: flex;
   align-items: center;
   justify-content: normal;
-  height: 44px;
-  box-sizing: border-box;
-  padding: 1rem;
 }
 .search-control input[type=text]::placeholder {
   color: #999;
