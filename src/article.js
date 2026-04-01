@@ -1,5 +1,5 @@
 import "./style.scss";
-import { loadRecipes, hamburger, getFeaturedImage, getAllImages, hideWarning, loadRecipesFromLocalStorage } from "./functions.js";
+import { loadRecipes, hamburger, getFeaturedImage, getAllImages, hideWarning, loadRecipesFromLocalStorage, loadCategories } from "./functions.js";
 import { marked } from "marked";
 import { setupShoppingList } from "./helpers/shoppingList.js";
 import { initAuth0, getToken, isAuthenticated, getUser } from './auth/auth0.js';
@@ -54,6 +54,8 @@ if (document.readyState === 'loading') {
 // ✅ Extract slug from URL pathname or query string
 let slug = null;
 
+let CATEGORIES_MAP = {};
+
 // Try query string first
 const urlParams = new URLSearchParams(window.location.search);
 slug = urlParams.get('slug');
@@ -107,19 +109,13 @@ await updateAuthUI();
 setupAuthListeners();
 initImpersonationBanner();
 
-let CATEGORIES_MAP = {};
+
 
 async function loadCategoriesMap() {
-  try {
-    const res = await fetch('/.netlify/functions/get-categories');
-    const { categories } = await res.json();
-    categories.forEach(cat => {
-      CATEGORIES_MAP[cat.slug] = cat.name;
-    });
-  } catch (e) {
-    console.warn('Could not load categories map, falling back to static:', e);
-    CATEGORIES_MAP = { ...CATEGORIES }; // fallback to hardcoded
-  }
+  const { categories } = await loadCategories();
+  categories.forEach(cat => {
+    CATEGORIES_MAP[cat.slug] = cat.name;
+  });
 }
 
 // Add storage listener
