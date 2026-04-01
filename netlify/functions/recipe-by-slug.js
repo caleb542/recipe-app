@@ -1,5 +1,5 @@
 import { getMongoClient } from './utils/mongoClient.js';
-import { headers } from './utils/verifyAuth.js';
+import { headers, verifyToken } from './utils/verifyAuth.js';
 
 export const handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -15,27 +15,41 @@ export const handler = async (event) => {
   }
 
   try {
-    // fullSlug format: "chef_caleb/carbonara"
-    const fullSlug = event.queryStringParameters?.fullSlug;
+    const slug = event.queryStringParameters?.slug;
     
-    if (!fullSlug) {
+    if (!slug) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'fullSlug parameter required' })
+        body: JSON.stringify({ error: 'slug parameter required' })
       };
+    }
+
+    // ✅ Check if user is authenticated (optional for drafts)
+    const token = event.headers.authorization?.split(' ')[1];
+    let currentUserId = null;
+    
+    if (token) {
+      try {
+
+        const decoded = await verifyToken(token);
+        currentUserId = decoded.sub;
+        console.log("currentUserId", currentUserId)
+      } catch (err) {
+        // Not authenticated, that's okay
+        console.log('Token verification failed:', err.message);
+      }
     }
 
     const client = await getMongoClient();
     const db = client.db('recipe-me-db');
     const recipesCollection = db.collection('recipes');
 
-    const recipe = await recipesCollection.findOne({ 
-      fullSlug: fullSlug,
-      isPublic: true
-    });
+    // ✅ Look up by slug
+    const recipe = await recipesCollection.findOne({ slug: slug });
 
     if (!recipe) {
+      console.log(`Recipe not found with slug: ${slug}`);
       return {
         statusCode: 404,
         headers,
@@ -43,6 +57,27 @@ export const handler = async (event) => {
       };
     }
 
+    // ✅ Check access: published OR user is the author
+    const isAuthor = currentUserId && recipe.author?.auth0Id === currentUserId;
+    
+    console.log('Recipe access check:', {
+      slug,
+      isPublic: recipe.isPublic,
+      isAuthor,
+      currentUserId,
+      recipeAuthor: recipe.author?.auth0Id
+    });
+    
+    if (!recipe.isPublic && !isAuthor) {
+      console.log('Access denied: recipe is not public and user is not author');
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({ error: 'Recipe not found' })
+      };
+    }
+
+    console.log(`✅ Returning recipe: ${recipe.name}`);
     return {
       statusCode: 200,
       headers,

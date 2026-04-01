@@ -1,0 +1,46 @@
+/* App Level Spinner Overlay */
+
+#spinner-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.98);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap:1.5rem;
+  z-index: 10000;
+  transition: opacity 0.3s ease;
+  
+  &.fade-out {
+    opacity: 0;
+    pointer-events: none;
+    background:none;
+  }
+
+  .spinner {
+
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  
+  .spinner span {
+    width: 12px;
+    height: 12px;
+    background: #fbbf24;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+    
+    &:nth-child(1) { animation-delay: -0.32s; }
+    &:nth-child(2) { animation-delay: -0.16s; }
+  }
+  
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+  }
+}

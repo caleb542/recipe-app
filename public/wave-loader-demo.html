@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Me - Wave Loaders Demo</title>
+  <link href="/scripts/index.css" rel="stylesheet" media="screen" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2d3436;
+      margin-bottom: 50px;
+      font-size: 2.5rem;
+    }
+
+    .loader-demo {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .loader-demo h2 {
+      color: #2d3436;
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+
+    .loader-demo p {
+      color: #636e72;
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+
+    .code-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .code-section h3 {
+      color: #2d3436;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    pre {
+      background: #2d3436;
+      color: #dfe6e9;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: 'Courier New', monospace;
+    }
+
+    .use-case {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 12px 16px;
+      margin-top: 15px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      color: #1565c0;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 50px;
+      color: #636e72;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <h1>🌊 Recipe Me - Dreamy Wave Loaders</h1>
+
+    <!-- OPTION 1 -->
+    <div class="loader-demo">
+      <h2>1. Smooth Wave Dots</h2>
+      <p>Elegant and clean - perfect for recipe loading and search results</p>
+      
+      <div class="loader-container">
+        <div class="wave-loader" role="status" aria-label="Loading">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span class="loader-sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="use-case">
+        ✨ <strong>Best for:</strong> Recipe search results, filtering, general page loading
+      </div>
+
+      <div class="code-section">
+        <h3>HTML:</h3>
+        <pre><code>&lt;div class="wave-loader" role="status" aria-label="Loading"&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span class="loader-sr-only"&gt;Loading...&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <!-- OPTION 2 -->
+    <div class="loader-demo">
+      <h2>2. Pulsing Ripples</h2>
+      <p>Subtle and sophisticated - great for background processes</p>
+      
+      <div class="loader-container">
+        <div class="ripple-loader" role="status" aria-label="Loading">
+          <span></span>
+          <span></span>
+          <span class="loader-sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="use-case">
+        ✨ <strong>Best for:</strong> Image uploads, authentication, background saves
+      </div>
+
+      <div class="code-section">
+        <h3>HTML:</h3>
+        <pre><code>&lt;div class="ripple-loader" role="status" aria-label="Loading"&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span class="loader-sr-only"&gt;Loading...&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <!-- OPTION 3 -->
+    <div class="loader-demo">
+      <h2>3. Bouncing Ingredients</h2>
+      <p>Playful and colorful - adds personality to your food platform</p>
+      
+      <div class="loader-container">
+        <div class="bouncing-loader" role="status" aria-label="Loading">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span class="loader-sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="use-case">
+        ✨ <strong>Best for:</strong> Recipe creation, shopping lists, fun user interactions
+      </div>
+
+      <div class="code-section">
+        <h3>HTML:</h3>
+        <pre><code>&lt;div class="bouncing-loader" role="status" aria-label="Loading"&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span class="loader-sr-only"&gt;Loading...&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <!-- OPTION 4 -->
+    <div class="loader-demo">
+      <h2>4. Flowing Wave Bars</h2>
+      <p>Modern and minimalist - professional feel with smooth motion</p>
+      
+      <div class="loader-container">
+        <div class="wave-bars-loader" role="status" aria-label="Loading">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span class="loader-sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="use-case">
+        ✨ <strong>Best for:</strong> Data loading, analytics, export processes
+      </div>
+
+      <div class="code-section">
+        <h3>HTML:</h3>
+        <pre><code>&lt;div class="wave-bars-loader" role="status" aria-label="Loading"&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span class="loader-sr-only"&gt;Loading...&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <!-- OPTION 5 -->
+    <div class="loader-demo">
+      <h2>5. Dreamy Fade Wave</h2>
+      <p>Very subtle and sophisticated - elegant without being distracting</p>
+      
+      <div class="loader-container">
+        <div class="fade-wave-loader" role="status" aria-label="Loading">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span class="loader-sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <div class="use-case">
+        ✨ <strong>Best for:</strong> Inline content loading, subtle transitions, premium feel
+      </div>
+
+      <div class="code-section">
+        <h3>HTML:</h3>
+        <pre><code>&lt;div class="fade-wave-loader" role="status" aria-label="Loading"&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span&gt;&lt;/span&gt;
+  &lt;span class="loader-sr-only"&gt;Loading...&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p><strong>💡 Implementation Tips:</strong></p>
+      <p>• All loaders respect <code>prefers-reduced-motion</code> for accessibility</p>
+      <p>• Include the <code>loader-sr-only</code> class for screen reader support</p>
+      <p>• Colors can be easily customized in the CSS file</p>
+      <p>• Zero JavaScript required - pure CSS animations</p>
+      <p>• Lightweight (~2KB gzipped)</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,7 +1,7 @@
-import { loadRecipes, saveRecipes } from '../functions.js';
+import { loadRecipes, loadRecipesFromLocalStorage,saveRecipes } from '../functions.js';
 
 async function syncRecipeUpdate(recipeId, mutator) {
-  const recipes = await loadRecipes();
+  const recipes = await loadRecipesFromLocalStorage();
   const recipe = recipes.find(r => r.id === recipeId);
     if (!recipe) {
     console.warn("syncRecipeUpdate: no recipe found for id", recipeId);

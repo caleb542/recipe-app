@@ -1,0 +1,110 @@
+/* ========================================
+   BASE STYLES
+   Resets, body, typography, global elements
+   ======================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    // transition:1s cubic-bezier(0.175, 0.885, 0.72, 1.9);
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 160px;
+}
+
+body {
+    font: normal normal 400 18px/28px 'Source Sans Pro', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    
+    &.article-page {
+        background-color: #f6fbfa;
+    }
+
+    &.edit-page {
+        background: #fff;
+    }
+}
+
+h2 {
+    font: normal normal 400 3rem/28px 'Lato', sans-serif;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+p {
+    font: normal 500 'Poppins' 1.125rem/normal;
+    margin-bottom: 1rem;
+
+    &.summary {
+        font-size: 1.2rem;
+        font-weight: 400;
+        color: #000;
+        text-align: left;
+    }
+
+    &.author {
+        margin-bottom: 1rem;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+}
+
+a {
+    color: blue;
+}
+
+button {
+    cursor: pointer;
+    border:0;
+    background-color: unset;
+    
+}
+
+textarea:focus,
+input:focus,
+button:focus,
+a:focus {
+    box-shadow: 0 0 0 0.25rem rgb(150, 200, 224, 0.5);
+    outline: none;
+}
+
+.hidden {
+    display: none;
+}
+
+.hide {
+    display: none;
+}
+
+.hide-text {
+    position: absolute;
+    left: -9999px;
+}
+
+/* Utility Classes */
+img {
+    border: 0;
+}
+
+dialog {
+    position: fixed;
+    border: none;
+}
+
+date {
+    padding: 0;
+    color: #000;
+    background: transparent;
+    margin: 0;
+    text-transform: capitalize;
+    font-weight: 600;
+}

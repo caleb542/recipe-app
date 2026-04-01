@@ -8,6 +8,12 @@ public/scripts/*.js
 public/scripts/*.js.map
 public/scripts/*.css
 public/scripts/*.css.map
+ron.html
+ron.css
+creo.html
+creo-dashboard.html
+creo-dashboard-v2.html
 
 # EXCEPT these HTML files (need to be tracked)
 !public/scripts/*.html
+!public/design-tokens.css

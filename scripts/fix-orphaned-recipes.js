@@ -38,7 +38,7 @@ async function fixOrphanedRecipes() {
     const recipesCollection = db.collection('recipes');
     const usersCollection = db.collection('users');
     
-    // Find recipes without slugs (these are the orphaned ones)
+    // Find recipes without slugs
     const orphanedRecipes = await recipesCollection.find({ 
       slug: { $exists: false } 
     }).toArray();
@@ -50,60 +50,45 @@ async function fixOrphanedRecipes() {
       return;
     }
     
-    // Get your primary user (you can change this to any user you want)
-    const primaryUser = await usersCollection.findOne({ 
-      username: 'chef_caleb'  // @chef_caleb
-    });
-    
-    if (!primaryUser) {
-      console.error('❌ Could not find primary user');
-      return;
-    }
-    
-    console.log(`👤 Claiming orphaned recipes for: @${primaryUser.username}\n`);
+    // ✅ CHANGED: No longer need to find primary user
     
     for (const recipe of orphanedRecipes) {
       console.log(`📝 Recipe: ${recipe.name || 'Untitled'}`);
       console.log(`   ID: ${recipe.id}`);
-      console.log(`   Current author:`, recipe.author);
       
       // Generate slug
       const baseSlug = generateSlug(recipe.name || 'untitled');
       let slug = baseSlug;
       let counter = 2;
       
+      // ✅ CHANGED: Check against ALL recipes (not just user's recipes)
       while (await recipesCollection.findOne({ 
-        fullSlug: `${primaryUser.username}/${slug}`,
+        fullSlug: slug,
         id: { $ne: recipe.id }
       })) {
         slug = `${baseSlug}-${counter}`;
         counter++;
       }
       
-      const fullSlug = `${primaryUser.username}/${slug}`;
+      // ✅ CHANGED: fullSlug is just the slug now (no username)
+      const fullSlug = slug;
       
-      // Update recipe with new author and slug
+      // Update recipe with slug
       await recipesCollection.updateOne(
         { id: recipe.id },
         { 
           $set: { 
             slug,
             fullSlug,
-            author: {
-              auth0Id: primaryUser.auth0Id,
-              username: primaryUser.username,
-              name: primaryUser.profile?.displayName || primaryUser.email,
-              email: primaryUser.email
-            },
-            displayAuthor: recipe.author?.name || 'Legacy Recipe'
+            updatedAt: new Date().toISOString()
           } 
         }
       );
       
-      console.log(`   ✅ Claimed → /@${fullSlug}\n`);
+      console.log(`   ✅ Fixed → /${fullSlug}\n`);
     }
     
-    console.log('🎉 All orphaned recipes have been claimed!');
+    console.log('🎉 All orphaned recipes have been fixed!');
     
   } catch (error) {
     console.error('❌ Fix failed:', error);

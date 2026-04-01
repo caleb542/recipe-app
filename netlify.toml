@@ -1,4 +1,4 @@
-# netlify.toml - WITH CACHE HEADERS AND CLEAN URL REDIRECTS
+# netlify.toml - Recipe Me Configuration
 
 [build.environment]
 SECRETS_SCAN_OMIT_KEYS = "AUTH0_CLIENT_ID,AUTH0_DOMAIN"
@@ -8,9 +8,8 @@ command = "npm run dev"
 targetPort = 8888
 port = 8080
 functions = "netlify/functions"
-autoLaunch = false  # ✅ Add this
-#framework = "#custom"
-#framework = "#custom"
+autoLaunch = false
+framework = "#static" 
 
 [functions]
 directory = "netlify/functions"
@@ -21,79 +20,64 @@ external_node_modules = ["mongodb"]
 publish = "public"
 command = "npm run build"
 
+
 # ========================================
-# CLEAN URL REDIRECTS (MUST BE FIRST!)
+# AUTH0 CALLBACK - Must be first
 # ========================================
 
-# /@username/slug → article page
 [[redirects]]
-  from = "/@:username/:slug"
-  to = "/article.html?user=:username&slug=:slug"
+  from = "/callback"
+  to = "/callback.html"
   status = 200
+  force = true
 
-# /@username → profile page
+
+# ========================================
+# PROFILE PAGES
+# ========================================
+
 [[redirects]]
   from = "/@:username"
   to = "/profile.html?username=:username"
   status = 200
+  force = false
 
-# Backward compatibility: old hash-based URLs still work
+# ========================================
+# RECIPE PAGES (Username-based slugs)
+# These come AFTER categories
+# ========================================
+
 [[redirects]]
-  from = "/article.html"
-  to = "/article.html"
+  from = "/category/:slug"
+  to = "/category.html?category=:slug"
   status = 200
 
+# ========================================
+# RECIPE PAGES (Username-based slugs)
+# These come AFTER categories
+# ========================================
+
 [[redirects]]
-  from = "/profile.html"
-  to = "/profile.html"
+  from = "/article/:slug"
+  to = "/article.html?slug=:slug"
   status = 200
+  force = false
+
+#[[redirects]]
+#  from = "/@:username/:slug/edit"
+#  to = "/edit.html?slug=:slug"
+#  status = 200
+#  force = false
+
+# Legacy support for /@username/slug format
+[[redirects]]
+  from = "/@:username/:slug"
+  to = "/article.html?slug=:slug"
+  status = 200
+  force = false
+
 
 # ========================================
-# SPA fallback - ONLY for non-@ paths
+# FALLBACK - Removed the /* catch-all
+# Let 404s be 404s
 # ========================================
-
-# First, handle all the @ paths (already done above)
-# Then catch everything else EXCEPT @ paths
-
-
-
-  
-# ========================================
-# CACHE HEADERS FOR STATIC ASSETS
-# ========================================
-
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    # 1 year cache for hashed assets (CSS, JS with version hashes)
-
-[[headers]]
-  for = "/images/*"
-  [headers.values]
-    Cache-Control = "public, max-age=2592000"
-    # 30 days for images
-
-[[headers]]
-  for = "/*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
-    # 7 days for CSS
-
-[[headers]]
-  for = "/*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
-    # 7 days for JS
-
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-    # Always revalidate HTML
-
-[[headers]]
-  for = "/partials/*"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
-    # 1 hour for partials/templates

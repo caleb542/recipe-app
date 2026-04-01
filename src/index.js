@@ -1,8 +1,6 @@
 import "./style.scss";
-import {
-  stringify,
-  v4 as uuidv4
-} from 'uuid';
+import 'notyf/notyf.min.css'; 
+import { stringify, v4 as uuidv4 } from 'uuid';
 import {
   createApi
 } from './unsplash.js'
@@ -17,67 +15,128 @@ import {
 import {
   unsplashme
 } from "./unsplash.js";
+import { loadCuratedSections } from './components/CuratedSections.js';
+
+import { initRoleBasedUI } from './auth/roleUI.js';
 import {
   loadRecipes,
+  loadCategories,
   getTimestamp,
   saveRecipes,
   toggleMenu,
   hamburger,
   convertTimestamp,
-  loadRecipesFromLocalStorage
+  loadRecipesFromLocalStorage,
+  hideWarning
 } from './functions.js'
-import { getRecipesFromDatabase } from "./backend/getRecipesFromDatabase.js";
 
-import { initAuth0, login, isAuthenticated } from './auth/auth0.js';
+import { initAuth0, login, isAuthenticated, getUser } from './auth/auth0.js';
+
 import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
+import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
+import { loadFooter } from './components/FooterComponent.js';
 
-// Initialize auth
+import { initBadgeVisibility } from './utils/badgeVisibility.js';
+import { loadHeader, injectBadgeToggle } from './components/HeaderComponent.js';
+import { renderBadgeToggle, initBadgeToggle } from './components/BadgeToggleButton.js';
+import { generateRecipeBadges } from './components/RecipeBadges.js';
+import { setupSanityMegaMenu, openMegaMenu, closeMegaMenu } from './components/MegaMenuSanity.js';
+
+// Load shared header FIRST
+await loadHeader();
+hideWarning();
+console.log('🔍 After loadHeader, checking box:', document.querySelector('.mega-menu-box'));
+setupSanityMegaMenu();
+await loadFooter();
+const container = document.getElementById("spinner-container");
+showSpinner(container);
+
+// Then initialize auth
 await initAuth0();
-await loadUserProfile(); 
+const authenticated = await isAuthenticated();
+
+if (authenticated) {
+  await loadUserProfile(false); // ✅ Force fresh fetch (skipFetch = false)
+}
+
 await updateAuthUI();
 setupAuthListeners();
 
-// Check if user is already logged in
-const authenticated = await isAuthenticated();
+// Initialize role-based UI (shows badge, etc.)
+initRoleBasedUI();
+initImpersonationBanner();
+
 
 // Get overlay elements
 const overlay = document.getElementById("static-landing-page");
 const browseBtn = document.getElementById('browse-btn');
 const splashLoginBtn = document.getElementById('splash-login-btn');
 
-// Check if first time visiting
+// ✅ Check localStorage FIRST - before any other logic
 const isFirstTime = localStorage.getItem('firstTime') !== 'false';
+// const authenticated = await isAuthenticated();
 
-// Show splash only if first time AND not authenticated
+// ✅ Declare recipes variable
+let recipes;
+let currentUser = null;
+
+
+// ✅ Hide immediately if not first time OR already logged in
 if (!isFirstTime || authenticated) {
+    overlay.style.display = 'none';
+  await updateAuthUI();
+  setupAuthListeners();
+  recipes = await loadRecipes(); // ✅ Force fresh fetch
+ 
+try {
+    currentUser = authenticated ? await getUser() : null;
+} catch (e) {
+    console.warn('Could not get user:', e.message);
+}
+await loadCuratedSections();
+removeSpinner(1500);
+await listRecipes(recipes, currentUser?.sub);
+ 
+
+  initBadgeVisibility();
+  injectBadgeToggle();
+  initBadgeToggle();
+} else {
+  // Show splash for first-time visitors
+  overlay.style.display = "flex";
+  removeSpinner(200);
+  // Warm the cache while user reads the splash
+  loadRecipes();    // fire and forget - no await
+  loadCategories(); // fire and forget - no await
+
+
+ 
+  // Browse without login
+ browseBtn.addEventListener('click', async () => {
+  localStorage.setItem('firstTime', 'false');
   overlay.classList.add('hidden');
   await updateAuthUI();
   setupAuthListeners();
-  loadRecipes();
-} else {
-  // Show splash for first-time visitors
+  recipes = await loadRecipes(); // hits localStorage, already warm
+  await loadCuratedSections();
+  await listRecipes(recipes, currentUser?.sub);
   
-  // Browse without login
-  browseBtn.addEventListener('click', () => {
-    localStorage.setItem('firstTime', 'false'); // ✅ Mark as seen
-    overlay.classList.add('hidden');
-    updateAuthUI();
-    setupAuthListeners();
-    loadRecipes();
-  });
-  
+  initBadgeVisibility();
+  injectBadgeToggle();
+  initBadgeToggle();
+});
   // Login to create
   splashLoginBtn.addEventListener('click', async () => {
-    localStorage.setItem('firstTime', 'false'); // ✅ Mark as seen
+    localStorage.setItem('firstTime', 'false');
     await login();
-    // After Auth0 redirects back, they won't see splash again
   });
 }
 
+console.log('📦 Initial recipes loaded:', recipes?.length || 0);
 
-let recipes =  await loadRecipesFromLocalStorage()
-await listRecipes(recipes);
+
 
 // Event Listeners
 document.querySelector('#search-filter').addEventListener('input', (e) => {
@@ -85,80 +144,40 @@ document.querySelector('#search-filter').addEventListener('input', (e) => {
   setFilters({
     searchText: e.target.value
   })
-  listRecipes(recipes)
+  listRecipes(recipes, currentUser?.sub)
 })
 
-
 document.querySelector('#filter-by').addEventListener('change', (e) => {
-  console.log(e.target.value)
+  console.log(`Sort Changed To `, e.target.value)
   setFilters({
     sortBy: e.target.value
   })
-  listRecipes()
+  listRecipes(recipes, currentUser?.sub) // ✅ Pass recipes
 })
 
-
-const getCategories = async () => {
-  let categories = [];
-
-  if (Array.isArray(recipes)) {
-    recipes.forEach((recipe) => {
-      // Controlled category
-      const category = recipe.category || "Uncategorized";
-      categories.push(category);
-
-      // Optional: include tags if you want them in the cloud
-      if (Array.isArray(recipe.tags)) {
-        recipe.tags.forEach(tag => categories.push(tag));
-      }
-    });
-  } else {
-    console.warn("Recipes not available yet:", recipes);
-  }
-
-  categories = [...new Set(categories)];
-  categories.unshift("All");
-
-  const categoriesCloud = document.querySelector("#categories-cloud section");
-  categoriesCloud.setAttribute("tabindex", "0");
-  categoriesCloud.setAttribute("role", "radiogroup");
-
-  categories.forEach((cat, index) => {
-    const label = document.createElement("label");
-    label.setAttribute("role", "radio");
-    label.setAttribute("for", `cat-${index}`);
-    label.textContent = cat;
-
-    const radio = document.createElement("input");
-    radio.type = "radio";
-    radio.name = "category";
-    radio.id = `cat-${index}`;
-    radio.value = cat;
-    radio.classList.add("sort", "radio");
-
-    label.appendChild(radio);
-    categoriesCloud.appendChild(label);
-  });
-};
-
-
-// Event Listeners
 document.addEventListener("change", (e) => {
   if (e.target.matches('#categories-cloud input[type="radio"]')) {
     const selected = e.target.value;
-    setFilters({
-      searchText: selected === "All" ? "" : selected
-    });
+    
+    if (selected === "All") {
+      setFilters({ 
+        searchText: "",
+        showUncategorized: false 
+      });
+    } else if (selected === "Uncategorized") {
+      setFilters({ 
+        searchText: "", 
+        showUncategorized: true 
+      });
+    } else {
+      setFilters({ 
+        searchText: selected,
+        showUncategorized: false 
+      });
+    }
+    
     listRecipes(recipes);
   }
 });
 
-
-await getCategories()
 hamburger()
-      
-// window.addEventListener('storage', (e) => {
-//   if (e.key === 'recipes') {
-//     listRecipes(recipes)
-//   }
-// })

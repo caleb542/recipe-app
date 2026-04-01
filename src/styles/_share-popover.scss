@@ -1,0 +1,82 @@
+.share-popover {
+  min-width: 220px;
+  width: auto;
+  background: white;
+  border: 0.5px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  overflow: hidden;
+  padding: 6px 0;
+  font-family: var(--font-sans);
+}
+
+.share-popover button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+  color: #111;
+  text-align: left;
+  line-height: 1.4;
+  transition: background 0.15s;
+  outline: none;
+}
+
+.share-popover button:hover {
+  background: #f3f4f6;
+}
+
+.share-popover button:active {
+  background: #e5e7eb;
+}
+
+.share-popover button i {
+  width: 18px;
+  text-align: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+/* Divider before Copy to Clipboard */
+.share-popover button:last-child {
+  border-top: 0.5px solid #e5e7eb;
+  margin-top: 4px;
+  padding-top: 12px;
+}
+
+/* Brand colours on icons */
+.share-popover button:has(.fa-google) i      { color: #EA4335; }
+.share-popover button:has(.fa-whatsapp) i    { color: #25D366; }
+.share-popover button:has(.fa-comment-sms) i { color: #007AFF; }
+.share-popover button:has(.fa-envelope) i    { color: #6B7280; }
+.share-popover button:has(.fa-copy) i        { color: #6B7280; }
+
+#share-list {
+  position: relative;
+}
+
+.share-button-container {
+    margin-top:20px;
+    display: flex;
+    gap: 1rem;
+}
+.fa-ellipsis {
+    font-weight:900;
+}
+
+.share-btn {
+
+    border:1px solid #333;
+    border-radius: 6px;
+    background:#fff;
+    padding:0.5rem 1rem;
+    
+}

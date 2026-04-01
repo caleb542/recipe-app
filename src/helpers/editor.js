@@ -5,6 +5,7 @@ import { optimizeImage, IMAGE_PRESETS } from './imageOptimizer.js';
 import { generateFileHash } from './duplicateCheck.js';
 import { findExistingImage, registerImage } from './globalImageRegistry.js';
 
+
 const CLOUDINARY_CLOUD_NAME = 'day1f5nz8';
 const CLOUDINARY_UPLOAD_PRESET = 'recipe_images';
 
@@ -104,6 +105,7 @@ addImageBlobHook: async (blob, callback) => {
   });
 
   window.toastEditor = toastEditor;
+  window.editorInstance = toastEditor;
   return toastEditor;
 }
 

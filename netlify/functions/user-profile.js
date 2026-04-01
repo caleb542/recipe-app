@@ -2,7 +2,7 @@
 // User profile management - create, read, update user profiles
 
 import { getMongoClient } from './utils/mongoClient.js';
-import { verifyToken, getTokenFromHeader, headers } from './utils/verifyAuth.js';
+import { verifyAuth, headers } from './utils/verifyAuth.js';
 
 export const handler = async (event) => {
   // Handle CORS preflight
@@ -14,26 +14,26 @@ export const handler = async (event) => {
   const db = client.db('recipe-me-db');
   const usersCollection = db.collection('users');
 
-  // Verify authentication
-  const token = getTokenFromHeader(event.headers);
-  if (!token) {
-    return {
-      statusCode: 401,
-      headers,
-      body: JSON.stringify({ error: 'Authentication required' })
-    };
-  }
-
+  // ✅ Use verifyAuth helper that handles both ID and access tokens
   try {
-    const decoded = await verifyToken(token);
-    const auth0Id = decoded.sub;
-    const email = decoded.email;
+    const user = await verifyAuth(event);
+    
+    if (!user) {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({ error: 'Authentication required' })
+      };
+    }
+    
+    const auth0Id = user.sub;
+    const email = user.email;
 
     // GET - Fetch user profile
     if (event.httpMethod === 'GET') {
-      const user = await usersCollection.findOne({ auth0Id });
+      const userDoc = await usersCollection.findOne({ auth0Id });
       
-      if (!user) {
+      if (!userDoc) {
         return {
           statusCode: 404,
           headers,
@@ -44,16 +44,37 @@ export const handler = async (event) => {
         };
       }
 
-      // Update last login
+      // Update last login AND backfill email if missing
+      const updateFields = { 
+        lastLoginAt: new Date() 
+      };
+
+      // ✅ Backfill email if it's missing
+      if (!userDoc.email && email) {
+        updateFields.email = email;
+        console.log(`✅ Backfilled email for user ${userDoc.username}: ${email}`);
+      }
+
       await usersCollection.updateOne(
         { auth0Id },
-        { $set: { lastLoginAt: new Date() } }
+        { $set: updateFields }
       );
+
+      // ✅ Update the user object being returned
+      if (updateFields.email) {
+        userDoc.email = email;
+      }
+
+      console.log('User profile being returned:', {
+        username: userDoc.username,
+        email: userDoc.email,
+        role: userDoc.role || 'user'
+      });
 
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(user)
+        body: JSON.stringify(userDoc)
       };
     }
 
@@ -104,11 +125,22 @@ export const handler = async (event) => {
         };
       }
 
+      if (!email) {
+        console.error('⚠️ No email found in Auth0 token for user:', auth0Id);
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ 
+            error: 'Email is required. Please check your Auth0 configuration.' 
+          })
+        };
+      }
+
       // Create new user profile
       const newUser = {
         auth0Id: auth0Id,
         username: username.toLowerCase(),
-        email: email || null,
+        email: email,
         profile: {
           displayName: body.displayName.trim(),
           bio: '',

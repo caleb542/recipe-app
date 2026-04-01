@@ -1,0 +1,376 @@
+/* ==========================================================================
+   print.css — Recipe Me
+   Handles three print contexts:
+   1. Default (Ctrl+P, no body class)
+   2. body.printing-grocery-list
+   3. body.printing-recipe (future)
+   ========================================================================== */
+
+@media print {
+
+    /* ==========================================================================
+       PAGE SETUP
+       ========================================================================== */
+
+    @page {
+        size: letter portrait;       /* or 'A4 portrait' */
+        margin: 1in 0.75in;          /* top/bottom 1in, left/right 0.75in */
+    }
+
+    @page :first {
+        margin-top: 0.75in;          /* slightly tighter on first page */
+    }
+
+
+    /* ==========================================================================
+       GLOBAL PRINT RESETS
+       Always applied regardless of body class
+       ========================================================================== */
+
+    *,
+    *::before,
+    *::after {
+        box-shadow: none !important;
+        text-shadow: none !important;
+        transition: none !important;
+        animation: none !important;
+    }
+
+    html,
+    body {
+        width: 100%;
+        font-size: 11pt;
+        line-height: 1.5;
+        color: #000 !important;
+        background: #fff !important;
+    }
+
+    /* Readable body font for print */
+    body {
+        font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: Georgia, 'Times New Roman', serif;
+        color: #000 !important;
+        page-break-after: avoid;     /* Don't orphan a heading at bottom of page */
+    }
+
+    h1 { font-size: 22pt; }
+    h2 { font-size: 16pt; }
+    h3 { font-size: 13pt; }
+
+    p, li {
+        font-size: 11pt;
+        orphans: 3;                  /* Min lines at bottom of page */
+        widows: 3;                   /* Min lines at top of next page */
+    }
+
+    /* Avoid breaking inside these elements */
+    li,
+    blockquote,
+    figure,
+    table {
+        page-break-inside: avoid;
+    }
+
+    /* Links — show URL after link text */
+    a[href]::after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        color: #555;
+    }
+
+    /* Don't print URLs for internal/anchor links or JS links */
+    a[href^="#"]::after,
+    a[href^="javascript:"]::after,
+    a[href^="mailto:"]::after {
+        content: '';
+    }
+
+    /* Images */
+    img {
+        max-width: 100% !important;
+        page-break-inside: avoid;
+    }
+
+
+    /* ==========================================================================
+       DEFAULT PRINT — body has no special class
+       Hides UI chrome, prints page content naturally
+       ========================================================================== */
+
+    body:not(.printing-grocery-list):not(.printing-recipe) nav,
+    body:not(.printing-grocery-list):not(.printing-recipe) header,
+    body:not(.printing-grocery-list):not(.printing-recipe) footer,
+    body:not(.printing-grocery-list):not(.printing-recipe) aside,
+    body:not(.printing-grocery-list):not(.printing-recipe) .sidebar,
+    body:not(.printing-grocery-list):not(.printing-recipe) button,
+    body:not(.printing-grocery-list):not(.printing-recipe) .btn,
+    body:not(.printing-grocery-list):not(.printing-recipe) .share-btn,
+    body:not(.printing-grocery-list):not(.printing-recipe) .share-popover,
+    body:not(.printing-grocery-list):not(.printing-recipe) .modal-dialog,
+    body:not(.printing-grocery-list):not(.printing-recipe) .notyf,
+    body:not(.printing-grocery-list):not(.printing-recipe) .advertisement,
+    body:not(.printing-grocery-list):not(.printing-recipe) [class*="ad-"],
+    body:not(.printing-grocery-list):not(.printing-recipe) .cookie-banner,
+    body:not(.printing-grocery-list):not(.printing-recipe) .back-to-top {
+        display: none !important;
+    }
+
+
+    /* ==========================================================================
+       GROCERY LIST PRINT — body.printing-grocery-list
+       ========================================================================== */
+
+    body.printing-grocery-list > *:not(.shoppinglist-container) {
+        display: none !important;
+    }
+
+    body.printing-grocery-list .shoppinglist-container {
+        display: block !important;
+        padding: 0;
+    }
+
+    body.printing-grocery-list .share-btn,
+    body.printing-grocery-list .share-btn--more,
+    body.printing-grocery-list .share-popover {
+        display: none !important;
+    }
+
+    /* Grocery list specific styles */
+    body.printing-grocery-list .shopping-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        columns: 2;                  /* Two-column grocery list */
+        column-gap: 1in;
+    }
+
+    body.printing-grocery-list .shopping-list li {
+        padding: 4pt 0;
+        border-bottom: 0.5pt solid #ccc;
+        break-inside: avoid;
+        font-size: 11pt;
+    }
+
+    /* Checkbox-style bullet for grocery items */
+    body.printing-grocery-list .shopping-list li::before {
+        content: '☐  ';
+        font-size: 12pt;
+    }
+
+    /* Print header for grocery list */
+    body.printing-grocery-list .shoppinglist-container::before {
+        content: 'Shopping List';
+        display: block;
+        font-size: 18pt;
+        font-weight: bold;
+        margin-bottom: 0.25in;
+        padding-bottom: 6pt;
+        border-bottom: 1.5pt solid #000;
+    }
+
+
+    /* ==========================================================================
+       RECIPE PRINT — body.printing-recipe (future)
+       ========================================================================== */
+
+    body.printing-recipe > *:not(.recipe-container) {
+        display: none !important;
+    }
+
+    body.printing-recipe .recipe-container {
+        display: block !important;
+    }
+
+    body.printing-recipe nav,
+    body.printing-recipe header,
+    body.printing-recipe footer,
+    body.printing-recipe .share-btn,
+    body.printing-recipe .share-popover,
+    body.printing-recipe button,
+    body.printing-recipe .edit-btn,
+    body.printing-recipe .delete-btn,
+    body.printing-recipe .likes-container,
+    body.printing-recipe .comments-section {
+        display: none !important;
+    }
+
+    /* Recipe title */
+    body.printing-recipe .recipe-title {
+        font-size: 24pt;
+        margin-bottom: 6pt;
+    }
+
+    /* Recipe meta (prep time, total time etc.) */
+    body.printing-recipe .recipe-meta {
+        font-size: 9pt;
+        color: #555;
+        margin-bottom: 0.2in;
+        padding-bottom: 6pt;
+        border-bottom: 0.5pt solid #ccc;
+    }
+
+    /* Two-column layout: ingredients left, directions right */
+    body.printing-recipe .recipe-body {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        column-gap: 0.4in;
+    }
+
+    body.printing-recipe .ingredients-section h2,
+    body.printing-recipe .directions-section h2 {
+        font-size: 12pt;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 0.5pt solid #000;
+        padding-bottom: 4pt;
+        margin-bottom: 8pt;
+    }
+
+    body.printing-recipe .ingredients-section li {
+        font-size: 10pt;
+        padding: 3pt 0;
+        border-bottom: 0.5pt dotted #ccc;
+        list-style: none;
+    }
+
+    body.printing-recipe .directions-section li {
+        font-size: 11pt;
+        margin-bottom: 8pt;
+    }
+
+
+
+/* To Do: Print recipe and directions */
+/* 
+body{
+    font-size:32px;
+    font-family:sans-serif;
+}
+date{
+    font-size:0.75em;
+    line-height:1rem;
+}
+.author{
+    font-size:0.75em;
+}
+nav{
+    display:none;
+}
+.page__title{
+    font-size:30px;
+    width:100%;
+    display:block;
+    text-align:center;
+}
+.imageElement{
+    display:none;
+}
+
+.summary strong{
+    margin-bottom:20px;
+}
+p,
+br,
+h2{
+    margin-bottom:20px;
+}
+figure{
+    display:none;
+}
+figcaption{
+    display:none;
+}
+.photoInfo {
+    display:none;
+}
+a {
+    display:none;
+}
+.shoppinglist-container{
+    display:none;
+}
+
+input[type="checkbox"] {
+  
+     display:inline-block;
+        display:flex;
+        justify-content:baseline;
+        white-space:normal;
+        width:auto;
+  }
+  input[type="checkbox"] {
+    appearance: none;
+    background-color: #fff;
+    margin: 0;
+    font: inherit;
+    width: 1.15em;
+    height: 1.15em;
+    border: 0.15em solid currentColor;
+    border-radius: 0.15em;
+    transform: translateY(1.1em) translateX(-1.3em);
+  }
+
+  li {list-style:none;}
+  input[type="checkbox"]::before {
+    content: "";
+    width: 0.5em;
+    height: 0.5em;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em var(--form-control-color);
+  }
+  
+  input[type="checkbox"]:checked::before {
+    transform: scale(1);
+  }
+
+  
+.article-page ol {
+        max-width: unset;
+     counter-reset: directions-counter;
+ 
+     list-style: none;
+     padding-left: 1.75rem;
+ }
+ .article-page ol li {
+     margin: 0 0.5rem 0 0.5rem ;
+     counter-increment: directions-counter;
+     position: relative;
+     padding:0.5rem 0 0 2rem;
+ }
+ .article-page ol li::before {
+     content: counter(directions-counter);
+     color: #000;
+     font-size: 2rem;
+     font-weight: bold;
+     position: absolute;
+     --size: 1.4rem;
+     left: calc(-1 * var(--size) - 0.8rem);
+     line-height: var(--size);
+     width: var(--size);
+     height: var(--size);
+     top: 0rem;
+     margin-top:0px;
+     padding:0.5rem ;
+     margin-right:1rem;
+     border:1px solid #000;
+     border-radius:50%;
+     background: transparent;
+     
+ }    
+ .article-page ol ol li::before {
+     content: counter(directions-counter, lower-roman);
+     font-weight:normal;
+     font-size:1.5rem;
+ }
+
+ footer{
+    margin-top:6rem;
+    font-size:0.5em;
+ } */
+
+
+}

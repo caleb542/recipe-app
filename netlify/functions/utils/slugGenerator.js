@@ -40,17 +40,19 @@ export async function generateUniqueSlug(name, username, recipeId = null) {
   let slug = baseSlug;
   let counter = 2;
   
-  // Find unique slug for this user
+  // Find unique slug (globally unique, no username prefix)
   while (true) {
-    const fullSlug = `${username}/${slug}`;
-    
     const existing = await recipesCollection.findOne({ 
-      fullSlug: fullSlug,
+      slug: slug,  // Check just "slug" field, not "fullSlug"
       ...(recipeId && { id: { $ne: recipeId } })
     });
     
     if (!existing) {
-      return { slug, fullSlug };
+      // ✅ Both slug and fullSlug are the same (no username prefix)
+      return { 
+        slug: slug,      // "fruit-pies"
+        fullSlug: slug   // "fruit-pies" (same!)
+      };
     }
     
     slug = `${baseSlug}-${counter}`;
@@ -65,8 +67,8 @@ export async function generateUniqueSlug(name, username, recipeId = null) {
   }
   
   return { 
-    slug, 
-    fullSlug: `${username}/${slug}` 
+    slug: slug,      // "fruit-pies-2"
+    fullSlug: slug   // "fruit-pies-2" (same!)
   };
 }
 

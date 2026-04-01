@@ -36,7 +36,6 @@ async function addRecipeSlugs() {
     
     const db = client.db('recipe-me-db');
     const recipesCollection = db.collection('recipes');
-    const usersCollection = db.collection('users');
     
     // Find recipes without slugs
     const recipes = await recipesCollection.find({ 
@@ -51,36 +50,25 @@ async function addRecipeSlugs() {
     }
     
     let updated = 0;
-    let skipped = 0;
     
     for (const recipe of recipes) {
-      // Get username from user
-      const user = await usersCollection.findOne({ 
-        auth0Id: recipe.author?.auth0Id 
-      });
-      
-      if (!user || !user.username) {
-        console.warn(`⚠️  No username for recipe ${recipe.id} - skipping`);
-        skipped++;
-        continue;
-      }
-      
       // Generate base slug
       const baseSlug = generateSlug(recipe.name);
       
-      // Make unique within user's recipes
+      // ✅ CHANGED: Make unique across ALL recipes (not just user's)
       let slug = baseSlug;
       let counter = 2;
       
       while (await recipesCollection.findOne({ 
-        fullSlug: `${user.username}/${slug}`,
+        fullSlug: slug,
         id: { $ne: recipe.id }
       })) {
         slug = `${baseSlug}-${counter}`;
         counter++;
       }
       
-      const fullSlug = `${user.username}/${slug}`;
+      // ✅ CHANGED: fullSlug is just the slug (no username)
+      const fullSlug = slug;
       
       // Update recipe
       await recipesCollection.updateOne(
@@ -89,18 +77,17 @@ async function addRecipeSlugs() {
           $set: { 
             slug,
             fullSlug,
-            'author.username': user.username
+            updatedAt: new Date().toISOString()
           } 
         }
       );
       
-      console.log(`✅ ${recipe.name} → /@${fullSlug}`);
+      console.log(`✅ ${recipe.name} → /${fullSlug}`);
       updated++;
     }
     
     console.log(`\n🎉 Migration complete!`);
     console.log(`   Updated: ${updated}`);
-    console.log(`   Skipped: ${skipped}`);
     
   } catch (error) {
     console.error('❌ Migration failed:', error);

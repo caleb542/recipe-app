@@ -1,0 +1,210 @@
+/* ========================================
+   SPLASH OVERLAY
+   Landing page, spinning wheels, animations
+   ======================================== */
+
+/* Splash Overlay */
+.splash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    display:none;
+    // transition: opacity 0.5s ease, visibility 0.5s ease;
+
+    &.hidden {
+        display: none !important;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
+
+/* Spinning Wheels Animation */
+#wheel-a, div#wheel-b, div#wheel-c {
+    z-index: 2;
+}
+
+#wheel-a.spinning-wheel {
+    position: absolute;
+    top: -2rem;
+    height: 80%;
+    width: 80%;
+    border-radius: 50%;
+    animation: spinningWheel 90s linear infinite reverse;
+}
+
+#wheel-b.spinning-wheel {
+    position: absolute;
+    top: -2rem;
+    height: 70%;
+    width: 70%;
+    transform: scale(0.5);
+    animation: spinningWheel 30s linear infinite reverse;
+}
+
+#wheel-c.spinning-wheel {
+    position: absolute;
+    top: -2rem;
+    height: 120%;
+    width: 70%;
+    transform: scale(0.5);
+    animation: spinningWheel 40s linear infinite reverse;
+}
+
+#wheel-b.spinning-wheel .fas {
+    color: rgb(79, 11, 59);
+    font-size: 2rem;
+    position: absolute;
+    animation: spinningWheel 15s linear infinite;
+}
+
+#wheel-a.spinning-wheel .fas {
+    color: rgb(96, 28, 110);
+    font-size: 2rem;
+    position: absolute;
+    animation: spinningWheel 3s linear infinite;
+}
+
+#wheel-c.spinning-wheel .fas {
+    color: rgb(226, 85, 85);
+    font-size: 2rem;
+    position: absolute;
+    animation: spinningWheel 6s linear infinite;
+}
+
+.spinning-wheel .fas:nth-of-type(1) {
+    top: -12rem;
+    left: -12rem;
+}
+
+.spinning-wheel .fas:nth-of-type(2) {
+    top: -12rem;
+    right: -12rem;
+}
+
+.spinning-wheel .fas:nth-of-type(3) {
+    bottom: -12rem;
+    left: -12rem;
+}
+
+.spinning-wheel .fas:nth-of-type(4) {
+    bottom: -12rem;
+    right: -12rem;
+}
+
+.spinning-wheel .fas:nth-of-type(5) {
+    bottom: -12rem;
+}
+
+.spinning-wheel .fas:nth-of-type(6) {
+    top: -12rem;
+}
+
+.spinning-wheel .fas:nth-of-type(7) {
+    left: -12rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.spinning-wheel .fas:nth-of-type(8) {
+    right: -12rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+@keyframes spinningWheel {
+    0% { transform: rotate(0deg) }
+    100% { transform: rotate(360deg) }
+}
+
+/* Splash Content */
+.splash-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    color: white;
+}
+
+.splash-logo {
+    font-size: 4rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.splash-tagline {
+    font-size: 1.5rem;
+    margin-bottom: 3rem;
+    opacity: 0.9;
+}
+
+.splash-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Splash Text */
+.stl-p {
+    color: #fff;
+    text-align: center;
+    font-family: 'Poppins';
+    font-weight: 200;
+    margin: 0;
+    font-size: 2rem;
+    line-height: normal;
+
+    &:first-letter {
+        color: #1abc9c;
+        font-weight: 900;
+        height: 2rem;
+        font-size: 3rem;
+        line-height: 2.2rem;
+        top: 0.5em;
+        display: inline-block;
+        position: absolute;
+    }
+}
+
+.stl-h2 {
+    font-weight: 500;
+    font-size: 3rem;
+    letter-spacing: 0.12rem;
+    padding: 0rem;
+    font-family: "Abril Fatface" !important;
+    color: #fff;
+}
+
+/* Main Content */
+.main-content {
+    min-height: 100vh;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .splash-logo {
+        font-size: 2.5rem;
+    }
+
+    .splash-tagline {
+        font-size: 1.2rem;
+    }
+
+    .splash-actions {
+        flex-direction: column;
+        padding: 0 2rem;
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+    }
+}

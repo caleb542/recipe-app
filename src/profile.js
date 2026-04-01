@@ -5,6 +5,12 @@ import { loadUserProfile, getUserProfile } from './userContext.js';
 import { optimizeImage, IMAGE_PRESETS } from './helpers/imageOptimizer.js';
 import { generateFileHash } from './helpers/duplicateCheck.js';
 import { findExistingImage, registerImage } from './helpers/globalImageRegistry.js';
+import { loadHeader } from './components/HeaderComponent.js';
+import { hideWarning } from './functions.js';
+import { initImpersonationBanner } from './components/ImpersonationBanner.js';
+import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
+
 
 const CLOUDINARY_CLOUD_NAME = 'day1f5nz8';
 const CLOUDINARY_UPLOAD_PRESET = 'recipe_images';
@@ -14,9 +20,14 @@ let currentProfile = null;
 let newAvatarUrl = null; // Store temporarily until save
 
 async function init() {
+  showSpinner();
+  await loadHeader()
+  hideWarning ()
+  setupSanityMegaMenu()
   // Initialize Auth0
   await initAuth0();
   await loadUserProfile();
+  initImpersonationBanner();
 
   // Get username from URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -24,20 +35,57 @@ async function init() {
 
   if (!username) {
     showError('No username provided');
+    removeSpinner();
     return;
   }
 
   // Load and display profile
   await loadAndDisplayProfile(username);
+  removeSpinner(1500);
 }
-
+function formatDate(dateValue) {
+  if (!dateValue) return 'Unknown date';
+  
+  try {
+    // Handle array format: ["Oct 12th, 2022 16:00", 1665604800]
+    if (Array.isArray(dateValue)) {
+      dateValue = dateValue[0]; // Use the string format
+    }
+    
+    // Try parsing as ISO string first
+    let date = new Date(dateValue);
+    
+    // If invalid, try moment-style format
+    if (isNaN(date.getTime()) && typeof dateValue === 'string') {
+      // Try parsing "MMM Do, YYYY HH:mm" format
+      date = new Date(dateValue.replace(/(\d+)(st|nd|rd|th)/, '$1'));
+    }
+    
+    // If still invalid, give up
+    if (isNaN(date.getTime())) {
+      return 'Unknown date';
+    }
+    
+    return date.toLocaleDateString();
+  } catch (error) {
+    return 'Unknown date';
+  }
+}
 async function loadAndDisplayProfile(username) {
   const container = document.getElementById('profile-container');
   
   try {
+    // ✅ Get auth token if user is logged in
+    const token = await getToken();
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     // Fetch public profile
     const response = await fetch(
-      `/.netlify/functions/user-profile-public?username=${encodeURIComponent(username)}`
+      `/.netlify/functions/user-profile-public?username=${encodeURIComponent(username)}`,
+      { headers } // ✅ Add headers
     );
 
     if (!response.ok) {
@@ -50,25 +98,29 @@ async function loadAndDisplayProfile(username) {
     }
 
     const profile = await response.json();
+   
     currentProfile = profile; // Store globally
     displayProfile(profile);
 
   } catch (error) {
     console.error('Error loading profile:', error);
     showError('Failed to load profile');
+    removeSpinner();
   }
 }
 
 function displayProfile(profile) {
+ 
   const container = document.getElementById('profile-container');
   const currentUser = getUserProfile();
   const isOwnProfile = currentUser?.username === profile.username;
 
+ 
   const avatar = getAvatarHTML(profile.avatar, profile.profile.displayName);
 
   container.innerHTML = `
     <div class="profile-card">
-      <div class="profile-header">
+      <section class="profile-header">
         <div class="profile-avatar-large">
           ${avatar}
           ${isOwnProfile ? `
@@ -83,21 +135,26 @@ function displayProfile(profile) {
             />
           ` : ''}
         </div>
-        <div class="profile-info">
-          <h1 class="profile-display-name">${escapeHtml(profile.profile.displayName)}</h1>
-          <p class="profile-username">@${escapeHtml(profile.username)}</p>
-          ${profile.profile.location ? `
-            <p class="profile-location">📍 ${escapeHtml(profile.profile.location)}</p>
-          ` : ''}
-          ${isOwnProfile ? `
-            <button class="btn-edit-profile" onclick="window.editProfile()">Edit Profile</button>
-          ` : ''}
-        </div>
-      </div>
 
-      ${profile.profile.bio ? `
+       
+          <div class="profile-info">
+            <h2 class="profile-display-name">${escapeHtml(profile.profile.displayName)}</h2>
+            <p class="profile-username">@${escapeHtml(profile.username)}</p>
+            ${profile.profile.location ? `
+              <p class="profile-location">📍 ${escapeHtml(profile.profile.location)}</p>
+            ` : ''}
+            ${isOwnProfile ? `
+              <button class="btn-edit-profile" onclick="window.editProfile()">Edit Profile</button>
+            ` : ''}
+          </div>
+      </section>
+
+    <section class="about-stats">
+      <div>
+     ${profile.profile.bio ? `
+       
         <div class="profile-bio">
-          <h2>About</h2>
+          <h3>About</h3>
           <p>${escapeHtml(profile.profile.bio)}</p>
         </div>
       ` : ''}
@@ -109,30 +166,34 @@ function displayProfile(profile) {
           </a>
         </div>
       ` : ''}
-
-      <div class="profile-stats">
-        <div class="stat">
+        </div>
+        <div>
+      <h4>Stats</h4>
+      <ul class="profile-stats">
+        <li class="stat">
           <div class="stat-value">${profile.stats.recipesCreated}</div>
           <div class="stat-label">Recipes</div>
-        </div>
-        <div class="stat">
+        </li>
+        <li class="stat">
           <div class="stat-value">${profile.stats.reviewsWritten}</div>
           <div class="stat-label">Reviews</div>
-        </div>
-        <div class="stat">
+        </li>
+        <li class="stat">
           <div class="stat-value">${profile.stats.likesReceived}</div>
           <div class="stat-label">Likes</div>
-        </div>
+        </li>
+      </ul>
       </div>
+    </section> 
 
       ${/* Published Recipes Section */ ''}
       ${profile.publishedRecipes && profile.publishedRecipes.length > 0 ? `
-        <div class="profile-section">
+        <section class="profile-section">
           <div class="section-header">
-            <h2>
+            <h3>
               <i class="fa-solid fa-check-circle" style="color: #2ecc71;"></i>
               ${isOwnProfile ? 'Published Recipes' : `${profile.profile.displayName}'s Recipes`}
-            </h2>
+            </h3>
             ${isOwnProfile ? `
               <a href="/edit.html" class="btn-create-recipe">
                 <i class="fa-solid fa-plus"></i> Create Recipe
@@ -142,14 +203,14 @@ function displayProfile(profile) {
           <div class="recipe-grid">
             ${profile.publishedRecipes.map(recipe => renderRecipeCard(recipe, true)).join('')}
           </div>
-        </div>
+        </section>
       ` : isOwnProfile ? `
         <div class="profile-section">
           <div class="section-header">
-            <h2>
+            <h3>
               <i class="fa-solid fa-check-circle" style="color: #2ecc71;"></i>
               Published Recipes
-            </h2>
+            </h3>
             <a href="/edit.html" class="btn-create-recipe">
               <i class="fa-solid fa-plus"></i> Create Recipe
             </a>
@@ -165,10 +226,10 @@ function displayProfile(profile) {
       ${isOwnProfile && profile.unpublishedRecipes && profile.unpublishedRecipes.length > 0 ? `
         <div class="profile-section">
           <div class="section-header">
-            <h2>
+            <h3>
               <i class="fa-solid fa-eye-slash" style="color: #f39c12;"></i>
-              Unpublished Recipes (Drafts)
-            </h2>
+              Drafts (Incomplete Unpublished Recipes)
+            </h3>
           </div>
           <p class="section-note">
             <i class="fa-solid fa-info-circle"></i>
@@ -181,7 +242,7 @@ function displayProfile(profile) {
       ` : ''}
 
       ${profile.recentReviews && profile.recentReviews.length > 0 ? `
-        <div class="profile-section">
+        <section class="profile-section">
           <h2>Recent Reviews</h2>
           <div class="recent-reviews">
             ${profile.recentReviews.map(review => `
@@ -194,9 +255,9 @@ function displayProfile(profile) {
               </div>
             `).join('')}
           </div>
-        </div>
+        </section>
       ` : ''}
-    </div>
+    </section>
     
     <div id="upload-status" style="margin-top: 1rem;"></div>
   `;
@@ -212,7 +273,7 @@ function displayProfile(profile) {
  */
 function renderRecipeCard(recipe, isPublished) {
   return `
-    <a href="${isPublished ? '/article.html' : '/edit.html'}#${recipe.id}" class="recipe-card ${!isPublished ? 'recipe-card-draft' : ''}">
+    <div class="recipe-card ${!isPublished ? 'recipe-card-draft' : ''}">
       ${!isPublished ? `
         <div class="recipe-card-status">
           <span class="status-badge draft-badge">
@@ -220,31 +281,34 @@ function renderRecipeCard(recipe, isPublished) {
           </span>
         </div>
       ` : ''}
-      ${recipe.featuredImage ? `
+      <div>
+       ${recipe.featuredImage ? `
         <div class="recipe-card-image">
           <img src="${recipe.featuredImage}" alt="${escapeHtml(recipe.name)}" loading="lazy">
         </div>
       ` : `
         <div class="recipe-card-image recipe-card-no-image">
-          <i class="fa-solid fa-utensils"></i>
+          <i class="fa-solid fa-utensils" style="font-size: 3rem; color: #ccc;"></i>
         </div>
       `}
       <div class="recipe-card-content">
-        <h3 class="recipe-card-title">${escapeHtml(recipe.name)}</h3>
+        <h4 class="recipe-card-title">${escapeHtml(recipe.name)}</h4>
         ${recipe.description ? `
           <p class="recipe-card-description">${escapeHtml(recipe.description).substring(0, 100)}${recipe.description.length > 100 ? '...' : ''}</p>
         ` : ''}
         ${recipe.categories && recipe.categories.length > 0 ? `
           <div class="recipe-card-tags">
+          Categories:
             ${recipe.categories.slice(0, 3).map(cat => `
               <span class="recipe-tag">${escapeHtml(cat)}</span>
             `).join('')}
           </div>
         ` : ''}
-        <div class="recipe-card-meta">
+       <div class="recipe-card-meta">
+       Created:
           <span class="recipe-date">
             <i class="fa-solid fa-calendar"></i>
-            ${new Date(recipe.createdAt).toLocaleDateString()}
+            ${formatDate(recipe.createdAt)}
           </span>
           ${!isPublished ? `
             <span class="recipe-action">
@@ -253,7 +317,18 @@ function renderRecipeCard(recipe, isPublished) {
           ` : ''}
         </div>
       </div>
-    </a>
+      </div>
+    
+      <div class="profile-recipe-card-links">
+        <a class="btn-primary" href="${'/edit.html'}#${recipe.id}">
+        Edit
+        </a>
+         <a class="btn-secondary" href="${'/article.html'}#${recipe.id}">
+       View Article
+        </a>
+      </div>
+
+    </div>
   `;
 }
 

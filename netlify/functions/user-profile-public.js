@@ -51,20 +51,35 @@ export const handler = async (event) => {
 
     // ✅ Check if viewing own profile (authenticated)
     let isOwnProfile = false;
+    let currentUserId = null;
     const token = getTokenFromHeader(event.headers);
+    
+    console.log('═══════════════════════════════════════');
+    console.log('🔍 Profile Request Debug:');
+    console.log('Username requested:', username);
+    console.log('Token present:', !!token);
     
     if (token) {
       try {
         const decoded = await verifyToken(token);
+        currentUserId = decoded.sub;
         isOwnProfile = decoded.sub === user.auth0Id;
+        console.log('Current user ID:', currentUserId);
+        console.log('Profile user ID:', user.auth0Id);
+        console.log('Is own profile:', isOwnProfile);
       } catch (error) {
-        // Invalid token, continue as public view
+        console.log('Token verification failed:', error.message);
         isOwnProfile = false;
       }
+    } else {
+      console.log('No token provided - viewing as public');
     }
+    
+    console.log('═══════════════════════════════════════');
 
     // Check if profile is public (unless viewing own profile)
     if (!isOwnProfile && !user.preferences?.publicProfile) {
+      console.log('❌ Profile is private and user is not owner');
       return {
         statusCode: 403,
         headers,
@@ -73,6 +88,7 @@ export const handler = async (event) => {
     }
 
     // ✅ Get published recipes (always)
+    console.log('📚 Fetching published recipes...');
     const publishedRecipes = await recipesCollection
       .find({ 
         'author.auth0Id': user.auth0Id,
@@ -81,10 +97,18 @@ export const handler = async (event) => {
       .sort({ createdAt: -1 })
       .limit(12)
       .toArray();
+    console.log('Found published recipes:', publishedRecipes.length);
 
     // ✅ Get unpublished recipes (only if viewing own profile)
     let unpublishedRecipes = [];
+    
+    console.log('📝 Checking for unpublished recipes...');
+    console.log('isOwnProfile value:', isOwnProfile);
+    
     if (isOwnProfile) {
+      console.log('✅ IS OWN PROFILE - fetching unpublished recipes');
+      console.log('Searching for recipes with author.auth0Id:', user.auth0Id);
+      
       unpublishedRecipes = await recipesCollection
         .find({ 
           'author.auth0Id': user.auth0Id,
@@ -96,6 +120,14 @@ export const handler = async (event) => {
         .sort({ createdAt: -1 })
         .limit(12)
         .toArray();
+      
+      console.log('Found unpublished recipes:', unpublishedRecipes.length);
+      if (unpublishedRecipes.length > 0) {
+        console.log('First unpublished recipe:', unpublishedRecipes[0]?.name);
+        console.log('First recipe isPublic:', unpublishedRecipes[0]?.isPublic);
+      }
+    } else {
+      console.log('❌ NOT own profile - skipping unpublished recipes');
     }
 
     // Get user's recent reviews
@@ -128,7 +160,8 @@ export const handler = async (event) => {
     const formatRecipes = (recipes) => recipes.map(recipe => ({
       id: recipe.id,
       name: recipe.name,
-      // description: recipe.description,
+      slug: recipe.slug,
+      fullSlug: recipe.fullSlug,
       featuredImage: recipe.images?.find(img => img.isFeatured)?.url || recipe.images?.[0]?.url || null,
       createdAt: recipe.createdAt,
       updatedAt: recipe.updatedAt,
@@ -140,7 +173,7 @@ export const handler = async (event) => {
     // Build public profile response
     const publicProfile = {
       username: user.username,
-      isOwnProfile: isOwnProfile, // ✅ NEW: Flag to show unpublished section
+      isOwnProfile: isOwnProfile,
       profile: {
         displayName: user.profile.displayName,
         bio: user.profile.bio || '',
@@ -149,11 +182,16 @@ export const handler = async (event) => {
       },
       avatar: user.avatar,
       stats: user.stats,
-      publishedRecipes: formatRecipes(publishedRecipes), // ✅ Renamed for clarity
-      unpublishedRecipes: isOwnProfile ? formatRecipes(unpublishedRecipes) : [], // ✅ NEW
+      publishedRecipes: formatRecipes(publishedRecipes),
+      unpublishedRecipes: isOwnProfile ? formatRecipes(unpublishedRecipes) : [],
       recentReviews: reviewsWithRecipeNames,
       memberSince: user.createdAt
     };
+
+    console.log('📤 Returning profile with:', {
+      published: publicProfile.publishedRecipes.length,
+      unpublished: publicProfile.unpublishedRecipes.length
+    });
 
     return {
       statusCode: 200,

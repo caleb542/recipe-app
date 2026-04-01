@@ -10,12 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
   
-    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Fugaz+One&family=Lato:wght@300;400;700&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Fugaz+One&family=Lato:wght@300;400;700&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Comfortaa:wght@400;600;700&family=Fira+Mono&family=Jacques+Francois&family=JetBrains+Mono:wght@100;300;400&family=La+Belle+Aurore&family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,700&family=Libre+Baskerville:wght@400;700&family=Montserrat:wght@300;400;600;800;900&family=Open+Sans:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Questrial&family=Recursive:slnt,wght,CASL,CRSV,MONO@-15,300..1000,0.92,1,0.92&family=Red+Hat+Mono:wght@300;400;500&family=Roboto:wght@300;400;500;700&family=Sigmar&family=Sofia+Sans+Condensed&display=swap" rel="stylesheet">
 
  
     <script src="https://kit.fontawesome.com/610bdb1969.js" crossorigin="anonymous"></script>
-<link href="/scripts/index.css" rel="stylesheet" media="screen" />
-<link href="/scripts/edit.css" rel="stylesheet" media="screen" />
+<link href="/scripts/index.css" rel="stylesheet" />
+<link href="/scripts/edit.css" rel="stylesheet" />
 
 
 
@@ -23,41 +23,43 @@
 </head>
 
 <body class="edit-page">
+   
     <div class="page-container">
+        <header></header>
         <div class="content-wrap">
-            <header class="">
-                <div class="header-top">
-                    <h1 class="site__title"><a href="/">Recipe Me</a></h1>
-                     <div id="auth-buttons">
-                        <button id="login-btn" style="display: none;">Login</button>
-                        <div id="user-info" style="display: none;">
-                            <span id="user-name"></span>
-                            <button id="logout-btn">Logout</button>
+            <!-- Quick Add Section (collapsible) -->
+            <div class="quick-add-section">
+                <details open>
+                    <summary>
+                        <h3>🚀 Quick Add</h3>
+                        <p>Import from URL or paste recipe text</p>
+                    </summary>
+                    
+                    <div class="quick-add-content">
+                        <div class="quick-add-input-group">
+                            <input 
+                                type="text" 
+                                id="quick-add-input" 
+                                placeholder="Paste recipe URL or start typing recipe text..."
+                                class="quick-add-input"
+                            />
+                            <button id="quick-add-parse-btn" class="btn-parse">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                Parse Recipe
+                            </button>
                         </div>
+                        
+                        <div id="quick-add-status" class="quick-add-status"></div>
+                        
+                        <p class="quick-add-hint">
+                            💡 Tip: Paste a URL from AllRecipes, Food Network, etc., or paste the full recipe text
+                        </p>
                     </div>
-                    <a href="#" id="menu-toggle" aria-expanded="false" aria-controls="nav" class="menu-toggle"
-                        aria-label="Open the menu">
-                        <i class="fa fa-bars" aria-hidden="true"></i>
-                    </a>
-
-                </div>
-                <nav id="nav" class="hide">
-                    <ul>
-                        <li>
-                            <a tabindex="-1" href="/index.html">Home</a>
-                        </li>
-                        <li>
-                            <a tabindex="-1" href="#" id="update-one">Update Database</a>
-                        </li>
-                       
-                    </ul>
-                </nav>
-              
-                         
-            </header>
+                </details>
+            </div>
             <div class="heading-h2-container edit-header">
                     <div class="edit-header__actions">
-                        <!-- Status Toggle Button -->
+                    
                         <button id="statusToggle" class="status-toggle" data-published="false">
                             <span class="status-icon">
                                 <i class="fa-solid fa-eye-slash"></i>
@@ -83,7 +85,7 @@
             </div>
             <div class="container">
                 <div class="former form">
-                    <h2><span id="heading-name" class=""><!-- Recipe Name --></span></h2>
+                    <h2><span id="heading-name" class=""></span></h2>
                     <div class="edit-form-list">
                         <div class="section-1">
                             <div class="form-group">
@@ -92,27 +94,26 @@
                                 <input id="recipe-name" class="input" type="text" required
                                 placeholder="e.g., Authentic Italian Carbonara" name="text">
                             </div>
-                            <!-- ✅ NEW: Slug Editor -->
-<div class="form-group slug-editor">
-  <label for="recipe-slug">Recipe URL</label>
-  
-  <div class="slug-preview-container">
-    <span class="url-base">recipeme.com/@chef_caleb/</span>
-    <input 
-      type="text" 
-      id="recipe-slug" 
-      placeholder="carbonara"
-      pattern="[a-z0-9-]+"
-      maxlength="100"
-    />
-  </div>
-  
-  <small class="slug-help">
-    Customize your recipe URL. Use lowercase letters, numbers, and hyphens.
-  </small>
-  
-  <div id="slug-feedback" class="slug-feedback"></div>
-</div>
+                       
+            <div class="form-group slug-editor">
+            <label for="recipe-slug">Recipe URL</label>
+            
+            <div class="slug-preview-container">
+                <span id="url-base">http://</span>
+                <input 
+                type="text" 
+                id="recipe-slug" 
+                placeholder="carbonara"
+                maxlength="100"
+                />
+            </div>
+            
+            <small class="slug-help">
+                Customize your recipe URL. Use lowercase letters, numbers, and hyphens.
+            </small>
+            
+            <div id="slug-feedback" class="slug-feedback"></div>
+            </div>
                             <div class="form-group">
                                 <label for="recipe-description">
                                 <div>Description</div></label>
@@ -122,69 +123,69 @@
                
                             <!-- UPDATED: Image selection with Cloudinary upload + Unsplash search -->
                            <!-- Image Gallery Management -->
-<div class="form-group">
-    <label>Recipe Images</label>
-    
-    <!-- Upload/Search Section -->
-    <div class="image-upload-section">
-        <!-- Cloudinary Upload -->
-        <div class="upload-option">
-            <h3>Upload Your Photo</h3>
-            <label for="cloudinary-upload" class="upload-button">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                Add Image
-            </label>
-            <input 
-                type="file" 
-                id="cloudinary-upload" 
-                accept="image/*"
-                style="display: none;"
-            />
-            <div id="upload-status"></div>
-        </div>
-        
-        <div class="upload-divider">
-            <span>OR</span>
-        </div>
-        
-        <!-- Unsplash Search -->
-        <div class="search-option">
-            <h3>Search Stock Photos</h3>
-            <fieldset id="image" class="feature-image">
-                <input id="feature-keyword" placeholder="Search for a photo">
-                <button class="feature-image" id="feature-image-button" type="button">
-                    <i class="fa fa-solid fa-magnifying-glass"></i>
-                </button>
-            </fieldset>
-        </div>
-    </div>
-    
-    <!-- Image Gallery (sortable list) -->
-    <div id="image-gallery" class="image-gallery">
-        <p class="no-images" style="display: none;">No images yet. Upload or search to add images.</p>
-        <!-- Images will be rendered here -->
-    </div>
-</div>
+            <div class="form-group">
+                <label>Recipe Images</label>
+                
+                <!-- Upload/Search Section -->
+                <div class="image-upload-section">
+                    <!-- Cloudinary Upload -->
+                    <div class="upload-option">
+                        <h3>Upload Your Photo</h3>
+                        <label for="cloudinary-upload" class="upload-button">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            Add Image
+                        </label>
+                        <input 
+                            type="file" 
+                            id="cloudinary-upload" 
+                            accept="image/*"
+                            style="display: none;"
+                        />
+                        <div id="upload-status"></div>
+                    </div>
+                    
+                    <div class="upload-divider">
+                        <span>OR</span>
+                    </div>
+                    
+                    <!-- Unsplash Search -->
+                    <div class="search-option">
+                        <h3>Search Stock Photos</h3>
+                        <fieldset id="image" class="feature-image">
+                            <input id="feature-keyword" placeholder="Search for a photo">
+                            <button class="feature-image" id="feature-image-button" type="button">
+                                <i class="fa fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </fieldset>
+                    </div>
+                </div>
+                
+                <!-- Image Gallery (sortable list) -->
+                <div id="image-gallery" class="image-gallery">
+                    <p class="no-images" style="display: none;">No images yet. Upload or search to add images.</p>
+                    <!-- Images will be rendered here -->
+                </div>
+            </div>
 
-<!-- Unsplash Modal (keep existing) -->
-<dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
-    <div class="carousel">
-        <ul class="carousel-track">
-        <!-- Unsplash images -->
-        </ul>
-    </div>
-</dialog>
+            <!-- Unsplash Modal (keep existing) -->
+            <dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
+                <div class="carousel">
+                    <ul class="carousel-track">
+                    <!-- Unsplash images -->
+                    </ul>
+                </div>
+            </dialog>
                              
-<!-- EXISTING: Unsplash modal -->
-<dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
-    <div class="carousel">
-        <!-- <button class="arrow left" aria-label="Previous">&#9664;</button> -->
-        <ul class="carousel-track">
-        <!-- Unsplash images -->
-        </ul>
-        <!-- <button class="arrow right" aria-label="Next">&#9654;</button> -->
-    </div>
-</dialog>
+            <!-- EXISTING: Unsplash modal -->
+            <dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
+                <div class="carousel">
+                    <!-- <button class="arrow left" aria-label="Previous">&#9664;</button> -->
+                    <ul class="carousel-track">
+                    <!-- Unsplash images -->
+                    </ul>
+                    <!-- <button class="arrow right" aria-label="Next">&#9654;</button> -->
+                </div>
+            </dialog>
                         <!-- Video Section -->
                         <div class="form-group video-section">
                         <details>
@@ -286,23 +287,73 @@
                         </div>
 
                         <div class="form-group checklist">
-                            <h2>Categories</h2>
-                            <ul>
-                                <li>
-                                    <div class="form-group"><label class="checkbox" for="drinks">Drinks</label><input type="checkbox" name="category" id="drinks"></div>
-                                    </li>
-                                <li>
-                                    <div class="form-group">
-                                        <label class="checkbox"  for="desserts">Desserts</label><input type="checkbox" name="category" id="desserts" value="desserts">
-                                    </div></li>
-                                <li><div class="form-group">
-                                    <label class="checkbox"  for="appetizers">Appetizers</label><input  type="checkbox" name="category" id="appetizers" value="appetizers">
-                                </div></li>
-                                <li><div class="form-group"><label class="checkbox"  for="meals">Meals</label><input type="checkbox" name="category" id="meals" value="meals"></div></li>
-                                <li><div class="form-group"><label class="checkbox"  for="breakfast">Breakfast</label><input type="checkbox" name="category" id="breakfast" value="breakfast"></div></li>
-                                <li><div class="form-group"><label class="checkbox"  for="lunch">Lunch</label><input type="checkbox" name="category" id="lunch"></div></li>
-                                <li><div class="form-group"><label class="checkbox"  for="dinner">Dinner</label><input type="checkbox" name="category" id="dinner" value="dinner"></div></li>
-                            </ul>
+                            <!-- Categories Section for edit.html -->
+                            <div class="form-section categories-section">
+                                <h3>Categories</h3>
+                                <p class="help-text">Select all that apply (multiple selections allowed)</p>
+                                <div id="categories-container">
+                                    <p style="color: #6b7280; font-size: 0.875rem;">Loading categories...</p>
+                                    <!-- dynamically rendered -->
+                                </div>
+                            </div>
+
+                            <style>
+                            .categories-section {
+                                margin: 2rem 0;
+                            }
+
+                            .category-group {
+                                margin-bottom: 2rem;
+                            }
+
+                            .category-group h4 {
+                                font-size: 0.875rem;
+                                font-weight: 700;
+                                color: #6b7280;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                                margin-bottom: 0.75rem;
+                                padding-bottom: 0.5rem;
+                                border-bottom: 2px solid #fbbf24;
+                            }
+
+                            .checkbox-grid {
+                                display: grid;
+                                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                                gap: 0.75rem;
+                            }
+
+                            .checkbox-grid label {
+                                display: flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                                cursor: pointer;
+                                padding: 0.5rem;
+                                border-radius: 0.25rem;
+                                transition: background-color 0.2s;
+                            }
+
+                            .checkbox-grid label:hover {
+                                background-color: #f9fafb;
+                            }
+
+                            .checkbox-grid input[type="checkbox"] {
+                                width: 1.25rem;
+                                height: 1.25rem;
+                                cursor: pointer;
+                            }
+
+                            .checkbox-grid span {
+                                font-size: 0.95rem;
+                                color: #374151;
+                            }
+
+                            .help-text {
+                                color: #6b7280;
+                                font-size: 0.875rem;
+                                margin-bottom: 1.5rem;
+                            }
+                            </style>
                         </div>
                         </div>
                          <div class="form-group">
@@ -378,6 +429,7 @@
             <footer class="page-footer">
                 <p>© Caleb Hamilton 2022 - current revisions underway 2025</p>
             </footer>
+            <div id="nav-overlay" class="nav-overlay"></div>
             <!-- page container-->
         </div>
 

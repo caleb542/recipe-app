@@ -20,7 +20,7 @@ export const initAuth0 = async () => {
     domain: process.env.AUTH0_DOMAIN,
     clientId: process.env.AUTH0_CLIENT_ID,
     authorizationParams: {
-      redirect_uri: window.location.origin,
+      redirect_uri: window.location.origin + '/callback',
       audience: process.env.AUTH0_AUDIENCE, // ← Add this!
       scope: 'openid profile email'
     }
@@ -37,14 +37,39 @@ export const initAuth0 = async () => {
 
 // Handle the redirect callback
 const handleCallback = async () => {
-  const query = window.location.search;
-  if (query.includes('code=') && query.includes('state=')) {
+  // ✅ Get the ACTUAL URL from the browser (not window.location)
+  const url = new URL(window.location.href);
+  
+  console.log('🔍 handleCallback called');
+  console.log('   Full href:', window.location.href);
+  console.log('   URL pathname:', url.pathname);
+  console.log('   URL search:', url.search);
+  
+  // ✅ Check if URL has auth code params
+  if (url.searchParams.has('code') && url.searchParams.has('state')) {
+    console.log('✅ Auth code found in URL');
+    
     try {
-      await auth0.handleRedirectCallback();
-      window.history.replaceState({}, document.title, '/');
+      console.log('🔄 Processing callback...');
+      const result = await auth0.handleRedirectCallback();
+      
+      console.log('📦 Result:', result);
+      console.log('📦 appState:', result.appState);
+      
+      const returnTo = result.appState?.returnTo || '/';
+      
+      console.log('✅ Login successful, redirecting to:', returnTo);
+      
+      window.location.href = returnTo;
     } catch (error) {
-      console.error('Error handling callback:', error);
+      console.error('❌ Error handling callback:', error);
+      console.error('Error details:', error.message, error.error_description);
+      window.location.href = '/';
     }
+  } else {
+    console.log('⚠️ No auth code in URL');
+    console.log('   Has code?', url.searchParams.has('code'));
+    console.log('   Has state?', url.searchParams.has('state'));
   }
 };
 
@@ -87,24 +112,20 @@ export const login = async () => {
   if (!auth0) {
     throw new Error('Auth0 client not initialized. Call initAuth0() first.');
   }
-  // Check if current page uses pretty URLs
-  const currentPath = window.location.pathname;
-  const isPrettyUrl = currentPath.startsWith('/@');
-
-   const redirectUri = isPrettyUrl
-    ? window.location.origin  // Pretty URLs → go to homepage
-    : window.location.href;   // Regular URLs → stay on page
-
-    console.log('🔑 Logging in...');
-  console.log('   Current path:', currentPath);
-  console.log('   Is pretty URL:', isPrettyUrl);
-  console.log('   Redirect URI:', redirectUri);
   
+  // ✅ Store current URL to return to after login
+  const returnTo = window.location.href;
+  
+  console.log('🔑 Logging in...');
+  console.log('   Return to:', returnTo);
   
   await auth0.loginWithRedirect({
     authorizationParams: {
-      redirect_uri: redirectUri,
-      scope: 'openid profile email'  // ← Return to current page (including hash)
+      redirect_uri: window.location.origin + '/callback', // Single callback URL
+      scope: 'openid profile email'
+    },
+    appState: {
+      returnTo: returnTo  // ✅ Store where to return
     }
   });
 };
@@ -114,25 +135,14 @@ export const logout = () => {
     throw new Error('Auth0 client not initialized. Call initAuth0() first.');
   }
   
-  // Check if current page requires auth
-  const protectedPages = ['/edit.html', '/addRecipe.html'];
-  const currentPath = window.location.pathname;
-  const isProtected = protectedPages.some(page => currentPath.includes(page));
-  const isPrettyUrl = currentPath.startsWith('/@');  // ✅ Add this check
-  
-  const returnUrl = (isProtected || isPrettyUrl) 
-    ? window.location.origin
-    : window.location.href;
-  
   console.log('🚪 Logging out...');
-  console.log('   Current path:', currentPath);
-  console.log('   Is protected:', isProtected);
-  console.log('   Is pretty URL:', isPrettyUrl);
-  console.log('   Return URL:', returnUrl);
+  console.log('   From:', window.location.pathname);
+  
+  localStorage.removeItem('userProfile');
   
   auth0.logout({
     logoutParams: {
-      returnTo: returnUrl
+      returnTo: window.location.origin
     }
   });
 };
@@ -158,10 +168,30 @@ export const getToken = async () => {
   if (!auth0) {
     throw new Error('Auth0 client not initialized. Call initAuth0() first.');
   }
+  
   try {
+    // ✅ Check if authenticated first
+    const authenticated = await auth0.isAuthenticated();
+    if (!authenticated) {
+      return null; // No token if not logged in
+    }
+    
     return await auth0.getTokenSilently();
   } catch (error) {
     console.error('Error getting token:', error);
+    return null;
+  }
+};
+
+// Export function to get ID token claims
+export const getIdTokenClaims = async () => {
+  if (!auth0) {
+    throw new Error('Auth0 client not initialized. Call initAuth0() first.');
+  }
+  try {
+    return await auth0.getIdTokenClaims();
+  } catch (error) {
+    console.error('Error getting ID token:', error);
     return null;
   }
 };

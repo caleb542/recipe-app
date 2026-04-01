@@ -7,9 +7,13 @@ import {
 import {
     getImageGroup
 } from './unsplash.js';
+
 import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
 import { updateRecipeInDatabase } from './backend/updateRecipeInDatabase.js';
-import { syncRecipeUpdate } from './helpers/syncRecipe.js'
+import { syncRecipeUpdate } from './helpers/syncRecipe.js';
+import { sanitizeHTML, sanitizeText } from './utils/sanitize.js';
+
+
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 const convertTimestamp = (rDate) => {
     if (typeof rDate === 'object') {
@@ -37,7 +41,7 @@ const listDirections = (directions) => {
 
     directions.forEach((step, index) => {
         const li = document.createElement('li')
-        li.innerHTML = `<label for="${step.id}"></ <span>${step.text}</span></label> 
+        li.innerHTML = `<label for="${step.id}"></ <span>${sanitizeText(step.text)}</span></label> 
 
       <button id="${step.id}" data-id="${step.id}" class="item-buttons edit-direction">
         <i class="fa fa-pencil" aria-hidden="true"></i> Edit
@@ -45,7 +49,7 @@ const listDirections = (directions) => {
 
       <button class="item-buttons remove-direction" data-name="${step.id}" data-id="${step.id}">
         <i class="fa fa-trash-can"></i> Delete
-      </button>`
+      </button>`;
         directionsList.appendChild(li)
     })
 
@@ -82,19 +86,17 @@ const openDirectionsDialogue = async (id, text) => {
   let recipes = await loadRecipesFromLocalStorage();
   let recipeId = location.hash.substring(1);
   let recItem = recipes.find((recipe) => recipe.id === recipeId);
-  if (recItem && recItem.name) {
-
-} else {
-    console.log("No name for this recipe yet")
-}
+  
+  if (!recItem || !recItem.name) {
+    console.log("No name for this recipe yet");
+  }
 
   const textBox = document.getElementById("enter-next-step");
   textBox.value = text ?? '';
 
-  // Attach input listener ONCE
+  // ✅ Update just the text in the DOM as you type
   textBox.oninput = async function (e) {
     const newText = e.target.value;
-    console.log("Input event fired:", newText);
 
     await syncRecipeUpdate(recipeId, recipe => {
       recipe.directions = recipe.directions.map(d =>
@@ -102,13 +104,10 @@ const openDirectionsDialogue = async (id, text) => {
       );
     });
 
-    // Re-render directions list from updated localStorage
-    const updatedRecipes = await loadRecipesFromLocalStorage();
-    const updatedRec = updatedRecipes.find(r => r.id === recipeId);
-    if (updatedRec) {
-      const directionsList = document.getElementById("directions-list");
-      directionsList.innerHTML = '';
-      listDirections(updatedRec.directions);
+    // Update ONLY the specific direction's text
+    const directionItem = document.querySelector(`li[data-id="${id}"] span`);
+    if (directionItem) {
+      directionItem.textContent = newText;
     }
   };
 
@@ -118,9 +117,19 @@ const openDirectionsDialogue = async (id, text) => {
   });
 
   const closeDialog = document.querySelector(".dialog-close-button");
-  closeDialog.addEventListener('click', function (e) {
+  closeDialog.addEventListener('click', async function (e) {
     e.preventDefault();
     modal.close("Cancelled");
+    
+    // ✅ Re-render full list when closing to ensure everything is synced
+    const updatedRecipes = await loadRecipesFromLocalStorage();
+    const updatedRec = updatedRecipes.find(r => r.id === recipeId);
+    if (updatedRec) {
+      const directionsList = document.getElementById("directions-list");
+      directionsList.innerHTML = '';
+      listDirections(updatedRec.directions);
+    }
+    
     document.querySelector('#add-step').focus();
   });
 };
@@ -252,43 +261,67 @@ function migrateRecipeImages(recipe) {
   return recipe;
 }
 
-const loadRecipes = async () => {
+const loadRecipes = async (forceRefresh = false) => {
   const raw = localStorage.getItem('recipes');
-
-  if (raw) {
-    console.log('📦 Getting recipes from localStorage');
-
+  const timestamp = localStorage.getItem('recipes_timestamp');
+  
+  // ✅ Check if cache is fresh (5 minutes)
+  // const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+  const isCacheFresh = timestamp && (Date.now() - parseInt(timestamp)) < CACHE_DURATION;
+  
+  // ✅ Use cache if available and fresh
+  if (raw && !forceRefresh && isCacheFresh) {
+    console.log('📦 Using cached recipes (age: ' + Math.round((Date.now() - parseInt(timestamp)) / 1000) + 's)');
+    
     try {
       let parsed = JSON.parse(raw);
-
+      
       if (Array.isArray(parsed)) {
-        console.log('✅ Parsed recipes successfully');
-        
-        // ✅ Migrate recipes to new format
+        // Migrate recipes to new format
         parsed = parsed.map(recipe => migrateRecipeImages(recipe));
-        
-        // Save migrated recipes back to localStorage
-        localStorage.setItem('recipes', JSON.stringify(parsed));
-        
         return parsed;
       } else {
-        console.warn('⚠️ Parsed data is not an array:', parsed);
-        return [];
+        console.warn('⚠️ Cached data is not an array');
+        // Fall through to fetch fresh data
       }
     } catch (e) {
-      console.error('❌ Failed to parse recipes from localStorage:', e);
-      return [];
+      console.error('❌ Failed to parse cached recipes:', e);
+      // Fall through to fetch fresh data
     }
   }
 
-  console.log('🌐 Fetching recipes from database');
+  // ✅ Fetch fresh data from database
+  console.log('🌐 Fetching recipes from database' + (forceRefresh ? ' (forced refresh)' : ' (cache expired/missing)'));
   const recipes = await getRecipesFromDatabase();
   
-  // ✅ Recipes are already migrated by the backend
+  // ✅ Save to cache with timestamp
+  localStorage.setItem('recipes', JSON.stringify(recipes));
+  localStorage.setItem('recipes_timestamp', Date.now().toString());
+  console.log('💾 Cached ' + recipes.length + ' recipes');
+  
   return recipes;
 };
 
-export { loadRecipes };
+const loadCategories = async (forceRefresh = false) => {
+  const raw = localStorage.getItem('categories');
+  const timestamp = localStorage.getItem('categories_timestamp');
+  
+  const CACHE_DURATION = 24 * 60 * 60 * 1000;
+  const isCacheFresh = timestamp && (Date.now() - parseInt(timestamp)) < CACHE_DURATION;
+  
+  if (raw && !forceRefresh && isCacheFresh) {
+    return JSON.parse(raw);
+  }
+
+  const res = await fetch('/.netlify/functions/get-categories');
+  const data = await res.json(); // { categories, grouped }
+  
+  localStorage.setItem('categories', JSON.stringify(data));
+  localStorage.setItem('categories_timestamp', Date.now().toString());
+  
+  return data;
+};
 
 
 const loadRecipesFromLocalStorage = async () => {
@@ -348,46 +381,78 @@ const sendRecipes = async () => {
     const recsd = await user.functions.updateAllRecipes(recipes);
 
 }
+const hideWarning = () => {
+  const warningCloseButton = document.getElementById('hide-this-header');
+  const warningBanner = document.querySelector(".dev-notice");
+  
+  if (!warningCloseButton || !warningBanner) {
+    console.warn('Warning banner or button not found');
+    return;
+  }
+  
+  // ✅ Check localStorage on page load
+  const warningHidden = localStorage.getItem('warning-notification-hidden');
+  
+  if (warningHidden === 'true') {
+    // Already hidden - apply class immediately
+    warningBanner.classList.add("hidden");
+    return; // Don't add event listener
+  }
+  
+  // ✅ Add click listener to hide it
+  warningCloseButton.addEventListener('click', function (e) {
+    e.preventDefault();
+    
+    // Hide the banner
+    warningCloseButton.classList.add("clicked");
+     console.warn('Warning close button clicked');
+    warningBanner.classList.add("hide-up");
+     console.warn('warning banner should be hidden');
+    // ✅ Save to localStorage
+    localStorage.setItem('warning-notification-hidden', 'true');
+  });
+}
+
 const hamburger = () => {
     const hamburger = document.getElementById('menu-toggle');
 
+     // ✅ Check if element exists before adding listener
+    if (!hamburger) {
+        console.warn('Menu toggle button not found');
+        return;
+    }
+    
     hamburger.addEventListener('click', function (e) {
 
-        e.preventDefault()
+        // e.preventDefault()
         toggleMenu();
+
     })
 
 }
 const toggleMenu = () => {
-    let toggle = document.getElementById('menu-toggle')
-    let menu = document.querySelector('nav');
-    let status = toggle.getAttribute('aria-label');
-    let nav = document.querySelector('nav');
-
-    if (status.toLowerCase() === 'open the menu') {
-        toggle.setAttribute('aria-label', 'close the menu');
-        nav.classList.remove('hide')
-        nav.classList.add('open')
-        nav.setAttribute('aria-expanded', 'true')
-        const a = document.querySelectorAll('nav a')
-        a.forEach(anchor => {
-            let tabindex = anchor.getAttribute('tabindex')
-            tabindex === "-1" ? anchor.setAttribute('tabindex', "0") : anchor.setAttribute('tabindex', "-1")
-        })
-
-    }
-    if (status.toLowerCase() === 'close the menu') {
-        toggle.setAttribute('aria-label', 'Open the menu');
-        nav.classList.add('hide')
-        nav.classList.remove('open')
-        nav.setAttribute('aria-expanded', false)
-        const a = document.querySelectorAll('nav a')
-        a.forEach(anchor => {
-            let tabindex = anchor.getAttribute('tabindex')
-            tabindex === "0" ? anchor.setAttribute('tabindex', "-1") : anchor.setAttribute('tabindex', "0")
-        })
-    }
-}
+  const toggle = document.getElementById('menu-toggle');
+  const mobileNav = document.getElementById('mobile-nav');
+  
+  if (!toggle || !mobileNav) return;
+  
+   const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+  const icon = toggle.querySelector('i');
+  
+  if (isOpen) {
+    mobileNav.close();
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open the menu');
+    if (icon) { icon.classList.replace('fa-times', 'fa-bars'); }
+    document.body.classList.remove('nav-open');
+  } else {
+    mobileNav.show();
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Close the menu');
+    if (icon) { icon.classList.replace('fa-bars', 'fa-times'); }
+    document.body.classList.add('nav-open');
+  }
+};
 const addToExistingRecipes = () => {
     const newRecipe = loadNewRecipeFromLocalStorage()
     let recipes = loadRecipes()
@@ -400,88 +465,12 @@ const addToExistingRecipes = () => {
 
 }
 
-let recipes = await loadRecipes()
+// let recipes = await loadRecipes() // IS THIS THE ONE?
 
 // In unsplash images
 
-import { selectUnsplashImageForGallery } from './helpers/featureImage.js';
 
-export async function renderImageSelector(keyword, pageNumber, recipeId) {
-  const modal = document.getElementById('select-images');
-  const carouselTrack = modal?.querySelector('.carousel-track');
-  
-  if (!carouselTrack) return;
 
-  // Show loading
-  carouselTrack.innerHTML = '<li class="loading">Searching Unsplash...</li>';
-  modal.showModal();
-
-  try {
-    const response = await fetch(
-      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(keyword)}&page=${pageNumber}&per_page=20&orientation=landscape`,
-      {
-        headers: {
-          'Authorization': `Client-ID ${UNSPLASH_ACCESS_KEY}`
-        }
-      }
-    );
-
-    const data = await response.json();
-
-    if (!data.results || data.results.length === 0) {
-      carouselTrack.innerHTML = '<li class="no-results">No images found.</li>';
-      return;
-    }
-
-    // Render results with UTM parameters for Unsplash compliance
-    carouselTrack.innerHTML = data.results.map(photo => `
-      <li class="carousel-item">
-        <div class="unsplash-photo">
-          <img src="${photo.urls.small}" alt="${photo.alt_description || ''}" />
-          <div class="photo-info">
-            <div class="photo-credit">
-              Photo by <a href="${photo.user.links.html}?utm_source=recipe_me&utm_medium=referral" target="_blank" rel="noopener">${photo.user.name}</a>
-            </div>
-            <button 
-              class="select-photo-btn"
-              data-url="${photo.urls.regular}"
-              data-photographer="${photo.user.name}"
-              data-photographer-link="${photo.user.links.html}?utm_source=recipe_me&utm_medium=referral"
-            >
-              <i class="fa-solid fa-plus"></i> Add to Recipe
-            </button>
-          </div>
-        </div>
-      </li>
-    `).join('');
-
-    // Add click handlers
-    const selectButtons = carouselTrack.querySelectorAll('.select-photo-btn');
-    selectButtons.forEach(button => {
-      button.addEventListener('click', async (e) => {
-        e.preventDefault();
-        
-        await selectUnsplashImageForGallery(
-          recipeId,
-          button.dataset.url,
-          button.dataset.photographer,
-          button.dataset.photographerLink // Now includes UTM params
-        );
-        
-        // Close modal
-        modal.close();
-        
-        // Clear search input
-        const searchInput = document.getElementById('feature-keyword');
-        if (searchInput) searchInput.value = '';
-      });
-    });
-
-  } catch (error) {
-    console.error('Unsplash search error:', error);
-    carouselTrack.innerHTML = '<li class="error">Search failed. Please try again.</li>';
-  }
-}
 
 const removeRecipe = async (recipeId) => {
     let recipes = await loadRecipes()
@@ -630,6 +619,8 @@ export {
     sortRecipes,
     saveRecipes,
     getTimestamp,
+    loadRecipes,
+    loadCategories,
     loadRecipesFromLocalStorage,
     loadNewRecipeFromLocalStorage,
     saveNewRecipeToLocalStorage,
@@ -639,5 +630,6 @@ export {
     // updateRecipeInDatabase,
     convertTimestamp,
     listeners,
-    updateLocalStorage
+    updateLocalStorage,
+    hideWarning
 }
