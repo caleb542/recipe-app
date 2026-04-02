@@ -74,7 +74,7 @@
   --hue-primary: 217;        /* Blue (current) - Try: 270 (purple), 160 (teal), 30 (orange) */
   --hue-secondary: 160;      /* Green - accent color hue */
   --hue-neutral: 220;        /* Slight blue tint for neutrals - Try: 0 (true gray), 30 (warm gray) */
-  
+  --mark-bg:  #fbbf24;
   /* Brand Colors - Primary (variations of same hue) */
   --color-primary: hsl(var(--hue-primary), 83%, 53%);           /* Main brand color */
   --color-primary-hover: hsl(var(--hue-primary), 77%, 48%);     /* Hover state (darker) */

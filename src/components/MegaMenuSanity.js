@@ -109,7 +109,7 @@ export function setupSanityMegaMenu() {
     navItems.forEach(item => {
       if (item.getAttribute('data-open') === 'true') {
         item.setAttribute('data-open', 'false');
-        item.classList.add('leaving');
+        // item.classList.add('leaving');
         
         const button = item.querySelector('.nav-link[aria-controls]');
         const panelId = button?.getAttribute('aria-controls');
@@ -140,7 +140,7 @@ export function setupSanityMegaMenu() {
   // Measure all panels on init
   getMeasurements();
 function openPanel(item, button, panelId) {
-  getMeasurements();
+  // getMeasurements();
   const panel = document.getElementById(panelId);
   if (!panel) return;
   
@@ -160,15 +160,36 @@ function openPanel(item, button, panelId) {
   backdrop.classList.add('is-visible');
   button.setAttribute('aria-expanded', 'true');
 }
+function closePanel(item, button, panelId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
 
+  item.setAttribute('data-open', 'false');
+  item.classList.add('leaving');
+  panel.style.visibility = 'hidden';
+  panel.style.zIndex = '';
+  panel.classList.remove('is-active');
+
+  box.classList.remove('is-active');
+  box.style.width = '0';
+  box.style.height = '0';
+
+  backdrop.classList.remove('is-visible');
+  button.setAttribute('aria-expanded', 'false');
+}
   navItems.forEach((item) => {
     const button = item.querySelector('.nav-link[aria-controls]');
     const panelId = button?.getAttribute('aria-controls');
     
     if (!button || !panelId) return;
+    
+    // Guard against double-binding
+    if (button.dataset.menuBound) return;
+    button.dataset.menuBound = 'true';
 
     // Mouse enter - open menu
     let hoverTimer;
+   
 
 item.addEventListener('mouseenter', (e) => {
   clearTimeout(hoverTimer);
@@ -200,84 +221,87 @@ item.addEventListener('mouseleave', () => {
 });
 
     // Focus in (keyboard navigation)
-item.addEventListener('focusin', (e) => {
-  // ✅ Close ALL other menus first (same as mouseenter)
-  navItems.forEach(otherItem => {
-    if (otherItem !== item && otherItem.getAttribute('data-open') === 'true') {
-      otherItem.setAttribute('data-open', 'false');
-      otherItem.classList.add('leaving');
+// item.addEventListener('focusin', (e) => {
+//   // ✅ Close ALL other menus first (same as mouseenter)
+//   navItems.forEach(otherItem => {
+//     if (otherItem !== item && otherItem.getAttribute('data-open') === 'true') {
+//       otherItem.setAttribute('data-open', 'false');
+//       otherItem.classList.add('leaving');
       
-      const otherButton = otherItem.querySelector('.nav-link[aria-controls]');
-      const otherPanelId = otherButton?.getAttribute('aria-controls');
-      const otherPanel = document.getElementById(otherPanelId);
+//       const otherButton = otherItem.querySelector('.nav-link[aria-controls]');
+//       const otherPanelId = otherButton?.getAttribute('aria-controls');
+//       const otherPanel = document.getElementById(otherPanelId);
       
-      if (otherPanel) {
-        otherPanel.classList.remove('is-active');
-        otherPanel.style.visibility = 'hidden';
-      }
+//       if (otherPanel) {
+//         otherPanel.classList.remove('is-active');
+//         otherPanel.style.visibility = 'hidden';
+//       }
       
-      otherButton?.setAttribute('aria-expanded', 'false');
-    }
-  });
+//       otherButton?.setAttribute('aria-expanded', 'false');
+//     }
+//   });
 
-  // Don't re-open if already open
-  if (item.getAttribute('data-open') === 'true') return;
+//   // Don't re-open if already open
+//   if (item.getAttribute('data-open') === 'true') return;
 
-  item.setAttribute('data-open', 'true');
-  item.classList.remove('leaving');
+//   item.setAttribute('data-open', 'true');
+//   item.classList.remove('leaving');
   
-  getMeasurements();
+//   getMeasurements();
   
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
+//   const panel = document.getElementById(panelId);
+//   if (!panel) return;
   
-  const w = panel.getAttribute('data-width');
-  const h = panel.getAttribute('data-height');
+//   const w = panel.getAttribute('data-width');
+//   const h = panel.getAttribute('data-height');
   
-  panel.style.visibility = 'visible';
-  panel.style.zIndex = '1';
-  panel.classList.add('is-active');
+//   panel.style.visibility = 'visible';
+//   panel.style.zIndex = '1';
+//   panel.classList.add('is-active');
   
-  box.classList.add('is-active');
-  box.style.width = `${Math.max(w, navBar.offsetWidth)}px`;
-  box.style.height = `${Math.max(h, 400)}px`;
-  // box.style.transition = 'all 0.2s';
+//   box.classList.add('is-active');
+//   box.style.width = `${Math.max(w, navBar.offsetWidth)}px`;
+//   box.style.height = `${Math.max(h, 400)}px`;
+//   // box.style.transition = 'all 0.2s';
   
-  backdrop.classList.add('is-visible');
-  button.setAttribute('aria-expanded', 'true');
-});
+//   backdrop.classList.add('is-visible');
+//   button.setAttribute('aria-expanded', 'true');
+// });
 
- // Focus out (keyboard navigation)
-item.addEventListener('focusout', (e) => {
-  // Check if focus is still within this nav item (after browser updates)
-  setTimeout(() => {
-    const focusedElement = document.activeElement;
+//  // Focus out (keyboard navigation)
+// item.addEventListener('focusout', (e) => {
+//   // Check if focus is still within this nav item (after browser updates)
+//   setTimeout(() => {
+//     const focusedElement = document.activeElement;
     
-    // Don't close if focus moved to another nav button
-    const isOnAnotherNavButton = Array.from(navItems).some(navItem => 
-      navItem.contains(focusedElement)
-    );
+//     // Don't close if focus moved to another nav button
+//     const isOnAnotherNavButton = Array.from(navItems).some(navItem => 
+//       navItem.contains(focusedElement)
+//     );
     
-    // Only close if focus completely left the mega menu system
-    if (!item.contains(focusedElement) && !isOnAnotherNavButton) {
-      closeAllMenus();
-    }
-  }, 0);
-});
+//     // Only close if focus completely left the mega menu system
+//     if (!item.contains(focusedElement) && !isOnAnotherNavButton) {
+//       closeAllMenus();
+//     }
+//   }, 0);
+// });
 
     // Click handler
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      
-      const isOpen = item.getAttribute('data-open') === 'true';
-      
-      if (isOpen) {
-      
-      } else {
-        closeAllMenus();
-        openPanel(item, button, panelId);
-      }
-    });
+button.addEventListener('click', (e) => {
+  e.preventDefault();
+  
+  const isOpen = item.getAttribute('data-open') === 'true';
+  console.log('click — isOpen:', isOpen);
+  
+  if (isOpen) {
+    console.log('→ closing');
+    closePanel(item, button, panelId);
+  } else {
+    console.log('→ opening');
+    closeAllMenus();
+    openPanel(item, button, panelId);
+  }
+});
   });
 
   // Close when leaving entire nav bar
@@ -302,6 +326,7 @@ item.addEventListener('focusout', (e) => {
     panel.querySelectorAll('.mega-link').forEach(link => {
       link.addEventListener('click', () => {
         navItems.forEach(item => {
+          
           item.setAttribute('data-open', 'false');
           const button = item.querySelector('.nav-link[aria-controls]');
           const panelId = button?.getAttribute('aria-controls');

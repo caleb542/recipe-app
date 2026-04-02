@@ -6,6 +6,7 @@
 // Import design tokens first
 // Import component files
 @use './styles/base';
+@use './styles/recipe-me';
 @use './styles/buttons';
 @use './styles/forms';
 @use './styles/header';
@@ -16,7 +17,7 @@
 @use './styles/spinner';
 @use './styles/impersonation-banner';
 @use './styles/recipe-badges';
-@use './styles/recipe-me';
+
 @use './styles/loaders';
 @use './styles/footer';
 @use './styles/badgeVisibility';
