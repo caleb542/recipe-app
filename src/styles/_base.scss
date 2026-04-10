@@ -15,7 +15,9 @@ html {
     scroll-snap-type: y mandatory;
     scroll-padding-top: 160px;
 }
-
+html, body {
+    scrollbar-gutter: stable;
+}
 body {
     font: normal normal 400 18px/28px 'Source Sans Pro', sans-serif;
     -webkit-font-smoothing: antialiased;

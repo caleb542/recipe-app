@@ -1129,6 +1129,10 @@ html {
   scroll-padding-top: 160px;
 }
 
+html, body {
+  scrollbar-gutter: stable;
+}
+
 body {
   font: normal normal 400 18px/28px "Source Sans Pro", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -1252,11 +1256,6 @@ a {
   color: var(--text-link);
   text-decoration: none;
   transition: color var(--transition-base);
-}
-
-a:hover {
-  color: var(--text-link-hover);
-  text-decoration: underline;
 }
 
 /* Images */
@@ -7039,6 +7038,9 @@ nav.main-nav {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.25rem;
+}
+.curated-cards:hover {
+  text-decoration: none;
 }
 
 .curated-section:has([href*=cocktails]) .curated-cards {

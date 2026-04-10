@@ -6,7 +6,7 @@ export function showSpinner() {
   }
 }
 
-export function removeSpinner(minDisplayTime = 1000) {
+export function removeSpinner(minDisplayTime = 10) {
   return new Promise((resolve) => {
     setTimeout(() => {
       const spinner = document.getElementById('spinner-container');

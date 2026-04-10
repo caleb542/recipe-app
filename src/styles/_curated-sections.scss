@@ -38,6 +38,10 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.25rem;
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 // 3-col for drinks

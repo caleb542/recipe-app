@@ -52,10 +52,10 @@ a {
   transition: color var(--transition-base);
 }
 
-a:hover {
-  color: var(--text-link-hover);
-  text-decoration: underline;
-}
+// a:hover {
+//   color: var(--text-link-hover);
+//   text-decoration: underline;
+// }
 
 /* Images */
 img {

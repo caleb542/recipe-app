@@ -1,5 +1,5 @@
 // src/helpers/featureImage.js
-
+import { sanitizeText } from '../utils/sanitize.js';
 
 
 
@@ -24,7 +24,7 @@ export async function renderImageSelector(keyword, pageNumber, recipeId) {
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(keyword)}&page=${pageNumber}&per_page=20&orientation=landscape`,
       {
         headers: {
-          'Authorization': `Client-ID ${UNSPLASH_ACCESS_KEY}`
+          'Authorization': `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`
         }
       }
     );

@@ -20,26 +20,26 @@ export const handler = async (event) => {
 
     // Get recipe counts per category — recipes store display names currently
     // so we count against both slug and display name for compatibility
-    const counted = await Promise.all(categories.map(async (cat) => {
-      const count = await recipesCollection.countDocuments({
-        isPublic: true,
-        status: { $ne: 'draft' },
-        $or: [
-          { categories: cat.slug },
-          { categories: cat.name }
-        ]
-      });
+    const recipeCounts = await recipesCollection.aggregate([
+      { $match: { isPublic: true, status: { $ne: 'draft' } } },
+      { $unwind: '$categories' },
+      { $group: { _id: '$categories', count: { $sum: 1 } } }
+    ]).toArray();
 
-      return {
-        slug: cat.slug,
-        name: cat.name,
-        group: cat.group,
-        order: cat.order,
-        recipeCount: count,
-        description: cat.description || null,
-        sectionTitle: cat.sectionTitle || null,
-        image: cat.image || null
-      };
+    const countMap = recipeCounts.reduce((acc, { _id, count }) => {
+      acc[_id] = count;
+      return acc;
+    }, {});
+
+    const counted = categories.map((cat) => ({
+      slug: cat.slug,
+      name: cat.name,
+      group: cat.group,
+      order: cat.order,
+      recipeCount: (countMap[cat.slug] || 0) + (countMap[cat.name] || 0),
+      description: cat.description || null,
+      sectionTitle: cat.sectionTitle || null,
+      image: cat.image || null
     }));
 
     // Group by nav group

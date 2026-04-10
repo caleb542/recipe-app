@@ -21,7 +21,7 @@ async function fetchSectionRecipes(slug, count) {
 
 async function fetchCategoryMeta(slug) {
   try {
-   const { categories } = await loadCategories();
+    const { categories } = await loadCategories();
     return categories.find(c => c.slug === slug) || null;
   } catch {
     return null;
@@ -125,7 +125,6 @@ export async function loadCuratedSections() {
       loadRecipes()
     ]);
 
-    // World Flavours — use Cuisine group, one recipe per cuisine
     const cuisineNames = new Set(
       (grouped.Cuisine || [])
         .filter(c => c.recipeCount > 0)
@@ -148,7 +147,6 @@ export async function loadCuratedSections() {
 
     const worldHTML = renderWorldFlavoursSection(worldItems);
 
-    // Curated sections — filter by display name
     const sectionsHTML = HOMEPAGE_SECTIONS
       .map(section => {
         const sectionRecipes = recipes
