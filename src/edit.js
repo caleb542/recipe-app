@@ -1,8 +1,8 @@
 // /src/edit.js - Entry point for Recipe Editor
 import { v4 as uuidv4 } from 'uuid';
 import { loadRecipes, saveRecipes, hideWarning } from './functions.js';
-import '@toast-ui/editor/dist/toastui-editor.css';
 import { showQuickAddModal } from './helpers/quickAdd.js';
+import '@toast-ui/editor/dist/toastui-editor.css';
 
 // Helpers
 import { populateFields, wireFieldListeners, loadCategories } from './helpers/fields.js';

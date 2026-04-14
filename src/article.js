@@ -1,5 +1,5 @@
 import "./style.scss";
-import { loadRecipes, hamburger, getFeaturedImage, getAllImages, hideWarning, loadRecipesFromLocalStorage, loadCategories } from "./functions.js";
+import { loadRecipes, formatDate, hamburger, getFeaturedImage, getAllImages, hideWarning, loadRecipesFromLocalStorage, loadCategories } from "./functions.js";
 import { marked } from "marked";
 import { setupShoppingList } from "./helpers/shoppingList.js";
 import { initAuth0, getToken, isAuthenticated, getUser } from './auth/auth0.js';
@@ -226,8 +226,8 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
     document.title = `Recipe Me - ${recItem.name}`;
   }
  
-  const d = tpl.querySelector(".dates");
-  if (d) d.innerHTML = `<date>${recItem.createdAt[0]}</date>`;
+  const dateEl = tpl.querySelector(".dates");
+  dateEl.innerHTML = `<date>${formatDate(recItem.createdAt)}</date>`;
 
   const a = tpl.querySelector(".author");
   if (a) {

@@ -1,4 +1,4 @@
-import moment from 'moment'
+
 import {
     stringify,
     v4 as uuidv4
@@ -16,21 +16,24 @@ import { sanitizeHTML, sanitizeText } from './utils/sanitize.js';
 
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 const convertTimestamp = (rDate) => {
-    if (typeof rDate === 'object') {
-        // do nothing
-    } else if (typeof rDate === 'string') {
-        const format_unix = moment(rDate, 'MMM Do, YYYY HH:mm').unix();
-        return format_unix
-    }
+  if (typeof rDate === 'object') {
+    // do nothing
+  } else if (typeof rDate === 'string') {
+    // Strip ordinal suffix (1st, 2nd, 3rd, 4th etc) so Date.parse can handle it
+    const cleaned = rDate.replace(/(\d+)(st|nd|rd|th)/, '$1');
+    return Math.floor(new Date(cleaned).getTime() / 1000);
+  }
 }
 
 const getTimestamp = () => {
-    let timestamp = moment()
-    let timestampValueOf = timestamp.valueOf()
-    let timestampLong = timestamp.format('MMM Do, YYYY')
-    let timestampShort = timestamp.format('MM-DD-YYYY')
-    let unixTimestamp = moment(timestampShort, 'MMM Do, YYYY HH:mm').unix();
-    return [timestampShort, unixTimestamp]
+  const now = new Date();
+  const timestampShort = now.toLocaleDateString('en-CA', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric'
+  }); // "MM-DD-YYYY" equivalent
+  const unixTimestamp = Math.floor(now.getTime() / 1000);
+  return [timestampShort, unixTimestamp];
 }
 
 
@@ -77,7 +80,38 @@ const listDirections = (directions) => {
     const directionsHeading = document.getElementById("directions-heading")
     // directionsHeading.appendChild(emptyBlock)
 }
+// Replace: import moment from 'moment'
+// With this:
 
+export function normalizeDate(createdAt) {
+  if (!createdAt) return null;
+
+  // Array format — old: ["Oct 14th, 2022 17:45", 1665783900] or new: ["2026-04-10T...", null]
+  if (Array.isArray(createdAt)) {
+    const [dateStr, unixTimestamp] = createdAt;
+    if (unixTimestamp) return unixTimestamp * 1000; // old — unix to ms
+    return new Date(dateStr).getTime(); // new — ISO string to ms
+  }
+
+  // Plain string — ISO format
+  return new Date(createdAt).getTime();
+}
+
+export function formatDate(createdAt) {
+  const ms = normalizeDate(createdAt);
+  if (!ms) return '';
+  return new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(new Date(ms));
+}
+
+export function toUnixTimestamp(createdAt) {
+  const ms = normalizeDate(createdAt);
+  if (!ms) return null;
+  return Math.floor(ms / 1000);
+}
 
 const openDirectionsDialogue = async (id, text) => {
   const modal = document.querySelector('#add-directions');

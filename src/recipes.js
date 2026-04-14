@@ -1,10 +1,10 @@
-import moment, { unix } from 'moment'
+
 import {
     v4 as uuidv4
 } from 'uuid';
 import { getFilters } from './filters.js'
 import { loadRecipes, saveRecipes, sortRecipes, getFeaturedImage } from './functions.js';
-import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
+// import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
 import { generateRecipeBadges } from './components/RecipeBadges.js';
 import { isAuthenticated, getUser, isAuthor } from './auth/auth0.js';
 
@@ -80,7 +80,8 @@ let listRecipes = async (recipesParam, currentUserId = null) => {
       let resaveCreatedDate = recipe.createdAt;
 
       if (typeof resaveCreatedDate === 'string') {
-        let unixTimestamp = moment(resaveCreatedDate, 'MMM Do, YYYY HH:mm').unix();
+        const cleaned = resaveCreatedDate.replace(/(\d+)(st|nd|rd|th)/, '$1');
+        let unixTimestamp = Math.floor(new Date(cleaned).getTime() / 1000);
         recipe.createdAt = [resaveCreatedDate, unixTimestamp];
         saveRecipes(recipes);
       }

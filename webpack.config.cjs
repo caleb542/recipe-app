@@ -6,6 +6,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+
+
 
 module.exports = (env, argv) => {
   const isDevelopment = argv.mode === 'development';
@@ -90,6 +93,8 @@ module.exports = (env, argv) => {
         "process.env.AUTH0_AUDIENCE": JSON.stringify(process.env.AUTH0_AUDIENCE),
         "process.env.UNSPLASH_ACCESS_KEY": JSON.stringify(process.env.UNSPLASH_ACCESS_KEY),
       }),
+      new BundleAnalyzerPlugin(),
+      new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
     ],
     
     module: {
