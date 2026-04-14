@@ -312,14 +312,24 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
     }
   }
 
-  // Summary content
-  const summaryContent = tpl.querySelector(".summary-content");
+// Summary content
+const summaryContent = tpl.querySelector(".summary-content");
+const jumpBtn = tpl.querySelector(".jump-to-recipe");
+
+if (summaryContent) {
+  let html = marked.parse(recItem.article || "");
+  html = autoEmbedVideos(html);
+  summaryContent.innerHTML = html;
   
-  if (summaryContent) {
-    let html = marked.parse(recItem.article || "");
-    html = autoEmbedVideos(html);
-    summaryContent.innerHTML = html;
-  }
+  const hasArticle = recItem.article && recItem.article.trim().length > 0;
+ const summaryWrapper = tpl.querySelector("div.summary");
+
+  console.log('!!!!!article content:', recItem.article, 'length:', recItem.article?.trim().length);
+  console.log('?????summaryWrapper:', summaryWrapper)
+
+
+  if (summaryWrapper) summaryWrapper.style.display = hasArticle ? '' : 'none';
+}
 
   // Directions
   const directionsList = tpl.querySelector(".directions-list");
