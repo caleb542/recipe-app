@@ -63,6 +63,9 @@ function showSharePopover(recipeName, anchorEl) {
 
   const popover = document.createElement('div');
   popover.className = 'share-popover';
+  popover.setAttribute('role', 'dialog');
+  popover.setAttribute('aria-label', 'Sharing options');
+
 
   options.forEach(({ label, icon, action }) => {
     const btn = document.createElement('button');
@@ -82,6 +85,13 @@ popover.style.zIndex = '9999';
 popover.style.left = `${rect.left}px`;
 document.body.appendChild(popover);
 
+document.body.appendChild(popover);
+
+// Move focus to first button
+requestAnimationFrame(() => {
+  popover.querySelector('button')?.focus();
+});
+
 const popoverRect = popover.getBoundingClientRect();
 const spaceBelow = window.innerHeight - rect.bottom;
 
@@ -98,14 +108,15 @@ if (rightEdge > window.innerWidth) {
 
 popover.style.visibility = 'visible';
 
+// Remove the setTimeout click handler and replace with:
+popover.addEventListener('focusout', (e) => {
   setTimeout(() => {
-    document.addEventListener('click', function handler(e) {
-      if (!popover.contains(e.target)) {
-        popover.remove();
-        document.removeEventListener('click', handler);
-      }
-    });
+    if (!popover.contains(document.activeElement)) {
+      popover.remove();
+      window.removeEventListener('scroll', scrollHandler);
+    }
   }, 0);
+});
 
   const scrollHandler = () => {
     popover.remove();
@@ -135,11 +146,13 @@ popover.style.visibility = 'visible';
     }
 
 function renderShoppingList(recipeName) {
+
     list.innerHTML = '';
 
     // Always remove existing buttons
-    document.getElementById('share-list')?.remove();
-    document.getElementById('share-list-more')?.remove();
+            document.getElementById('share-list')?.remove();
+        document.getElementById('share-list-more')?.remove();
+        document.getElementById('share-button-container')?.remove();
 
     shoppingListArr.forEach(item => {
         const li = document.createElement('li');
@@ -168,7 +181,9 @@ function renderShoppingList(recipeName) {
         moreBtn.addEventListener('click', () => showSharePopover(recipeName, moreBtn));
 
         const container = document.querySelector('.shoppinglist-container');
+        
         const shareButtonContainer = document.createElement("div");
+        shareButtonContainer.id = 'share-button-container';
         shareButtonContainer.classList.add("share-button-container");
         container.appendChild(shareButtonContainer);
         shareButtonContainer.appendChild(shareBtn);

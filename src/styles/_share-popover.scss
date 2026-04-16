@@ -33,6 +33,9 @@
 .share-popover button:hover {
   background: #f3f4f6;
 }
+.share-popover button:focus-visible {
+  background: #f3f4f6;
+}
 
 .share-popover button:active {
   background: #e5e7eb;

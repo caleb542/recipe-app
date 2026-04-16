@@ -3,6 +3,24 @@
    Two-tier header, top bar, navigation bar, mobile menu
    ======================================== */
 
+/* A11y Skip to Content */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  background: #111;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  z-index: 9999;
+  border-radius: 0 0 4px 4px;
+
+  &:focus-visible {
+    top: 0;
+  }
+}
 /* Dev Notice Banner */
 
 .dev-notice {
@@ -78,7 +96,7 @@
   }
 
   #hide-this-header {
-    animation: devnotice-fadein 0.4s ease forwards 4.5s;
+    animation: devnotice-fadein 0.4s ease forwards 4.5s;    
   }
 }
 
