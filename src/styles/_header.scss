@@ -216,7 +216,15 @@
 .nav-bar-logo a:hover span {
     color:#eee;
 }
-
+.logo-wordmark {
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 300;
+  font-size: 0.85rem;
+  letter-spacing: 4px;
+  color: #c8892a;
+  vertical-align: middle;
+  margin-left: 0rem;
+}
 .nav-bar-controls {
     display: flex;
     align-items: center;
