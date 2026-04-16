@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 
 
 
@@ -79,6 +79,32 @@ module.exports = (env, argv) => {
         template: "./public/index.html",
         inject: false // Don't auto-inject scripts (you handle manually)
       }),
+      new HtmlWebpackTagsPlugin({
+        tags: [
+          { 
+            path: 'favicon.ico',
+            type: 'css',
+            attributes: { rel: 'icon', type: 'image/x-icon' } 
+          },
+          { 
+            path: 'favicon-32.png',
+            type: 'css',
+            attributes: { rel: 'icon', type: 'image/png', sizes: '32x32' } 
+          },
+          { 
+            path: 'favicon-16.png',
+            type: 'css',
+            attributes: { rel: 'icon', type: 'image/png', sizes: '16x16' } 
+          },
+          { 
+            path: 'favicon-180.png',
+            type: 'css',
+            attributes: { rel: 'apple-touch-icon', sizes: '180x180' } 
+          },
+        ],
+        append: false,
+        publicPath: '/'
+      }),
       new MiniCssExtractPlugin({ 
         filename: "[name].css" 
       }),
@@ -93,7 +119,6 @@ module.exports = (env, argv) => {
         "process.env.AUTH0_AUDIENCE": JSON.stringify(process.env.AUTH0_AUDIENCE),
         "process.env.UNSPLASH_ACCESS_KEY": JSON.stringify(process.env.UNSPLASH_ACCESS_KEY),
       }),
-      new BundleAnalyzerPlugin(),
       new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
     ],
     
