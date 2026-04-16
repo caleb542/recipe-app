@@ -23,7 +23,7 @@ import { loadUserProfile } from './userContext.js';
 import { setupPreview } from './helpers/preview.js'
 import { initStatusToggle, getCurrentPublishedState } from './helpers/statusToggle.js'
 import { setupVideoHelper } from './helpers/setupVideoHelper.js';
-import { loadHeader } from './components/HeaderComponent.js';
+import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
 
 loadHeader();
@@ -162,18 +162,21 @@ export async function initCreate() {
   const newRecipeId = uuidv4();
 
 
-  const newRecipe = {
-    id: newRecipeId,
-    name: "New unnamed recipe",
-    prepTime: "",
-    totalTime: "",
-    description: "",
-    author: {
-      auth0Id: currentUser.sub,
-      name: currentUser.name,
-      email: currentUser.email
-    },
-    displayAuthor: currentUser.name,
+ const rawName = currentUser.name || currentUser.nickname || '';
+const safeName = rawName.includes('@') ? '' : rawName;
+
+const newRecipe = {
+  id: newRecipeId,
+  name: "New unnamed recipe",
+  prepTime: "",
+  totalTime: "",
+  description: "",
+  author: {
+    auth0Id: currentUser.sub,
+    name: safeName,
+    // email removed entirely — no reason to store it on the recipe
+  },
+  displayAuthor: safeName,
     isPublic: false,
     directions: [],
     tags: [],

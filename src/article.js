@@ -8,7 +8,7 @@ import { RatingDisplay } from './components/RatingDisplay.js';
 import { CommunityNotes } from './components/CommunityNotes.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { autoEmbedVideos } from './helpers/youtubeEmbed.js';
-import { loadHeader } from './components/HeaderComponent.js';
+import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
 import { setupSanityMegaMenu } from "./components/MegaMenuSanity.js";
@@ -180,13 +180,11 @@ async function loadRecipeBySlug(slug) {
 }
 
 async function hydrateArticle(recipes, recipeIdOverride = null) {
-  // Prevent multiple hydrations
   if (articleHydrated) {
     console.log('Article already hydrated, skipping...');
     return;
   }
   
-  // ✅ Use override ID if provided (from slug loading)
   const currentRecipeId = recipeIdOverride || recipeId;
   
   const recItem = Array.isArray(recipes)
@@ -199,35 +197,27 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
     return;
   }
 
-  // ✅ Update URL to clean format if loaded via hash
   if (!slug && recItem.fullSlug) {
-    const newUrl = `/${recItem.fullSlug}`;
-    window.history.replaceState({}, '', newUrl);
+    window.history.replaceState({}, '', `/${recItem.fullSlug}`);
   }
 
-  // Load template
   const res = await fetch("/partials/article-template.html");
   const html = await res.text();
   
-  // ✅ Remove spinner BEFORE adding content
   removeSpinner(0);
-  
   container.insertAdjacentHTML("beforeend", html);
 
   const template = document.getElementById("article-template");
   const tpl = template.content.cloneNode(true);
 
-  // Hydrate fields safely
   const articleTitle = tpl.querySelector(".article__title");
-
-
   if (articleTitle) {
     articleTitle.textContent = recItem.name;
     document.title = `Recipe Me - ${recItem.name}`;
   }
  
   const dateEl = tpl.querySelector(".dates");
-  dateEl.innerHTML = `<date>${formatDate(recItem.createdAt)}</date>`;
+  if (dateEl) dateEl.innerHTML = `<date>${formatDate(recItem.createdAt)}</date>`;
 
   const a = tpl.querySelector(".author");
   if (a) {
@@ -244,92 +234,21 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
   const dsum = tpl.querySelector(".description.summary");
   if (dsum) dsum.innerHTML = recItem.description;
 
-  // Handle multiple images from images array
-  const imageElement = tpl.querySelector(".imageElement");
-  const photoInfo = tpl.querySelector(".photoInfo");
-  
-  if (imageElement) {
-    const featuredImage = getFeaturedImage(recItem);
+  // Image gallery
+  renderArticleImageGallery(tpl, recItem);
+
+  // Summary content
+  const summaryContent = tpl.querySelector(".summary-content");
+
+  if (summaryContent) {
+    let html = marked.parse(recItem.article || "");
+    html = autoEmbedVideos(html);
+    summaryContent.innerHTML = html;
     
-    if (featuredImage) {
-      // Display featured image
-      imageElement.style.backgroundImage = `url(${featuredImage.url})`;
-      
-      // Show attribution if exists
-      if (photoInfo && featuredImage.attribution) {
-        if (featuredImage.source === 'unsplash') {
-          photoInfo.innerHTML = `Photo by <a href="${featuredImage.attribution.photographerUrl}" target="_blank" rel="noopener">${featuredImage.attribution.photographer}</a> on <a href="https://unsplash.com/?utm_source=recipe_me&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a>`;
-        } else {
-          // User-added attribution
-          const attr = featuredImage.attribution;
-          if (attr.customCredit) {
-            photoInfo.innerHTML = attr.customCredit;
-          } else if (attr.photographerUrl) {
-            photoInfo.innerHTML = `Photo by <a href="${attr.photographerUrl}" target="_blank" rel="noopener">${attr.photographer}</a>`;
-          } else {
-            photoInfo.innerHTML = `Photo by ${attr.photographer}`;
-          }
-        }
-      } else if (photoInfo) {
-        photoInfo.innerHTML = '';
-      }
-    }
+    const hasArticle = recItem.article && recItem.article.trim().length > 0;
+    const summaryWrapper = tpl.querySelector("div.summary");
+    if (summaryWrapper) summaryWrapper.style.display = hasArticle ? '' : 'none';
   }
-
-  // Display image gallery (all images)
-  const imageGalleryContainer = tpl.querySelector(".recipe-image-gallery");
-  if (imageGalleryContainer) {
-    const allImages = getAllImages(recItem);
-
-    // ✅ Filter out featured image if there are fewer than 3 uploaded images
-    const uploadedImages = allImages.filter(img => img.source === 'upload');
-    const displayImages = uploadedImages.length < 3 
-      ? allImages.filter(img => !img.isFeatured)
-      : allImages;
-    
-    if (allImages.length > 0) {
-      imageGalleryContainer.innerHTML = `
-        <div class="recipe-images-grid">
-          ${displayImages.map((img, index) => `
-            <figure class="recipe-image-item ${img.isFeatured ? 'featured-image' : ''}">
-              ${img.resourceType === 'video' ? `
-                <video controls>
-                  <source src="${img.url}" type="video/mp4">
-                  Your browser does not support video.
-                </video>
-              ` : `
-                <img src="${img.url}" alt="Recipe image ${index + 1}" loading="lazy">
-              `}
-              ${img.attribution ? `
-                <figcaption class="image-attribution">
-                  ${formatImageAttribution(img)}
-                </figcaption>
-              ` : ''}
-            </figure>
-          `).join('')}
-        </div>
-      `;
-    }
-  }
-
-// Summary content
-const summaryContent = tpl.querySelector(".summary-content");
-const jumpBtn = tpl.querySelector(".jump-to-recipe");
-
-if (summaryContent) {
-  let html = marked.parse(recItem.article || "");
-  html = autoEmbedVideos(html);
-  summaryContent.innerHTML = html;
-  
-  const hasArticle = recItem.article && recItem.article.trim().length > 0;
- const summaryWrapper = tpl.querySelector("div.summary");
-
-  console.log('!!!!!article content:', recItem.article, 'length:', recItem.article?.trim().length);
-  console.log('?????summaryWrapper:', summaryWrapper)
-
-
-  if (summaryWrapper) summaryWrapper.style.display = hasArticle ? '' : 'none';
-}
 
   // Directions
   const directionsList = tpl.querySelector(".directions-list");
@@ -359,12 +278,10 @@ if (summaryContent) {
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         const amt = document.createElement("span");
-
         const parts = [
           ingr.amount, ingr.unit || ingr.measureWord, ingr.name, ingr.description
         ].filter(part => part && String(part).trim());
         amt.textContent = parts.join(' ');
-
         label.append(checkbox, amt);
         li.appendChild(label);
         checklist.appendChild(li);
@@ -376,7 +293,6 @@ if (summaryContent) {
   const editBtn = tpl.getElementById?.('edit-recipe-btn') || tpl.querySelector("#edit-recipe-btn");
   if (editBtn) {
     const authenticated = await isAuthenticated();
-
     if (authenticated) {
       const currentUser = await getUser();
       const isAuthor = recItem.author?.auth0Id === currentUser.sub;
@@ -394,33 +310,114 @@ if (summaryContent) {
     }
   }
 
-  // Append hydrated fragment
   container.appendChild(tpl);
-
-    // Render breadcrumbs
   renderBreadcrumbs(recItem);
 
-  // Community notes
   const notesContainer = document.getElementById("community-notes");
   if (notesContainer) {
     new CommunityNotes(notesContainer, currentRecipeId);
   }
 
-  // Wire shopping list helper
   const userProfile = getUserProfile();
-  const userEmail = userProfile?.email || '';
-  setupShoppingList(recItem, currentRecipeId, userEmail);
+  setupShoppingList(recItem, currentRecipeId, userProfile?.email || '');
 
-  // Initialize likes once
   if (!likesInitialized) {
     await initializeLikes(currentRecipeId, container);
     likesInitialized = true;
   }
 
-  // Hamburger menu
   hamburger();
   articleHydrated = true;
   removeSpinner(1500);
+  showDevNotice();
+}
+
+function renderArticleImageGallery(tpl, recipe) {
+  const galleryEl = tpl.querySelector('.recipe-gallery');
+  if (!galleryEl) return;
+
+  const images = getAllImages(recipe);
+  if (!images.length) {
+    galleryEl.style.display = 'none';
+    return;
+  }
+
+  const heroImg = galleryEl.querySelector('.recipe-gallery__hero-img');
+  const caption = galleryEl.querySelector('.recipe-gallery__caption');
+  const thumbsEl = galleryEl.querySelector('.recipe-gallery__thumbs');
+  const mobileEl = galleryEl.querySelector('.recipe-gallery__mobile');
+
+  function buildAttribution(img) {
+    if (!img.attribution) return '';
+    const attr = img.attribution;
+    if (img.source === 'unsplash') {
+      return `Photo by <a href="${attr.photographerUrl}" target="_blank" rel="noopener">${attr.photographer}</a> on <a href="https://unsplash.com/?utm_source=recipe_me&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a>`;
+    }
+    if (attr.customCredit) return attr.customCredit;
+    if (attr.photographerUrl) return `Photo by <a href="${attr.photographerUrl}" target="_blank" rel="noopener">${attr.photographer}</a>`;
+    return `Photo by ${attr.photographer}`;
+  }
+
+  function setHero(img, index) {
+    heroImg.src = img.url;
+    heroImg.alt = img.attribution?.photographer
+      ? `Recipe photo by ${img.attribution.photographer}`
+      : `${recipe.name} — photo ${index + 1} of ${images.length}`;
+    caption.innerHTML = buildAttribution(img) || '';
+    thumbsEl.querySelectorAll('.recipe-gallery__thumb').forEach((btn, i) => {
+      btn.setAttribute('aria-pressed', i === index ? 'true' : 'false');
+    });
+  }
+
+  const featured = images.find(img => img.isFeatured) || images[0];
+  const featuredIndex = images.indexOf(featured);
+  setHero(featured, featuredIndex);
+
+  if (images.length > 1) {
+    thumbsEl.innerHTML = images.map((img, i) => `
+      <div class="recipe-gallery__thumb-wrap">
+        <button
+          class="recipe-gallery__thumb"
+          aria-pressed="${i === featuredIndex ? 'true' : 'false'}"
+          aria-label="View photo ${i + 1} of ${images.length}${img.attribution?.photographer ? ': photo by ' + img.attribution.photographer : ''}"
+          data-index="${i}"
+        >
+          <img src="${img.url}" alt="" aria-hidden="true">
+        </button>
+        ${img.attribution ? `
+          <div class="recipe-gallery__thumb-popover" role="group" aria-label="Photo ${i + 1} attribution">
+            ${buildAttribution(img)}
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+
+    thumbsEl.querySelectorAll('.recipe-gallery__thumb').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setHero(images[parseInt(btn.dataset.index)], parseInt(btn.dataset.index));
+      });
+    });
+  } else {
+    thumbsEl.style.display = 'none';
+  }
+
+  mobileEl.innerHTML = images.map((img, i) => `
+    <div class="recipe-gallery__scroll-item" data-index="${i}">
+      <img src="${img.url}" 
+        alt="${img.attribution?.photographer ? 'Photo by ' + img.attribution.photographer : recipe.name + ' photo ' + (i + 1)}" 
+        loading="lazy">
+    </div>
+  `).join('');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+        caption.innerHTML = buildAttribution(images[parseInt(entry.target.dataset.index)]) || '';
+      }
+    });
+  }, { threshold: 0.5 });
+
+  mobileEl.querySelectorAll('.recipe-gallery__scroll-item').forEach(el => observer.observe(el));
 }
 
 /**

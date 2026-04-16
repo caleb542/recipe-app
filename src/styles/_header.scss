@@ -4,77 +4,216 @@
    ======================================== */
 
 /* Dev Notice Banner */
-/* Dev Notice */
+
 .dev-notice {
-  background: #ffdc52;
-  height:50px;
+   align-self: flex-start; // don't stretch vertically
+    transform-origin: left center;
+  margin-top: 8px; 
+ background: hsla(48, 100%, 65%, 0.75);
+  height: 50px;
   width: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 50px;
   position: relative;
-  transform:0 -80px;
-  
+  margin-left: 24px;
+  overflow: hidden;
+  opacity: 0;
+
+  // Remove flex from here — no more display: flex, align-items, justify-content
+
   &.hidden {
     display: none;
   }
-  
-  p {
-    opacity: 0;
-    margin: 0;
-    animation: devnoticetextappear 2s linear forwards 2s;
-  }
+  // Inner content wrapper — this is what flexes
+.dev-notice-inner {
+  display: flex;
+  height:inherit;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 1rem;
+  opacity: 0; // hidden until expand completes
+}
+
+.dev-notice p {
+    flex: 1;
+    text-align: center;
+    line-height: 0;
+    display: inline-block;
+    padding: 0;
+    margin:0 auto;
+    margin-bottom: 0;
+}
+
   #hide-this-header {
-    position: absolute;
-    right: 1rem;
+    position: static; // no longer needs absolute
     cursor: pointer;
     padding: 0.5rem;
-    opacity:0;
-    animation:devnoticetextappear 2s linear forwards 1s;
+    opacity: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    flex-shrink: 0;
   }
 
-  animation: devnoticeappear 2s linear forwards .5s;
+  &.hidden {
+    display: none;
+  }
 
+  // JS adds this class to trigger the sequence
+ &.animate {
+  animation: devnotice-slidein 0.8s ease forwards 0s,
+             devnotice-pulse 1s ease-in-out both 1s,
+             devnotice-expand 0.7s linear forwards 4.3s;
 
-@keyframes devnoticetextappear {
-   0%, 20% {
-    opacity:0;
-    translate:-100px;
+  .dev-notice-inner {
+    animation: devnotice-fadein 0.3s ease forwards 5.3s;
+  }
 
+  p {
+    animation: devnotice-fadein 0.4s ease forwards 4.3s;
+    margin-bottom: 0 !important;
+    line-height: 0;
+    margin: 0 auto;
+    animation: devnotice-fadein 0.4s ease forwards 4.3s;
+  }
+
+  #hide-this-header {
+    animation: devnotice-fadein 0.4s ease forwards 4.5s;
+  }
+}
+
+  // Closing state — freeze current size before hiding
+  &.hide-up {
+    animation: devnotice-hideup 0.4s ease forwards !important;
+    p, #hide-this-header {
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes devnotice-slidein {
+  0% {
+    opacity: 0;
+    transform: translateX(-60px) scale(0.8);
   }
   100% {
-    opacity:1;
+    opacity: 1;
+    transform: translateX(0) scale(1);
   }
 }
-@keyframes devnoticeappear{
-  0% {
-    translate:0 0;
-    width:50px;
-    height:50px;
-    border-radius:50%
-  }
 
+@keyframes devnotice-pulse {
+  0%, 100% {
+    background: hsla(48, 100%, 65%, 1);
+    transform: scale(1);
+    transform-origin: center center;
+  }
   50% {
-    width:50px;
-    height:50px;
-    border-radius:50px;
-  }
-  to {
-    width:100%;
-    border-radius:50px;
-    translate:0px;
+    background: hsla(48, 100%, 65%, 0.75);
+    transform: scale(0.92);
+    transform-origin: center center;
   }
 }
-  
+@keyframes devnotice-expand {
+  0% {
+    width: 50px;
+    border-radius: 50px;
+    margin-right: 24px;
+    background: hsla(48, 100%, 65%, 0.75);
+  }
+  100% {
+    width: calc(100% - 48px);
+    border-radius: 50px;
+    margin-right: 24px;
+    background: hsla(48, 100%, 65%, 1);
+  }
 }
 
-@keyframes hideup {
-    to {
-        opacity:0;
-        margin-top:-60px;
-    }
+@keyframes devnotice-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
+
+@keyframes devnotice-hideup {
+  0% {
+    opacity: 1;
+    margin-top: 0;
+  }
+  100% {
+    opacity: 0;
+    margin-top: -60px;
+  }
+}
+// .dev-notice {
+//   background: #ffdc52;
+//   height:50px;
+//   width: 50px;
+//   border-radius: 50%;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   position: relative;
+//   transform:0 -80px;
+  
+//   &.hidden {
+//     display: none;
+//   }
+  
+//   p {
+//     opacity: 0;
+//     margin: 0;
+//     animation: devnoticetextappear 2s linear forwards 2s;
+//   }
+//   #hide-this-header {
+//     position: absolute;
+//     right: 1rem;
+//     cursor: pointer;
+//     padding: 0.5rem;
+//     opacity:0;
+//     animation:devnoticetextappear 2s linear forwards 1s;
+//   }
+
+//   animation: devnoticeappear 2s linear forwards .5s;
+
+
+// @keyframes devnoticetextappear {
+//    0%, 20% {
+//     opacity:0;
+//     translate:-100px;
+
+//   }
+//   100% {
+//     opacity:1;
+//   }
+// }
+// @keyframes devnoticeappear{
+//   0% {
+//     translate:0 0;
+//     width:50px;
+//     height:50px;
+//     border-radius:50%
+//   }
+
+//   50% {
+//     width:50px;
+//     height:50px;
+//     border-radius:50px;
+//   }
+//   to {
+//     width:100%;
+//     border-radius:50px;
+//     translate:0px;
+//   }
+// }
+  
+// }
+
+// @keyframes hideup {
+//     to {
+//         opacity:0;
+//         margin-top:-60px;
+//     }
+// }
 /* TWO-TIER HEADER - SLACK STYLE */
 
 /* Top Bar - Full Width Dark */

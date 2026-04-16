@@ -14,14 +14,15 @@
             <div id="rating-display"></div>
             <p class="description summary"></p> 
             
-            <!-- Featured Image (existing) -->
-            <div class="imageElement">
-                <p class="photoInfo"></p>
+            <!-- Replace .imageElement and .recipe-image-gallery with: -->
+           <div class="recipe-gallery" role="region" aria-label="Recipe photos">
+                <div class="recipe-gallery__thumbs" role="group" aria-label="All recipe photos"></div>
+                <figure class="recipe-gallery__hero">
+                    <img src="" alt="" class="recipe-gallery__hero-img">
+                    <figcaption class="recipe-gallery__caption" aria-live="polite"></figcaption>
+                </figure>
+                <div class="recipe-gallery__mobile" aria-label="Recipe photos"></div>
             </div>
-            
-            <!-- NEW: Image Gallery (all images) -->
-            <div class="recipe-image-gallery"></div>
-            
             <section class="article-meta">
                 <div class="meta-icons">
                     <!-- Date -->

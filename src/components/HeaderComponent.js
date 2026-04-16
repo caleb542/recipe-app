@@ -157,7 +157,16 @@ export function injectBadgeToggle() {
     console.warn('⚠️ renderBadgeToggle() returned empty string (user not authenticated?)');
   }
 }
-
+/**
+ * Show dev notice banner after spinner disappears
+ * Only shows if not previously dismissed
+ */
+export function showDevNotice() {
+  const banner = document.querySelector('.dev-notice');
+  if (!banner) return;
+  if (localStorage.getItem('warning-notification-hidden') === 'true') return;
+  banner.classList.add('animate');
+}
 /**
  * Initialize header with auth state and event listeners
  */

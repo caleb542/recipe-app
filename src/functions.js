@@ -445,6 +445,16 @@ const hideWarning = () => {
     // ✅ Save to localStorage
     localStorage.setItem('warning-notification-hidden', 'true');
   });
+
+  warningCloseButton.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    warningCloseButton.classList.add("clicked");
+    warningBanner.classList.add("hide-up");
+    localStorage.setItem('warning-notification-hidden', 'true');
+  }
+});
+
 }
 
 const hamburger = () => {

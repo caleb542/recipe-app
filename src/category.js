@@ -1,4 +1,4 @@
-import { loadHeader } from './components/HeaderComponent.js';
+import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { loadFooter } from './components/FooterComponent.js';
 import { listRecipes } from './recipes.js';
 import { loadRecipes, getFeaturedImage } from './functions.js';
@@ -72,6 +72,7 @@ async function init() {
     renderHero(currentCategory);
     renderRecipes();
     removeSpinner(1500);
+    showDevNotice()
 
     const sortSelect = document.getElementById('filter-by');
     if (sortSelect) {

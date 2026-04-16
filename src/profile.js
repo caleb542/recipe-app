@@ -5,7 +5,7 @@ import { loadUserProfile, getUserProfile } from './userContext.js';
 import { optimizeImage, IMAGE_PRESETS } from './helpers/imageOptimizer.js';
 import { generateFileHash } from './helpers/duplicateCheck.js';
 import { findExistingImage, registerImage } from './helpers/globalImageRegistry.js';
-import { loadHeader } from './components/HeaderComponent.js';
+import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { hideWarning } from './functions.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
 import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
@@ -42,6 +42,7 @@ async function init() {
   // Load and display profile
   await loadAndDisplayProfile(username);
   removeSpinner(1500);
+  showDevNotice();
 }
 function formatDate(dateValue) {
   if (!dateValue) return 'Unknown date';

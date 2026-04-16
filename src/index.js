@@ -39,7 +39,7 @@ import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
 import { loadFooter } from './components/FooterComponent.js';
 
 import { initBadgeVisibility } from './utils/badgeVisibility.js';
-import { loadHeader, injectBadgeToggle } from './components/HeaderComponent.js';
+import { loadHeader, injectBadgeToggle, showDevNotice } from './components/HeaderComponent.js';
 import { renderBadgeToggle, initBadgeToggle } from './components/BadgeToggleButton.js';
 import { generateRecipeBadges } from './components/RecipeBadges.js';
 import { setupSanityMegaMenu, openMegaMenu, closeMegaMenu } from './components/MegaMenuSanity.js';
@@ -96,7 +96,8 @@ try {
     console.warn('Could not get user:', e.message);
 }
 await loadCuratedSections();
-removeSpinner(1500);
+await removeSpinner(1500);
+showDevNotice();
 await listRecipes(recipes, currentUser?.sub);
  
 

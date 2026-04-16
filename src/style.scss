@@ -27,6 +27,7 @@
 @use './styles/avatar-dropdown';
 @use './styles/curated-sections';
 @use './styles/hero';
+@use './styles/recipe-gallery';
 @use './styles/mobile';
 @use './styles/print';
 
@@ -107,9 +108,7 @@ article {
     height: auto;
     width: clamp(400px, 100%, 1366px);
     margin: 0 auto;
-    margin-top: 2rem;
     background-color:#ffffff;
-   
 }
 
 .home-page article {
@@ -890,6 +889,10 @@ footer.page-footer {
 .summary {
     padding: 2rem 0;
 }
+p.description.summary:empty {
+  display: none;
+  padding:0;
+}
 
 /* Cross Lines (debugging) */
 .cross.x {
@@ -973,7 +976,7 @@ a.article-edit-button {
 }
 .article-block {
     width: clamp(400px, 100%, 1366px);
-     padding:40px;
+     padding:0 40px;
 }
 #breadcrumbs {
     margin:0 auto;
