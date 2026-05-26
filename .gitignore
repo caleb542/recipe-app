@@ -1,19 +1,32 @@
 node_modules
 .env
+
 # Local Netlify folder
 .netlify
-# Build files
-# Build files
+
+# Build output
 public/scripts/*.js
 public/scripts/*.js.map
 public/scripts/*.css
 public/scripts/*.css.map
+public/scripts/*.html
+public/scripts/*.LICENSE.txt
+
+# Scratch/experiment files
 ron.html
 ron.css
 creo.html
 creo-dashboard.html
 creo-dashboard-v2.html
-
-# EXCEPT these HTML files (need to be tracked)
-!public/scripts/*.html
-!public/design-tokens.css
+blend-mode-text.html
+punch-through.html
+ultraheader.css
+ultraheader.html
+wave-text.html
+src/components/MegaMenuSanity_newer_broke.js
+src/styles/_megamenubox_newer_broken.scss
+src/styles/_edit-page_old.scss
+public/edit_old.html
+public/partials/header-template-old-v2.html
+src/partials/header-template-old-v2.html
+src/edit_page_bento_full.html

@@ -17,7 +17,6 @@
 @use './styles/spinner';
 @use './styles/impersonation-banner';
 @use './styles/recipe-badges';
-
 @use './styles/loaders';
 @use './styles/footer';
 @use './styles/badgeVisibility';
@@ -28,6 +27,7 @@
 @use './styles/curated-sections';
 @use './styles/hero';
 @use './styles/recipe-gallery';
+@use './styles/recipe-page';
 @use './styles/mobile';
 @use './styles/print';
 
@@ -107,6 +107,10 @@ article {
     width: clamp(400px, 100%, 1366px);
     margin: 0 auto;
     background-color:#ffffff;
+    width: 100%;
+max-width: var(--width-content);
+margin-left: auto;
+margin-right: auto;
 }
 
 .home-page article {
@@ -973,18 +977,27 @@ a.article-edit-button {
     }
 }
 .article-block {
-    width: clamp(400px, 100%, 1366px);
+    width: 100%;
+    max-width: var(--width-content);
+    margin-left: auto;
+    margin-right: auto;
      padding:0 40px;
 }
 #breadcrumbs {
 
     margin:10px auto 0 auto;
-    width: clamp(400px, 100%, 1366px);
+    width: 100%;
+    max-width: var(--width-content);
+    margin-left: auto;
+    margin-right: auto;
     padding:0 40px;
 }
 .also-in {
     
-    width: clamp(400px, 100%, 1366px);
+    width: 100%;
+    max-width: var(--width-content);
+    margin-left: auto;
+    margin-right: auto;
     font-size: 0.75rem;
     color: var(--color-text-secondary);
     margin-top: 0.25rem;
@@ -1031,8 +1044,8 @@ a.article-edit-button {
 
 header {
   background: rgba(15, 15, 15, 0.95) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+//   backdrop-filter: blur(16px) !important;
+//   -webkit-backdrop-filter: blur(16px) !important;
   border-bottom: 0.5px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 2px 24px rgba(0, 0, 0, 0.15) !important;
 }

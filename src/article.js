@@ -16,34 +16,6 @@ import { CATEGORIES, getCategoryNames } from "./helpers/categories.js";
 
 
 
-// const CATEGORIES = {
-//   'breakfast-and-brunch': 'Breakfast & Brunch',
-//   'appetizers-and-starters': 'Appetizers & Starters',
-//   'finger-foods-and-party-snacks': 'Finger Foods & Party Snacks',
-//   'main-dishes': 'Main Dishes',
-//   'side-dishes': 'Side Dishes',
-//   'soups-and-salads': 'Soups & Salads',
-//   'desserts-and-sweets': 'Desserts & Sweets',
-//   'cocktails': 'Cocktails',
-//   'mocktails-and-non-alcoholic': 'Mocktails & Non-Alcoholic',
-//   'hot-beverages': 'Hot Beverages',
-//   'italian': 'Italian',
-//   'mexican': 'Mexican',
-//   'asian': 'Asian',
-//   'mediterranean': 'Mediterranean',
-//   'american': 'American',
-//   'french': 'French',
-//   'vegetarian': 'Vegetarian',
-//   'vegan': 'Vegan',
-//   'gluten-free': 'Gluten-Free',
-//   'dairy-free': 'Dairy-Free',
-//   'nut-free': 'Nut-Free',
-//   'keto': 'Keto',
-//   'quick-and-easy': 'Quick & Easy',
-//   'party-and-entertaining': 'Party & Entertaining',
-//   'holiday-and-special-occasions': 'Holiday & Special Occasions'
-// };
-
 // ✅ Wait for DOM before doing anything
 if (document.readyState === 'loading') {
   await new Promise(resolve => {
@@ -179,6 +151,8 @@ async function loadRecipeBySlug(slug) {
   }
 }
 
+
+
 async function hydrateArticle(recipes, recipeIdOverride = null) {
   if (articleHydrated) {
     console.log('Article already hydrated, skipping...');
@@ -311,6 +285,23 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
   }
 
   container.appendChild(tpl);
+
+  // Wrap .lists and .directions in a recipe-body div
+    const lists = container.querySelector('.lists');
+    const directions = container.querySelector('.directions');
+
+    console.log('lists:', lists);
+    console.log('directions:', directions);
+
+    if (lists && directions) {
+      const recipeBody = document.createElement('div');
+      recipeBody.className = 'recipe-body';
+      lists.parentNode.insertBefore(recipeBody, lists);
+      recipeBody.appendChild(lists);
+      recipeBody.appendChild(directions);
+      console.log('recipe-body created');
+    }
+
   renderBreadcrumbs(recItem);
 
   const notesContainer = document.getElementById("community-notes");
@@ -327,10 +318,30 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
   }
 
   hamburger();
+
+const devNotice = document.querySelector('.dev-notice-inner');
+if (devNotice) {
+  const toggleBtn = document.createElement('button');
+  toggleBtn.textContent = 'Recipe View';
+  toggleBtn.className = 'view-toggle-btn';
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('article-page');
+    document.body.classList.toggle('recipe-page');
+    toggleBtn.textContent = document.body.classList.contains('recipe-page')
+      ? 'Article View'
+      : 'Recipe View';
+  });
+  devNotice.appendChild(toggleBtn);
+} else {
+  alert('no dev-notice');
+}
+
   articleHydrated = true;
   removeSpinner(1500);
   showDevNotice();
 }
+
+
 
 function renderArticleImageGallery(tpl, recipe) {
   const galleryEl = tpl.querySelector('.recipe-gallery');
@@ -602,3 +613,5 @@ async function initializeLikes(recipeId, container) {
 }
 
 // export { fetchRecipes };
+
+

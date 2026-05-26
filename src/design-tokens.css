@@ -279,8 +279,17 @@
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
-}
 
+/* ----------------------------------------------------------------------------
+   LAYOUT WIDTHS
+   ---------------------------------------------------------------------------- */
+
+--width-content: 680px;        /* Article text, recipe content */
+--width-content-wide: 860px;   /* Images, gallery */
+--width-site: 1024px;          /* Max site width */
+--width-recipe: 960px;         /* Recipe page two-column layout */
+
+}
 /* ============================================================================
    DARK MODE
    ============================================================================ */
