@@ -3,6 +3,17 @@
    Resets, body, typography, global elements
    ======================================== */
 // View Transitions
+:root {
+  color-scheme: light only;
+}
+html, body {
+  overflow-x: hidden;
+}
+
+* {
+  min-width: 0;
+}
+
 @view-transition {
   navigation: auto;
 }
