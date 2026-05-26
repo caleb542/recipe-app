@@ -46,7 +46,16 @@ command = "npm run build"
 # RECIPE PAGES (Username-based slugs)
 # These come AFTER categories
 # ========================================
+# ========================================
+# CATEGORIES PAGE
+# ========================================
 
+[[redirects]]
+  from = "/categories"
+  to = "/categories.html"
+  status = 200
+  force = false
+  
 [[redirects]]
   from = "/category/:slug"
   to = "/category.html?category=:slug"

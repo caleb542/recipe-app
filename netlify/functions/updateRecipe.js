@@ -266,6 +266,7 @@ export async function handler(event) {
         displayAuthor: processedUpdates.displayAuthor || name,
         isPublic: processedUpdates.isPublic !== undefined ? processedUpdates.isPublic : true,
         images: processedUpdates.images || [],
+        videos: processedUpdates.videos || [],
         version: 1,
         createdAt: new Date().toISOString(),
         updatedAt: updatedAt || new Date().toISOString(),

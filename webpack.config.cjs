@@ -61,8 +61,9 @@ module.exports = (env, argv) => {
       article: "./src/article.js",
       profile: "./src/profile.js",
       category: "./src/category.js",
+      categories:"./src/categories.js",
       admin: './src/admin.js',
-      addRecipe: "./src/addRecipe.js",
+      // addRecipe: "./src/addRecipe.js",
       icons: "./src/icons.js",
       callback: "./src/callback.js"
     },
