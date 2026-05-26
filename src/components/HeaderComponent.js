@@ -4,10 +4,11 @@
  * Loads header HTML from partial and injects it into pages
  * Ensures consistent navigation across all pages
  */
-import { buildNav, setupSanityMegaMenu } from './MegaMenuSanity.js';
+import { buildNav, setupSanityMegaMenu,setupEdgeWarning } from './MegaMenuSanity.js';
 import { isSuperadmin } from '../userContext.js';
 import { renderBadgeToggle } from './BadgeToggleButton.js';
 import { buildMobileNav } from './MobileNav.js';
+import { isAuthenticated, login } from '../auth/auth0.js';
 
 
 export async function loadHeader() {
@@ -55,7 +56,19 @@ if(document.getElementById('nav-overlay')){
     // Build nav from DB then setup interactions
     await buildNav();
     setupSanityMegaMenu();
+    setupEdgeWarning();
     
+    
+    const addRecipeBtn = document.getElementById('create-recipe-link');
+    addRecipeBtn?.addEventListener('click', async () => {
+  
+      const authenticated = await isAuthenticated();
+      if (!authenticated) {
+        showAuthNotice();
+        return;
+      }
+      window.location.href = '/edit.html';
+    });
     await buildMobileNav();
     
     return true;
@@ -173,3 +186,20 @@ export function showDevNotice() {
 export function initHeader() {
   console.log('✓ Header initialized');
 }
+
+export function showAuthNotice() {
+  const dialog = document.getElementById('auth-notice-dialog');
+  if (!dialog) return;
+
+  dialog.showModal();
+
+  document.getElementById('auth-notice-login')?.addEventListener('click', () => {
+    dialog.close();
+    login();
+  }, { once: true });
+
+  document.getElementById('auth-notice-cancel')?.addEventListener('click', () => {
+    dialog.close();
+  }, { once: true });
+}
+

@@ -63,6 +63,9 @@ export async function buildNav() {
       `;
     }).join('');
 
+    // Remove old items
+    navList.querySelectorAll('.nav-item.has-dropdown').forEach(item => item.remove());
+    // Prepend fresh ones
     navList.insertAdjacentHTML('afterbegin', dropdownHTML);
 
   } catch (error) {
@@ -116,8 +119,10 @@ export function setupSanityMegaMenu() {
         const panel = document.getElementById(panelId);
         
         if (panel) {
+          
           panel.classList.remove('is-active');
           panel.style.visibility = 'hidden';
+          navBar.classList.remove('nav-danger');
         }
         
         box.style.width = '0';
@@ -131,7 +136,7 @@ export function setupSanityMegaMenu() {
             panel.classList.remove('is-active');
           }
       
-        backdrop.classList.remove('is-visible');
+        // backdrop.classList.remove('is-visible');
         button?.setAttribute('aria-expanded', 'false');
       }
     });
@@ -157,7 +162,7 @@ function openPanel(item, button, panelId) {
   box.style.width = `${Math.max(w, navBar.offsetWidth)}px`;
   box.style.height = `${Math.max(h, 400)}px`;
   
-  backdrop.classList.add('is-visible');
+  // backdrop.classList.add('is-visible');
   button.setAttribute('aria-expanded', 'true');
 }
 function closePanel(item, button, panelId) {
@@ -174,7 +179,7 @@ function closePanel(item, button, panelId) {
   box.style.width = '0';
   box.style.height = '0';
 
-  backdrop.classList.remove('is-visible');
+  // backdrop.classList.remove('is-visible');
   button.setAttribute('aria-expanded', 'false');
 }
   navItems.forEach((item) => {
@@ -305,9 +310,23 @@ button.addEventListener('click', (e) => {
   });
 
   // Close when leaving entire nav bar
-  navBar.addEventListener('mouseleave', () => {
-    closeAllMenus();
-  });
+ let leaveTimer;
+
+navBar.addEventListener('mouseleave', () => {
+  leaveTimer = setTimeout(() => closeAllMenus(), 100);
+});
+
+navBar.addEventListener('mouseenter', () => {
+  clearTimeout(leaveTimer);
+});
+
+box.addEventListener('mouseenter', () => {
+  clearTimeout(leaveTimer);
+});
+
+box.addEventListener('mouseleave', () => {
+  leaveTimer = setTimeout(() => closeAllMenus(), 100);
+});
 
   // Close on backdrop click
   backdrop.addEventListener('click', () => {
@@ -344,7 +363,7 @@ button.addEventListener('click', (e) => {
         box.classList.remove('is-active');
         box.style.width = '0';
         box.style.height = '0';
-        backdrop.classList.remove('is-visible');
+        // backdrop.classList.remove('is-visible');
         
         // Page will navigate, no need for smooth close
       });
@@ -394,4 +413,22 @@ export function closeMegaMenu() {
   if (backdrop) {
     backdrop.classList.remove('is-visible');
   }
+}
+
+export function setupEdgeWarning() {
+   const navBar = document.querySelector('.nav-bar');
+  const box = document.querySelector('.mega-menu-box');
+  if (!navBar || !box) return;
+
+  navBar.addEventListener('mousemove', (e) => {
+    const anyOpen = document.querySelector('.nav-item[data-open="true"]');
+    if (!anyOpen) {
+      navBar.classList.remove('nav-danger');
+      return;
+    }
+
+    const rect = navBar.getBoundingClientRect();
+    const distFromTop = e.clientY - rect.top;
+    navBar.classList.toggle('nav-danger', distFromTop < 40);
+  });
 }

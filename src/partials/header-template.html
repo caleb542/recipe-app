@@ -1,91 +1,195 @@
-<!-- /public/partials/header-template.html -->
-
 <a href="#main-content" class="skip-to-content">Skip to content</a>
-<!-- ============================================ -->
-<!-- TIER 1: Dev Notice + Logo + Search + Auth   -->
-<!-- ============================================ -->
-
+<!-- Search bar — absolute, top center, hides on scroll -->
+  <!-- <div class="site-search">
+    <div class="search-bar">
+      <i class="fa fa-search" aria-hidden="true"></i>
+      <input type="text" placeholder="Search recipes, ingredients..." aria-label="Search recipes">
+    </div>
+  </div> -->
+<!-- TIER 1: Dev notice — scrolls away -->
 <div class="dev-notice">
-    <div class="dev-notice-inner">
-         <p><span><i class="fa fa-warning --color-warning-bg"></i></span> Active Development: Migrating infrastructure. Some features may be unstable.&nbsp;<a href="https://github.com/caleb542/recipe-app">View code</a></p>
-        <button id="hide-this-header" aria-label="Hide this warning">
-            <i class="fa fa-times"></i>
-        </button>
-    </div>
-   
-</div>
-
-<div class="top-bar">
-    <div class="top-bar-left">
-        <!-- <h1 class="nav-bar-logo"><a href="/">Recipe Me</a></h1> -->
-         <h1 class="nav-bar-logo">
-        <a href="/"  style="display:flex;
-         flex-direction: column; gap:0.5em;">
-            <span class="logo-r">R</span>
-            <span class="logo-wordmark">recipe me</span>
-        </a>
-        </h1>
-        <!-- Search bar - only visible on homepage -->
-        <!-- <div class="top-bar-search homepage-only">
-            <i class="fa fa-search search-icon"></i>
-            <input type="text" id="search-bar" placeholder="Search recipes, ingredients, authors..." aria-label="Search recipes">
-        </div> -->
-    </div>
-    
-    <div class="top-bar-right">        
-    <div class="top-bar-user">
-        <button id="login-btn" class="primary sm">Login</button>
-        <div id="user-info" style="display: none;">
-            <div class="user-specific">
-                <div id="user-avatar-container"></div>
-                <span id="user-name"></span>
-            </div>
-            <button id="logout-btn">Logout</button>
-        </div>
-    </div>
-    <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open the menu">
-        <i class="fa fa-bars" aria-hidden="true"></i>
+  <div class="dev-notice-inner">
+    <p>
+      <span><i class="fa fa-warning" aria-hidden="true"></i></span>
+      Active Development: Migrating infrastructure. Some features may be unstable.&nbsp;
+      <a href="https://github.com/caleb542/recipe-app">View code</a>
+    </p>
+    <button id="hide-this-header" aria-label="Hide this warning">
+      <i class="fa fa-times" aria-hidden="true"></i>
     </button>
+  </div>
 </div>
-</div>
+<dialog id="auth-notice-dialog">
+  <h2>Sign in to Recipe Me</h2>
+  <p>You need to be logged in to add a recipe.</p>
+  <div class="auth-notice-actions">
+    <button id="auth-notice-login">Log in</button>
+    <button id="auth-notice-cancel">Cancel</button>
+  </div>
+</dialog>
+<!-- TIER 2: Tall flex bar — logo left, auth right, search absolute center top, nav bottom center -->
+<div class="site-header">
 
-<!-- ============================================ -->
-<!-- TIER 2: Navigation with Box Pattern         -->
-<!-- ============================================ -->
+  <!-- Logo — top left -->
+  <h1 class="nav-bar-logo">
+    <a href="/">
+      <span class="logo-r">R</span>
+      <span class="logo-wordmark">recipe me</span>
+    </a>
+  </h1>
 
-<nav class="main-nav" aria-label="Main navigation">
+  <!-- Nav — bottom center -->
+  <nav class="main-nav" aria-label="Main navigation">
     <div class="nav-bar">
-       <ul class="nav-list" id="nav-list">
-            <li class="nav-item">
-                <a href="/category/quick-and-easy" class="nav-link">Quick & Easy</a>
-            </li>
-            <li class="nav-item">
-                <a href="/edit.html" class="nav-link create-recipe-link">
-                <i class="fa fa-plus"></i><span>&nbsp;Create Recipe</span>
-                </a>
-            </li>
+      <ul class="nav-list nav-list-links" id="nav-list">
+        <li class="nav-item has-dropdown" data-open="false">
+          <button class="nav-link" aria-expanded="false" aria-controls="course-menu" aria-haspopup="true">
+            Course <i class="fa fa-chevron-down" aria-hidden="true"></i>
+          </button>
+          <div id="course-menu" class="mega-menu-panel" style="display:grid; visibility:hidden;"></div>
+        </li>
+
+        <li class="nav-item has-dropdown" data-open="false">
+          <button class="nav-link" aria-expanded="false" aria-controls="cuisine-menu" aria-haspopup="true">
+            Cuisine <i class="fa fa-chevron-down" aria-hidden="true"></i>
+          </button>
+          <div id="cuisine-menu" class="mega-menu-panel" style="display:grid; visibility:hidden;"></div>
+        </li>
+
+        <li class="nav-item has-dropdown" data-open="false">
+          <button class="nav-link" aria-expanded="false" aria-controls="drinks-menu" aria-haspopup="true">
+            Drinks <i class="fa fa-chevron-down" aria-hidden="true"></i>
+          </button>
+          <div id="drinks-menu" class="mega-menu-panel" style="display:grid; visibility:hidden;"></div>
+        </li>
+
+        <li class="nav-item has-dropdown" data-open="false">
+          <button class="nav-link" aria-expanded="false" aria-controls="occasions-menu" aria-haspopup="true">
+            Occasions <i class="fa fa-chevron-down" aria-hidden="true"></i>
+          </button>
+          <div id="occasions-menu" class="mega-menu-panel" style="display:grid; visibility:hidden;"></div>
+        </li>
+
+        <li class="nav-item">
+          <a href="/category/quick-and-easy" class="nav-link">Quick &amp; Easy</a>
+        </li>
         </ul>
-            <!-- THE BOX - persistent container -->
-            <div class="mega-menu-box"></div>
-        <!-- Mobile Menu Toggle -->
+        <ul class="nav-list nav-list-actions"> <li class="nav-item">
+          <button href="/edit.html" id="create-recipe-link" class="nav-link create-recipe-link">
+            <i class="fa fa-plus" aria-hidden="true"></i><span>&nbsp;Create Recipe</span>
+          </button>
+        </li>
+
+         <!-- Search icon — hidden until scroll collapses the search bar -->
+        <li class="nav-item nav-search-trigger">
+          <button class="nav-link search-trigger-btn" aria-label="Open search">
+            <i class="fa fa-search" aria-hidden="true"></i>
+          </button>
+        </li>
+      </ul>
+       
       
     </div>
-</nav>
+  </nav>
+  <div class="mega-menu-box"></div>
+  
 
-<!-- Backdrop -->
+  <!-- Auth — top right -->
+<div class="top-bar-user">
+  <button id="login-btn" class="primary sm" style="visibility: hidden;">Login</button>
+  <div id="user-info" style="visibility: hidden;">
+    <div class="user-specific">
+      <div class="user-avatar-container" id="user-avatar-container"></div>
+      <dialog id="avatar-dialog" aria-label="User menu" autofocus></dialog>
+      <span id="user-name"></span>
+    </div>
+    <button id="logout-btn" style="display:none;">Logout</button>
+  </div>
+  <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open the menu">
+    <i class="fa fa-bars" aria-hidden="true"></i>
+  </button>
+</div>
+
+
+
+</div>
+
+<!-- Search drawer — slides down from top when search icon clicked -->
+<div class="search-drawer" hidden>
+  <div class="search-drawer-inner">
+    <i class="fa fa-search" aria-hidden="true"></i>
+    <input type="text" placeholder="Search recipes..." aria-label="Search" autofocus>
+    <button class="search-drawer-close" aria-label="Close search">
+      <i class="fa fa-times" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Mega menu backdrop -->
 <div class="mega-menu-backdrop"></div>
 
-<!-- Mobile Navigation Drawer (collapsed by default) -->
-<dialog id="mobile-nav" closedBy="any" class="mobile-nav" hidden>
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/edit.html">Create Recipe</a></li>
-        <li><a href="/category/quick-and-easy">Quick & Easy</a></li>
-        <li class="mobile-nav-divider">Browse</li>
-        <li><a href="/category/desserts-and-sweets">Desserts</a></li>
-        <li><a href="/category/cocktails">Cocktails</a></li>
-        <li><a href="/category/italian">Italian</a></li>
-        <li><a href="/category/vegetarian">Vegetarian</a></li>
-    </ul>
-</dialog>
+<!-- Mobile Navigation Drawer -->
+<dialog id="mobile-nav" closedby="any" class="mobile-nav" hidden>
+  <ul class="mobile-nav-list">
 
+    <li class="mobile-nav-group">
+      <button class="mobile-nav-group-btn" aria-expanded="false" aria-controls="mobile-group-course">
+        Course <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </button>
+      <ul id="mobile-group-course" class="mobile-nav-subcategories" hidden>
+        <li><a href="/category/breakfast-and-brunch" class="mobile-nav-link">Breakfast &amp; Brunch</a></li>
+        <li><a href="/category/appetizers-and-starters" class="mobile-nav-link">Appetizers &amp; Starters</a></li>
+        <li><a href="/category/main-dishes" class="mobile-nav-link">Main Dishes</a></li>
+        <li><a href="/category/side-dishes" class="mobile-nav-link">Side Dishes</a></li>
+        <li><a href="/category/soups-and-salads" class="mobile-nav-link">Soups &amp; Salads</a></li>
+        <li><a href="/category/desserts-and-sweets" class="mobile-nav-link">Desserts &amp; Sweets</a></li>
+      </ul>
+    </li>
+
+    <li class="mobile-nav-group">
+      <button class="mobile-nav-group-btn" aria-expanded="false" aria-controls="mobile-group-cuisine">
+        Cuisine <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </button>
+      <ul id="mobile-group-cuisine" class="mobile-nav-subcategories" hidden>
+        <li><a href="/category/italian" class="mobile-nav-link">Italian</a></li>
+        <li><a href="/category/mexican" class="mobile-nav-link">Mexican</a></li>
+        <li><a href="/category/mediterranean" class="mobile-nav-link">Mediterranean</a></li>
+        <li><a href="/category/french" class="mobile-nav-link">French</a></li>
+        <li><a href="/category/irish" class="mobile-nav-link">Irish</a></li>
+      </ul>
+    </li>
+
+    <li class="mobile-nav-group">
+      <button class="mobile-nav-group-btn" aria-expanded="false" aria-controls="mobile-group-drinks">
+        Drinks <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </button>
+      <ul id="mobile-group-drinks" class="mobile-nav-subcategories" hidden>
+        <li><a href="/category/drinks" class="mobile-nav-link">Drinks</a></li>
+        <li><a href="/category/cocktails" class="mobile-nav-link">Cocktails</a></li>
+        <li><a href="/category/mocktails-and-non-alcoholic" class="mobile-nav-link">Mocktails &amp; Non-Alcoholic</a></li>
+        <li><a href="/category/hot-beverages" class="mobile-nav-link">Hot Beverages</a></li>
+      </ul>
+    </li>
+
+    <li class="mobile-nav-group">
+      <button class="mobile-nav-group-btn" aria-expanded="false" aria-controls="mobile-group-occasions">
+        Occasions <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </button>
+      <ul id="mobile-group-occasions" class="mobile-nav-subcategories" hidden>
+        <li><a href="/category/quick-and-easy" class="mobile-nav-link">Quick &amp; Easy</a></li>
+        <li><a href="/category/party-and-entertaining" class="mobile-nav-link">Party &amp; Entertaining</a></li>
+        <li><a href="/category/holiday-and-special-occasions" class="mobile-nav-link">Holiday &amp; Special Occasions</a></li>
+      </ul>
+    </li>
+
+    <li class="mobile-nav-divider"></li>
+    <li><a href="/" class="mobile-nav-link">Home</a></li>
+    <li><a href="/category/quick-and-easy" class="mobile-nav-link">Quick &amp; Easy</a></li>
+    <li>
+      <a href="/edit.html" class="mobile-nav-link mobile-nav-create">
+        <i class="fa fa-plus" aria-hidden="true"></i> Create Recipe
+      </a>
+    </li>
+
+  </ul>
+</dialog>
