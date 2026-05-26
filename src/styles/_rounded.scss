@@ -1,0 +1,28 @@
+
+
+.tab-container-class {
+  --r: 20px; /* Corner radius (smoothness) */
+  --h: 50px; /* Tab height */
+  --w: 120px; /* Tab width */
+  
+  width: 400px;
+  height: 250px;
+  background: #3498db;
+  
+  /* The magic: drawing the tab path with inner and outer curves */
+  clip-path: shape(
+    from 0% 100%,
+    line to 0% var(--h),
+    /* 1. Outer curve (top-left) */
+    curve to var(--r) 0% with 0% 0%,
+    line to calc(var(--w) - var(--r)) 0%,
+    /* 2. Outer curve (top-right) */
+    curve to var(--w) var(--r) with var(--w) 0%,
+    vline to calc(var(--h) - var(--r)),
+    /* 3. Inner curve (bottom-right round-out) */
+    curve to calc(var(--w) + var(--r)) var(--h) with var(--w) var(--h),
+    line to 100% var(--h),
+    vline to 100%,
+    close
+  );
+}

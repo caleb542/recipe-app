@@ -135,6 +135,12 @@ let listRecipes = async (recipesParam, currentUserId = null) => {
       image.setAttribute('alt', `Photo of ${recipe.name}`);
       image.setAttribute('description', `Decorative image relating to ${recipe.name}`);
 
+      // Shared element morph — matches viewTransitionName set in article.js
+    if (recipe.fullSlug) {
+      image.style.viewTransitionName = `recipe-img-${recipe.id}`;
+      recipeName.style.viewTransitionName = `recipe-title-${recipe.id}`;
+     }
+
       const badges = generateRecipeBadges(recipe, currentUserId);
       if (badges) {
         article.insertAdjacentHTML('afterbegin', badges);
