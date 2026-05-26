@@ -1,171 +1,181 @@
 .recipe-gallery {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  grid-template-rows: auto auto;
-  gap: 8px;
-  margin-bottom: 2rem;
+   display: grid;
+  grid-template-rows: 1fr auto auto;
+  gap: 0;
 
-  // Thumbnails — left column
-  &__thumbs {
-    grid-column: 1;
-    grid-row: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-self: start;
 
-    @media (max-width: 768px) {
-      display: none;
-    }
-  }
+  // ============================================================
+  // FIGURES CONTAINER
+  // ============================================================
 
-  // Hero — right column
- &__hero {
-  grid-column: 2;
-  grid-row: 1;
-  margin: 0;
-
-  img {
-    width: 100%;
-    aspect-ratio: 3/2;
-    max-height: 480px;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-  }
-}
-
-  // Caption — spans under hero only
-  &__caption {
-    grid-column: 2;
-    grid-row: 2;
-    font-size: 0.8rem;
-    color: #888;
-    margin: 0;
-
-    a {
-      color: #888;
-      text-decoration: underline;
-    }
-  }
-
-  &__thumb-wrap {
+  &__figures {
     position: relative;
-    .recipe-gallery__thumb-popover a:focus-visible {
-  outline: 2px solid #c8892a;
-}
-    
-
-    &:has(.recipe-gallery__thumb:focus-visible) .recipe-gallery__thumb-popover {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateX(0);
-    }
-
-    .recipe-gallery__thumb-popover:focus-within{
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateX(0);
-    }
-  }
-
-  &__thumb {
     width: 100%;
-    height: auto;
-    padding: 0;
-    aspect-ratio: 3/2;
-    border: 2px solid transparent;
-    border-radius: 2px;
-    cursor: pointer;
-    background: none;
-    overflow: hidden;
-    transition: border-color 0.15s;
-    display: block;
+    // height: 55svh;
+    cursor: grab;
 
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    &[aria-pressed="true"] {
-      border-color: #c8892a;
-    }
+    &:active { cursor: grabbing; }
 
     &:focus-visible {
       outline: 2px solid #c8892a;
       outline-offset: 2px;
     }
   }
+  // ============================================================
+  // INDIVIDUAL FIGURES — stacked, only active is visible
+  // ============================================================
 
-  // Popover slides out to the right of the thumbnail
-  &__thumb-popover {
+  &__figure {
     position: absolute;
-    left: calc(100% + 8px);
-    top: 0;
-    background: rgba(0, 0, 0, 0.82);
-    color: white;
-    font-size: 11px;
-    padding: 6px 10px;
-    border-radius: 4px;
-    white-space: nowrap;
+    inset: 0;
     opacity: 0;
+    transition: opacity 0.4s ease;
     pointer-events: none;
-    transform: translateX(-6px);
-    transition: opacity 0.2s, transform 0.2s;
-    z-index: 10;
+    display: flex;
+    flex-direction: column;
 
-    a {
-      color: #e8d5b0;
-      text-decoration: underline;
+    &.is-active {
+      opacity: 1;
+      pointer-events: auto;
+      position: relative;
+      inset: unset;
+      // height: 55svh;
     }
-  }
-
-  // Mobile scroll strip — full width, replaces grid
-  &__mobile {
-    display: none;
-
-    @media (max-width: 768px) {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      gap: 12px;
-      -webkit-overflow-scrolling: touch;
-      grid-column: 1 / -1;
-    }
-  }
-
-  &__scroll-item {
-    flex-shrink: 0;
-    width: 90vw;
-    scroll-snap-align: start;
 
     img {
       width: 100%;
-      aspect-ratio: 16/9;
+      height: 70svh;
       object-fit: cover;
+      object-position: center;
       display: block;
-      border-radius: 2px;
+      // no flex: 1
     }
   }
 
-  // On mobile — hide desktop grid, show scroll strip
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
+  // ============================================================
+  // FIGURE CAPTION — attribution inside each figure
+  // ============================================================
 
-    &__hero {
-      display: none;
+  &__figure-caption {
+    font-size: 0.75rem;
+    color: #333;
+    padding: 0.35rem 0;
+    background: transparent;
+    position: relative;
+    z-index: 1;
+
+    a {
+      color: #333;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      &:hover { color: #c8892a; }
+      &:focus-visible { outline: 2px solid #c8892a; }
+    }
+  }
+
+  // ============================================================
+  // BAR — counter + lines
+  // ============================================================
+
+  &__bar {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    min-height: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  // Counter — left
+  &__counter {
+    font-size: 0.75rem;
+    color: #333;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // Lines — center
+  &__lines {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  &__line {
+    height: 2px;
+    background: #ccc;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.2s, height 0.2s;
+    border-radius: 3px;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -8px 0;
     }
 
-    &__caption {
-      grid-column: 1;
-      grid-row: 2;
+    &.is-active {
+      background: #c8892a;
+      height: 3px;
     }
 
-    &__mobile {
-      grid-row: 1;
+    &:hover {
+      background: #a06820;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #c8892a;
+      outline-offset: 4px;
     }
   }
 }
+
+// ============================================================
+// HERO LAYOUT — 50/50 grid
+// ============================================================
+
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+
+    .hero-text {
+      display:flex;
+      flex-direction: column;
+      gap:0;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      height: 70svh;
+      text-align: center;
+      text-wrap:balance;
+
+       h2 {
+          max-width:35ch;
+
+        }
+        .author {
+          margin-bottom:3rem;
+          margin-top:-0.5rem;
+        }
+
+        p {
+            max-width:35ch;
+            text-align: center;
+        }
+    }
+
+    .recipe-gallery {
+      height: auto;
+    }
+  }
+   
+
+

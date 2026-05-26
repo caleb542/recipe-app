@@ -9,10 +9,11 @@ import { CommunityNotes } from './components/CommunityNotes.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { autoEmbedVideos } from './helpers/youtubeEmbed.js';
 import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
-import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+// import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
 import { setupSanityMegaMenu } from "./components/MegaMenuSanity.js";
 import { CATEGORIES, getCategoryNames } from "./helpers/categories.js";
+import { extractYouTubeId, extractVimeoId } from './helpers/youtubeEmbed.js';
 
 
 
@@ -68,7 +69,7 @@ if (!container) {
 }
 
 console.log("✅ Container found:", container);
-showSpinner();
+// showSpinner();
 
 // Initialize Auth0
 await initAuth0();
@@ -106,14 +107,16 @@ async function fetchRecipes() {
     // Old hash-based URL: /article.html#recipe-123
     recipes = await loadRecipesFromLocalStorage();
     await hydrateArticle(recipes);
+    
   } else {
     // No recipe specified
-    removeSpinner(400);
+    // removeSpinner(400);
     location.assign("/index.html");
   }
 }
 
 fetchRecipes();
+
 
 // ✅ Load recipe by simple slug
 async function loadRecipeBySlug(slug) {
@@ -133,7 +136,7 @@ async function loadRecipeBySlug(slug) {
 
     if (!response.ok) {
       console.error('Recipe not found:', response.status);
-      removeSpinner(0);
+      // removeSpinner(0);
       location.assign("/index.html");
       return;
     }
@@ -146,7 +149,7 @@ async function loadRecipeBySlug(slug) {
     
   } catch (error) {
     console.error('Load by slug failed:', error);
-    removeSpinner(0);
+    // removeSpinner(0);
     location.assign("/index.html");
   }
 }
@@ -166,7 +169,7 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
     : null;
 
   if (!recItem) {
-    removeSpinner(0);
+    // removeSpinner(0);
     location.assign("/index.html");
     return;
   }
@@ -177,8 +180,9 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
 
   const res = await fetch("/partials/article-template.html");
   const html = await res.text();
+  document.body.classList.add('is-hydrated');
   
-  removeSpinner(0);
+  // removeSpinner(0);
   container.insertAdjacentHTML("beforeend", html);
 
   const template = document.getElementById("article-template");
@@ -188,6 +192,7 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
   if (articleTitle) {
     articleTitle.textContent = recItem.name;
     document.title = `Recipe Me - ${recItem.name}`;
+    articleTitle.style.viewTransitionName = `recipe-title-${currentRecipeId}`;
   }
  
   const dateEl = tpl.querySelector(".dates");
@@ -223,7 +228,43 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
     const summaryWrapper = tpl.querySelector("div.summary");
     if (summaryWrapper) summaryWrapper.style.display = hasArticle ? '' : 'none';
   }
-
+  // Videos
+const videosContainer = tpl.querySelector('.recipe-videos');
+if (videosContainer && recItem.videos && recItem.videos.length > 0) {
+  const validVideos = recItem.videos.filter(v => v.url && v.url.trim());
+  
+  validVideos.forEach(video => {
+    const youtubeId = extractYouTubeId(video.url);
+    const vimeoId = extractVimeoId(video.url);
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'video-embed';
+    
+    if (youtubeId) {
+      wrapper.innerHTML = `
+        <iframe 
+          src="https://www.youtube-nocookie.com/embed/${youtubeId}"
+          title="${recItem.name} video"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      `;
+    } else if (vimeoId) {
+      wrapper.innerHTML = `
+        <iframe
+          src="https://player.vimeo.com/video/${vimeoId}"
+          title="${recItem.name} video"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      `;
+    }
+    
+    videosContainer.appendChild(wrapper);
+  });
+}
   // Directions
   const directionsList = tpl.querySelector(".directions-list");
   if (directionsList) {
@@ -260,6 +301,14 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
         li.appendChild(label);
         checklist.appendChild(li);
       });
+      // i18n: recipe.checklist.hint
+      const checklistHeader = tpl.querySelector('.checklistHeader');
+      if (checklistHeader && recItem.ingredients.length > 0) {
+        const hint = document.createElement('p');
+        hint.className = 'checklist-hint';
+        hint.textContent = 'Check items to build your shopping list';
+        checklistHeader.appendChild(hint);
+      }
     }
   }
 
@@ -322,14 +371,14 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
 const devNotice = document.querySelector('.dev-notice-inner');
 if (devNotice) {
   const toggleBtn = document.createElement('button');
-  toggleBtn.textContent = 'Recipe View';
+  toggleBtn.textContent = 'Article View';
   toggleBtn.className = 'view-toggle-btn';
   toggleBtn.addEventListener('click', () => {
-    document.body.classList.toggle('article-page');
     document.body.classList.toggle('recipe-page');
-    toggleBtn.textContent = document.body.classList.contains('recipe-page')
-      ? 'Article View'
-      : 'Recipe View';
+      document.body.classList.toggle('article-page');
+    toggleBtn.textContent = document.body.classList.contains('article-page')
+      ? 'Recipe View'
+      : 'Article View';
   });
   devNotice.appendChild(toggleBtn);
 } else {
@@ -337,7 +386,7 @@ if (devNotice) {
 }
 
   articleHydrated = true;
-  removeSpinner(1500);
+  // removeSpinner(1500);
   showDevNotice();
 }
 
@@ -347,16 +396,25 @@ function renderArticleImageGallery(tpl, recipe) {
   const galleryEl = tpl.querySelector('.recipe-gallery');
   if (!galleryEl) return;
 
-  const images = getAllImages(recipe);
+  let images = getAllImages(recipe);
   if (!images.length) {
     galleryEl.style.display = 'none';
     return;
   }
 
-  const heroImg = galleryEl.querySelector('.recipe-gallery__hero-img');
-  const caption = galleryEl.querySelector('.recipe-gallery__caption');
-  const thumbsEl = galleryEl.querySelector('.recipe-gallery__thumbs');
-  const mobileEl = galleryEl.querySelector('.recipe-gallery__mobile');
+  // Always show featured first
+  images = [...images].sort((a, b) => {
+    if (a.isFeatured) return -1;
+    if (b.isFeatured) return 1;
+    return (a.order ?? 0) - (b.order ?? 0);
+  });
+
+  const figuresEl = galleryEl.querySelector('.recipe-gallery__figures');
+  const barEl = galleryEl.querySelector('.recipe-gallery__bar');
+  const counterEl = galleryEl.querySelector('.recipe-gallery__counter');
+  const linesEl = galleryEl.querySelector('.recipe-gallery__lines');
+
+  let currentIndex = 0;
 
   function buildAttribution(img) {
     if (!img.attribution) return '';
@@ -369,66 +427,94 @@ function renderArticleImageGallery(tpl, recipe) {
     return `Photo by ${attr.photographer}`;
   }
 
-  function setHero(img, index) {
-    heroImg.src = img.url;
-    heroImg.alt = img.attribution?.photographer
-      ? `Recipe photo by ${img.attribution.photographer}`
-      : `${recipe.name} — photo ${index + 1} of ${images.length}`;
-    caption.innerHTML = buildAttribution(img) || '';
-    thumbsEl.querySelectorAll('.recipe-gallery__thumb').forEach((btn, i) => {
-      btn.setAttribute('aria-pressed', i === index ? 'true' : 'false');
+  function goTo(index) {
+    currentIndex = index;
+
+    // Update figures — show active, hide others
+    figuresEl.querySelectorAll('.recipe-gallery__figure').forEach((fig, i) => {
+      fig.setAttribute('aria-hidden', i === index ? 'false' : 'true');
+      fig.classList.toggle('is-active', i === index);
     });
+
+    // Update counter
+    if (counterEl) counterEl.textContent = `${index + 1} / ${images.length}`;
+
+
+    // Update lines
+    if (linesEl) {
+      linesEl.querySelectorAll('.recipe-gallery__line').forEach((line, i) => {
+        line.classList.toggle('is-active', i === index);
+        line.setAttribute('aria-pressed', i === index ? 'true' : 'false');
+      });
+    }
   }
 
-  const featured = images.find(img => img.isFeatured) || images[0];
-  const featuredIndex = images.indexOf(featured);
-  setHero(featured, featuredIndex);
+  // Render all figures
+ figuresEl.innerHTML = images.map((img, i) => {
+  const alt = img.attribution?.photographer
+    ? `Recipe photo by ${img.attribution.photographer}`
+    : `${recipe.name} — photo ${i + 1} of ${images.length}`;
+  return `
+    <figure class="recipe-gallery__figure${i === 0 ? ' is-active' : ''}" 
+      aria-hidden="${i === 0 ? 'false' : 'true'}"
+      data-index="${i}">
+      <img src="${img.url}" alt="${alt}" ${i > 0 ? 'loading="lazy"' : ''}>
+      <figcaption class="recipe-gallery__figure-caption">
+        ${buildAttribution(img) || ''}
+      </figcaption>
+    </figure>
+  `;
+}).join('');
 
-  if (images.length > 1) {
-    thumbsEl.innerHTML = images.map((img, i) => `
-      <div class="recipe-gallery__thumb-wrap">
-        <button
-          class="recipe-gallery__thumb"
-          aria-pressed="${i === featuredIndex ? 'true' : 'false'}"
-          aria-label="View photo ${i + 1} of ${images.length}${img.attribution?.photographer ? ': photo by ' + img.attribution.photographer : ''}"
-          data-index="${i}"
-        >
-          <img src="${img.url}" alt="" aria-hidden="true">
-        </button>
-        ${img.attribution ? `
-          <div class="recipe-gallery__thumb-popover" role="group" aria-label="Photo ${i + 1} attribution">
-            ${buildAttribution(img)}
-          </div>
-        ` : ''}
-      </div>
+  // Set view transition name on first image
+  const firstImg = figuresEl.querySelector('.recipe-gallery__figure.is-active img');
+  if (firstImg) firstImg.style.viewTransitionName = `recipe-img-${recipe.id}`;
+
+  // Single image — no bar needed
+  if (images.length === 1) {
+    if (barEl) barEl.hidden = true;
+    return;
+  }
+
+  // Multiple images — show bar
+  if (barEl) barEl.hidden = false;
+
+  // Render lines
+  if (linesEl) {
+    linesEl.innerHTML = images.map((img, i) => `
+      <button
+        class="recipe-gallery__line${i === 0 ? ' is-active' : ''}"
+        aria-label="View photo ${i + 1} of ${images.length}${img.attribution?.photographer ? ': photo by ' + img.attribution.photographer : ''}"
+        aria-pressed="${i === 0 ? 'true' : 'false'}"
+        data-index="${i}"
+      ></button>
     `).join('');
 
-    thumbsEl.querySelectorAll('.recipe-gallery__thumb').forEach(btn => {
-      btn.addEventListener('click', () => {
-        setHero(images[parseInt(btn.dataset.index)], parseInt(btn.dataset.index));
-      });
+    linesEl.querySelectorAll('.recipe-gallery__line').forEach(line => {
+      line.addEventListener('click', () => goTo(parseInt(line.dataset.index)));
     });
-  } else {
-    thumbsEl.style.display = 'none';
   }
 
-  mobileEl.innerHTML = images.map((img, i) => `
-    <div class="recipe-gallery__scroll-item" data-index="${i}">
-      <img src="${img.url}" 
-        alt="${img.attribution?.photographer ? 'Photo by ' + img.attribution.photographer : recipe.name + ' photo ' + (i + 1)}" 
-        loading="lazy">
-    </div>
-  `).join('');
+  // Pointer drag to advance
+  let dragStartX = 0;
+  figuresEl.addEventListener('pointerdown', (e) => { dragStartX = e.clientX; });
+  figuresEl.addEventListener('pointerup', (e) => {
+    const delta = e.clientX - dragStartX;
+    if (Math.abs(delta) < 40) return;
+    if (delta < 0 && currentIndex < images.length - 1) goTo(currentIndex + 1);
+    if (delta > 0 && currentIndex > 0) goTo(currentIndex - 1);
+  });
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-        caption.innerHTML = buildAttribution(images[parseInt(entry.target.dataset.index)]) || '';
-      }
-    });
-  }, { threshold: 0.5 });
+  // Keyboard arrow support
+  figuresEl.setAttribute('tabindex', '0');
+  figuresEl.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' && currentIndex < images.length - 1) goTo(currentIndex + 1);
+    if (e.key === 'ArrowLeft' && currentIndex > 0) goTo(currentIndex - 1);
+  });
 
-  mobileEl.querySelectorAll('.recipe-gallery__scroll-item').forEach(el => observer.observe(el));
+  // Init
+  const featured = images.find(img => img.isFeatured) || images[0];
+  goTo(0);
 }
 
 /**
@@ -462,7 +548,6 @@ function renderBreadcrumbs(recipe) {
   const breadcrumbContainer = document.getElementById('breadcrumbs');
   if (!breadcrumbContainer) return;
 
-  // Get category from query param, fall back to sessionStorage
   const params = new URLSearchParams(window.location.search);
   let fromCategory = params.get('from');
 
@@ -474,29 +559,29 @@ function renderBreadcrumbs(recipe) {
     fromCategory = sessionStorage.getItem(storageKey);
   }
 
+  const otherCategories = (recipe.categories || []).filter(cat => {
+    const catSlug = Object.keys(CATEGORIES_MAP).find(key => CATEGORIES_MAP[key] === cat) || cat;
+    return catSlug !== fromCategory;
+  });
+
   let breadcrumbHTML = '<nav aria-label="Breadcrumb" class="breadcrumb"><a href="/">Home</a>';
 
-if (fromCategory && CATEGORIES_MAP[fromCategory]) {
-  breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/category/${fromCategory}">${CATEGORIES_MAP[fromCategory]}</a>`;
-}
+  if (fromCategory && CATEGORIES_MAP[fromCategory]) {
+    breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/category/${fromCategory}">${CATEGORIES_MAP[fromCategory]}</a>`;
+  }
 
   breadcrumbHTML += ` <span aria-hidden="true">›</span> <span aria-current="page">${recipe.name}</span>`;
+
+  if (otherCategories.length > 0) {
+    breadcrumbHTML += ` <span class="also-in-label">Also in:</span> ${
+      otherCategories.map(cat => {
+        const slug = Object.keys(CATEGORIES_MAP).find(key => CATEGORIES_MAP[key] === cat) || cat;
+        return `<a href="/category/${slug}" class="also-in-pill">${cat}</a>`;
+      }).join('')
+    }`;
+  }
+
   breadcrumbHTML += '</nav>';
-
-  // Also-in tags — exclude the category already in the trail
-const otherCategories = (recipe.categories || []).filter(cat => {
-  const catSlug = Object.keys(CATEGORIES_MAP).find(key => CATEGORIES_MAP[key] === cat) || cat;
-  return catSlug !== fromCategory;
-});
-
-if (otherCategories.length > 0) {
-  breadcrumbHTML += `<p class="also-in">Also in: ${
-    otherCategories.map(cat => {
-      const slug = Object.keys(CATEGORIES_MAP).find(key => CATEGORIES_MAP[key] === cat) || cat;
-      return `<a href="/category/${slug}">${cat}</a>`;
-    }).join(' · ')
-  }</p>`;
-}
 
   breadcrumbContainer.innerHTML = breadcrumbHTML;
 }

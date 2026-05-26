@@ -1,27 +1,42 @@
 <template class="article-template" id="article-template">
     <article class="recipe-article">
-      
+        <div class="hero">
+            <div class="hero-text">
+                 <h2 class="article__title"></h2>
+                <!-- Rating -->
+                <p class="author"></p>
+                <div id="rating-display"></div>
+                <p class="description summary"></p> 
+            </div> 
+           
+   <div class="recipe-gallery" role="region" aria-label="Recipe photos">
+
+    <div class="recipe-gallery__figures overflow-scroller" 
+         role="group" 
+         tabindex="0"
+         aria-label="Recipe photos">
+    </div>
+
+    <figcaption class="recipe-gallery__caption" aria-live="polite"></figcaption>
+
+    <div class="recipe-gallery__bar" hidden>
+        <span class="recipe-gallery__counter" aria-live="polite"></span>
+        <div class="recipe-gallery__lines" role="group" aria-label="Photo navigation"></div>
+    </div>
+
+</div>
+        </div>
         <div class="article-block">
             <a id="edit-recipe-btn" class="article-edit-button">
-              <i class="fa-sharp fa-solid fa-pen-to-square"></i>
-              <span class="-hide-text">Edit Recipe</span>
+                <span class="edit-btn-light">
+                    <i class="fa-sharp fa-solid fa-pen-to-square"></i>
+                    Edit Recipe
+                </span>
+                <span class="edit-btn-dark">
+                    <i class="fa-sharp fa-solid fa-pen-to-square"></i>
+                    Edit Recipe
+                </span>
             </a>
-
-            <h2 class="article__title"></h2>
-            <!-- Rating -->
-            <p class="author"></p>
-            <div id="rating-display"></div>
-            <p class="description summary"></p> 
-            
-            <!-- Replace .imageElement and .recipe-image-gallery with: -->
-           <div class="recipe-gallery" role="region" aria-label="Recipe photos">
-                <div class="recipe-gallery__thumbs" role="group" aria-label="All recipe photos"></div>
-                <figure class="recipe-gallery__hero">
-                    <img src="" alt="" class="recipe-gallery__hero-img">
-                    <figcaption class="recipe-gallery__caption" aria-live="polite"></figcaption>
-                </figure>
-                <div class="recipe-gallery__mobile" aria-label="Recipe photos"></div>
-            </div>
             <section class="article-meta">
                 <div class="meta-icons">
                     <!-- Date -->
@@ -41,19 +56,24 @@
                         <h4><span>Total time </span><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></h4>
                         <span class="meta-text total-time-value"></span>
                     </div>
-                    <!-- Likes -->
+                   <!-- Likes -->
                     <div class="meta-item">
-                        <p><button id="like-button" aria-pressed="false"><i class="fa fa-heart" aria-hidden="true"></i></button></p>
-                        <span class="meta-text" id="like-count">0</span>
+                        <h4>Likes <i class="fa fa-heart" aria-hidden="true"></i></h4>
+                        <span class="meta-text">
+                            <button id="like-button" aria-pressed="false" aria-label="Like this recipe">
+                                <span id="like-count">0</span> <i class="fa fa-heart" aria-hidden="true"></i>
+                            </button>
+                           
+                        </span>
                     </div>
                 </div>
             </section>
             
             <div class="summary">
-                <a class="recipe-link" href="#recipe">Jump to the recipe</a>
+                <a class="recipe-link" href="#recipe">Skip to the recipe</a>
                 <div class="summary-content"></div>
             </div>
-            
+            <div class="recipe-videos"></div>
             <div class="lists">
                 <div class="checklist-container">
                     <div class="checklistHeader" id="recipe">
