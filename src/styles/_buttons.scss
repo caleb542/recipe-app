@@ -67,13 +67,12 @@ button {
 }
 
 /* Edit Page Buttons */
-.edit-page button:not(#editor button) {
+.edit-page button:not(#editor button, .avatar-btn) {
     --b-color: lch(71.39% 0 67.2);
     font-weight: 400;
     font-size: 0.9rem;
     padding: 0.5em 1.25em;
     border-radius: 25px;
-    height: 40px;
     transition: all 0.35s;
     border-width: 1px;
 }
