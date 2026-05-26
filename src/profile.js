@@ -8,7 +8,7 @@ import { findExistingImage, registerImage } from './helpers/globalImageRegistry.
 import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { hideWarning } from './functions.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
-import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+// import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
 
 
@@ -20,7 +20,7 @@ let currentProfile = null;
 let newAvatarUrl = null; // Store temporarily until save
 
 async function init() {
-  showSpinner();
+  // showSpinner();
   await loadHeader()
   hideWarning ()
   setupSanityMegaMenu()
@@ -35,13 +35,13 @@ async function init() {
 
   if (!username) {
     showError('No username provided');
-    removeSpinner();
+    // removeSpinner();
     return;
   }
 
   // Load and display profile
   await loadAndDisplayProfile(username);
-  removeSpinner(1500);
+  // removeSpinner(1500);
   showDevNotice();
 }
 function formatDate(dateValue) {
@@ -106,7 +106,7 @@ async function loadAndDisplayProfile(username) {
   } catch (error) {
     console.error('Error loading profile:', error);
     showError('Failed to load profile');
-    removeSpinner();
+    // removeSpinner();
   }
 }
 
