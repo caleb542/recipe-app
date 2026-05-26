@@ -9,432 +9,678 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-  
-    <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Roboto+Mono&family=Abril+Fatface&family=Fugaz+One&family=Lato:wght@300;400;700&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Comfortaa:wght@400;600;700&family=Fira+Mono&family=Jacques+Francois&family=JetBrains+Mono:wght@100;300;400&family=La+Belle+Aurore&family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,700&family=Libre+Baskerville:wght@400;700&family=Montserrat:wght@300;400;600;800;900&family=Open+Sans:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Questrial&family=Recursive:slnt,wght,CASL,CRSV,MONO@-15,300..1000,0.92,1,0.92&family=Red+Hat+Mono:wght@300;400;500&family=Roboto:wght@300;400;500;700&family=Sigmar&family=Sofia+Sans+Condensed&display=swap" rel="stylesheet">
-
- 
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Roboto+Mono&family=Abril+Fatface&family=Fugaz+One&family=Lato:wght@300;400;700&family=Monsieur+La+Doulaise&family=Parisienne&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Comfortaa:wght@400;600;700&family=Fira+Mono&family=Jacques+Francois&family=JetBrains+Mono:wght@100;300;400&family=La+Belle+Aurore&family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,700&family=Libre+Baskerville:wght@400;700&family=Montserrat:wght@300;400;600;800;900&family=Open+Sans:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Questrial&family=Recursive:slnt,wght,CASL,CRSV,MONO@-15,300..1000,0.92,1,0.92&family=Red+Hat+Mono:wght@300;400;500&family=Roboto:wght@300;400;500;700&family=Sigmar&family=Sofia+Sans+Condensed&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/610bdb1969.js" crossorigin="anonymous"></script>
-<link href="/scripts/index.css" rel="stylesheet" />
-<link href="/scripts/edit.css" rel="stylesheet" />
-
-
-
+    <link href="/scripts/index.css" rel="stylesheet" />
+    <link href="/scripts/edit.css" rel="stylesheet" />
     <title>Recipe App - Edit</title>
 </head>
 
 <body class="edit-page">
-   
-    <div class="page-container">
-        <header></header>
-        <main id="main-content" class="content-wrap">
-            <!-- Quick Add Section (collapsible) -->
-            <div class="quick-add-section">
-                <details open>
-                    <summary>
-                        <h3>🚀 Quick Add</h3>
-                        <p>Import from URL or paste recipe text</p>
-                    </summary>
-                    
-                    <div class="quick-add-content">
-                        <div class="quick-add-input-group">
-                            <input 
-                                type="text" 
-                                id="quick-add-input" 
-                                placeholder="Paste recipe URL or start typing recipe text..."
-                                class="quick-add-input"
-                            />
-                            <button id="quick-add-parse-btn" class="btn-parse">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                Parse Recipe
-                            </button>
-                        </div>
-                        
-                        <div id="quick-add-status" class="quick-add-status"></div>
-                        
-                        <p class="quick-add-hint">
-                            💡 Tip: Paste a URL from AllRecipes, Food Network, etc., or paste the full recipe text
-                        </p>
-                    </div>
-                </details>
+<div class="page-container">
+    <header></header>
+
+    <dialog id="auth-notice-dialog">
+        <h2>Sign in to Recipe Me</h2>
+        <p>You need to be logged in to add a recipe.</p>
+        <div class="auth-notice-actions">
+            <button id="auth-notice-login">Log in</button>
+            <button id="auth-notice-cancel">Cancel</button>
+        </div>
+    </dialog>
+
+    <main id="main-content" class="content-wrap">
+
+        <!-- STICKY ACTION BAR -->
+        <div class="edit-sticky-bar">
+            <div class="edit-sticky-bar__left">
+                <h2 id="heading-name" class="edit-recipe-title"></h2>
             </div>
-            <div class="heading-h2-container edit-header">
-                    <div class="edit-header__actions">
-                    
-                        <button id="statusToggle" class="status-toggle" data-published="false">
-                            <span class="status-icon">
-                                <i class="fa-solid fa-eye-slash"></i>
-                            </span>
-                            <span class="status-text">Unpublished</span>
-                        </button>
-                        
-                        <button id="preview-recipe-btn" class="action-btn preview-btn">
-                            <i class="fa-solid fa-eye"></i>
-                            <span>Preview</span>
-                        </button>
-                        
-                        <button id="save-button" class="action-btn save-btn">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            <span>Save</span>
-                        </button>
-                        
-                        <button id="remove-recipe" class="action-btn delete-btn">
-                            <i class="fa-solid fa-trash"></i>
-                            <span>Delete</span>
-                        </button>
-                    </div>
+            <div class="edit-sticky-bar__right">
+                <button id="statusToggle" class="status-toggle" data-published="false">
+                    <span class="status-icon"><i class="fa-solid fa-eye-slash"></i></span>
+                    <span class="status-text">Unpublished</span>
+                </button>
+                <button id="preview-recipe-btn" class="action-btn preview-btn">
+                    <i class="fa-solid fa-eye"></i><span>Preview</span>
+                </button>
+                <button id="save-button" class="action-btn save-btn">
+                    <i class="fa-solid fa-floppy-disk"></i><span>Save</span>
+                </button>
+                <button id="remove-recipe" class="action-btn delete-btn">
+                    <i class="fa-solid fa-trash"></i><span>Delete</span>
+                </button>
             </div>
-            <div class="container">
-                <div class="former form">
-                    <h2><span id="heading-name" class=""></span></h2>
-                    <div class="edit-form-list">
-                        <div class="section-1">
-                            <div class="form-group">
-                                <label for="recipe-name" id="recipe-name-label">
-                                <div>Recipe Name</div> </label>
-                                <input id="recipe-name" class="input" type="text" required
-                                placeholder="e.g., Authentic Italian Carbonara" name="text">
-                            </div>
-                       
-            <div class="form-group slug-editor">
-            <label for="recipe-slug">Recipe URL</label>
-            
-            <div class="slug-preview-container">
-                <span id="url-base">http://</span>
-                <input 
-                type="text" 
-                id="recipe-slug" 
-                placeholder="carbonara"
-                maxlength="100"
-                />
-            </div>
-            
-            <small class="slug-help">
-                Customize your recipe URL. Use lowercase letters, numbers, and hyphens.
-            </small>
-            
-            <div id="slug-feedback" class="slug-feedback"></div>
-            </div>
-                            <div class="form-group">
-                                <label for="recipe-description">
-                                <div>Description</div></label>
-                                <textarea id="recipe-description"
-                                    placeholder="Recipe Description"></textarea>
-                            </div>
-               
-                            <!-- UPDATED: Image selection with Cloudinary upload + Unsplash search -->
-                           <!-- Image Gallery Management -->
-            <div class="form-group">
-                <label>Recipe Images</label>
-                
-                <!-- Upload/Search Section -->
-                <div class="image-upload-section">
-                    <!-- Cloudinary Upload -->
-                    <div class="upload-option">
-                        <h3>Upload Your Photo</h3>
-                        <label for="cloudinary-upload" class="upload-button">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            Add Image
-                        </label>
-                        <input 
-                            type="file" 
-                            id="cloudinary-upload" 
-                            accept="image/*"
-                            style="display: none;"
-                        />
-                        <div id="upload-status"></div>
-                    </div>
-                    
-                    <div class="upload-divider">
-                        <span>OR</span>
-                    </div>
-                    
-                    <!-- Unsplash Search -->
-                    <div class="search-option">
-                        <h3>Search Stock Photos</h3>
-                        <fieldset id="image" class="feature-image">
-                            <input id="feature-keyword" placeholder="Search for a photo">
-                            <button class="feature-image" id="feature-image-button" type="button">
-                                <i class="fa fa-solid fa-magnifying-glass"></i>
-                            </button>
-                        </fieldset>
-                    </div>
-                </div>
-                
-                <!-- Image Gallery (sortable list) -->
-                <div id="image-gallery" class="image-gallery">
-                    <p class="no-images" style="display: none;">No images yet. Upload or search to add images.</p>
-                    <!-- Images will be rendered here -->
-                </div>
-            </div>
-
-            <!-- Unsplash Modal (keep existing) -->
-            <dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
-                <div class="carousel">
-                    <ul class="carousel-track">
-                    <!-- Unsplash images -->
-                    </ul>
-                </div>
-            </dialog>
-                             
-            <!-- EXISTING: Unsplash modal -->
-            <dialog id="select-images" class="modal-dialog image-dialog" closedBy="any">
-                <div class="carousel">
-                    <!-- <button class="arrow left" aria-label="Previous">&#9664;</button> -->
-                    <ul class="carousel-track">
-                    <!-- Unsplash images -->
-                    </ul>
-                    <!-- <button class="arrow right" aria-label="Next">&#9654;</button> -->
-                </div>
-            </dialog>
-                        <!-- Video Section -->
-                        <div class="form-group video-section">
-                        <details>
-                            <summary>
-                                <label>Recipe Video (Optional)</label>
-                            </summary>
-                       
-                            <div class="video-helper-card">
-                                <div class="video-icon">📹</div>
-                                
-                                <div class="video-content">
-                                <h4>Add a Recipe Video</h4>
-                                
-                                <div class="video-benefits">
-                                    <p><strong>Why use YouTube?</strong></p>
-                                    <ul>
-                                    <li>✅ Free unlimited storage</li>
-                                    <li>✅ You keep copyright and ad revenue</li>
-                                    <li>✅ Build your audience</li>
-                                    <li>✅ Professional video player</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="video-instructions">
-                                    <p><strong>How to add a video:</strong></p>
-                                    <ol>
-                                    <li>Record your recipe video</li>
-                                    <li>Upload to <a href="https://youtube.com/upload" target="_blank" rel="noopener">YouTube</a> or <a href="https://vimeo.com/upload" target="_blank" rel="noopener">Vimeo</a></li>
-                                    <li>Copy the video link</li>
-                                    <li>Paste it anywhere in your article below</li>
-                                    </ol>
-                                    <p class="note">💡 <strong>Pro tip:</strong> Just paste the URL in your article text. It will automatically become an embedded video!</p>
-                                </div>
-                                
-                                <div class="video-quick-add">
-                                    <label for="quick-video-url">Quick Add Video:</label>
-                                    <div class="video-input-group">
-                                    <input 
-                                        type="url" 
-                                        id="quick-video-url" 
-                                        placeholder="https://youtube.com/watch?v=..." 
-                                        class="video-url-input"
-                                    />
-                                    <button 
-                                        type="button" 
-                                        id="add-video-btn" 
-                                        class="btn-add-video"
-                                    >
-                                        <i class="fa-solid fa-plus"></i> Add to Article
-                                    </button>
-                                    </div>
-                                    <small>Supports YouTube and Vimeo links</small>
-                                </div>
-                                </div>
-                            </div>
-                        </details>   
-                       
-                        </div>
-                        <!-- end video -->
-                            <div class="form-group">
-                                 <div id="article">
-                                <div>Article</div>
-                                <div id="editor"></div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="recipe-author">
-                                    <div>Author Display Name</div>
-                                </label>
-                                <input id="recipe-author" class="input" type="text"
-                                    placeholder="Chef Smith" name="text" value="">
-                            </div>
-                            <div class="form-group cols-2">
-                                <div class="form-group">
-                                <label for="recipe-prep-time">
-                                    <div>Prep Time</div>
-                                </label>
-                                <input id="recipe-prep-time" class="input" type="text" placeholder="20 minutes">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="recipe-total-time">
-                                    <div>Total Time</div>
-                                </label>
-                                <input id="recipe-total-time" class="input" type="text" placeholder="1.5 hours">
-                            </div>
-                            </div>
-                            
-                            
-                           
-                        <div class="form-group" id="tags">
-                            <h2 class="tags">Tags</h2>
-                            
-                            <!-- Input for adding tags -->
-                            <input type="text" id="tag-input" placeholder="Type a tag and press Enter">
-                            
-                            <!-- Container where pills will appear -->
-                            <div id="tags-container" class="tags-container"></div>
-                        </div>
-
-                        <div class="form-group checklist">
-                            <!-- Categories Section for edit.html -->
-                            <div class="form-section categories-section">
-                                <h3>Categories</h3>
-                                <p class="help-text">Select all that apply (multiple selections allowed)</p>
-                                <div id="categories-container">
-                                    <p style="color: #6b7280; font-size: 0.875rem;">Loading categories...</p>
-                                    <!-- dynamically rendered -->
-                                </div>
-                            </div>
-
-                            <style>
-                            .categories-section {
-                                margin: 2rem 0;
-                            }
-
-                            .category-group {
-                                margin-bottom: 2rem;
-                            }
-
-                            .category-group h4 {
-                                font-size: 0.875rem;
-                                font-weight: 700;
-                                color: #6b7280;
-                                text-transform: uppercase;
-                                letter-spacing: 0.05em;
-                                margin-bottom: 0.75rem;
-                                padding-bottom: 0.5rem;
-                                border-bottom: 2px solid #fbbf24;
-                            }
-
-                            .checkbox-grid {
-                                display: grid;
-                                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                                gap: 0.75rem;
-                            }
-
-                            .checkbox-grid label {
-                                display: flex;
-                                align-items: center;
-                                gap: 0.5rem;
-                                cursor: pointer;
-                                padding: 0.5rem;
-                                border-radius: 0.25rem;
-                                transition: background-color 0.2s;
-                            }
-
-                            .checkbox-grid label:hover {
-                                background-color: #f9fafb;
-                            }
-
-                            .checkbox-grid input[type="checkbox"] {
-                                width: 1.25rem;
-                                height: 1.25rem;
-                                cursor: pointer;
-                            }
-
-                            .checkbox-grid span {
-                                font-size: 0.95rem;
-                                color: #374151;
-                            }
-
-                            .help-text {
-                                color: #6b7280;
-                                font-size: 0.875rem;
-                                margin-bottom: 1.5rem;
-                            }
-                            </style>
-                        </div>
-                        </div>
-                         <div class="form-group">
-                                    <article>
-                                      <header>
-                                           <h2 class="header__title">Directions</h2>
-                                    </header>
-
-                                    <ol id="directions-list" class="directions">
-
-                                    </ol>
-                                    <div id="add-container"><a id="add-step" href="#"><i class="fa fa-plus"
-                                        aria-hidden="true"></i><span class="hide-text">Add another step</span></a>
-                                    </div>
-                                    </article>
-                                    
-                            
-                                <dialog id="add-directions" class="modal-dialog direction-dialog" closedBy="any">
-                                    Edit or add step:
-                                        <textarea placeholder="Start by preheating the oven to 350 degrees fahrenheit." id="enter-next-step"></textarea>
-                                        <div class="button__footer">
-                                            <button class="dialog-close-button">Finished</button>
-                                        </div>
-                                </dialog>
-                              </div>   
-                        <!-- Ingredient Modal -->
-                        <dialog id="ingredient-modal"  class="modal-dialog ingredient-modal" closedBy="any">
-                            <ul id="ingredient">
-                                <li><label><div>Name:</div> <input  id="name"  /></label></li>
-                                <li><label><div>Description:</div> <input id="description"  /></label></li>
-                                <li><label><div>Amount:</div> <input id="amount" /></label></li>
-                                <li><label><div>Unit:</div> <input id="unit" /></label></li>
-                                <li><label><div>Measure Word (Optional):</div> <input id="measureWord" placeholder="i.e. a splash, a pinch, a dollop"  /></label></li>                          
-                                <div class="button__footer">
-                                    <button class="close-ingredient-modal" id="close-ingredient-modal">Close</button>
-                                </div>
-                                </ul>
-                        </dialog>
-
-                        <div class="form-group">                        
-                        <article id="recipe" class="article__recipe">
-                            <header id="recipe-header">
-                                <h2 class="header__title">Recipe</h2>
-                            </header>
-                           
-                            <ul class="recipe recipe-list">
-                            </ul>
-                             
-                             <footer class="edit-form-ingredient-footer">
-                                    <div>
-                                        <button id="add-an-ingredient"><i class="fa fa-plus" aria-hidden="true"></i> Add an Ingredient
-                                        </button>
-                                    </div>
-                                   
-                             </footer>
-                        </article>
-                        <div id="ingredients" class="edit-ingredients">
-                            <!-- Dynamically list ingredients with js-->
-                        </div>
-                        </div>
-                    </div>
-            </div>     
-                <!--container-->     
-            </div>
-            
-
-  
-            </main>
-            <dialog id="preview-dialog" class="preview-dialog" closedBy="any">
-                <div id="preview-content"></div>
-                <button id="close-preview">Close Preview</button>
-            </dialog>
-            <footer class="page-footer">
-                <p>© Caleb Hamilton 2022 - current revisions underway 2025</p>
-            </footer>
-            <div id="nav-overlay" class="nav-overlay"></div>
-            <!-- page container-->
         </div>
 
-        <script type="module" src="/scripts/edit-bundle.js"></script>
-    </div>
- </body>
+        <div class="edit-form-wrap">
 
+            <!-- RESTORE BANNER -->
+            <div class="restore-banner" id="restore-banner" hidden>
+                <i class="fa-solid fa-clock"></i>
+                <div class="restore-banner__text">
+                    <p>You have unsaved content for this recipe from <span id="restore-time">2 hours ago</span>. Do you want to save it to the cloud?</p>
+                    <div class="restore-banner__actions">
+                        <button id="restore-discard" class="restore-btn">Discard</button>
+                        <button id="restore-continue" class="restore-btn">Continue editing</button>
+                        <button id="restore-save" class="restore-btn restore-btn--primary">Save to cloud</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK ADD — accordion, not modal -->
+            <div class="bento-quick-add">
+                <div class="edit-card" id="card-quick-add">
+                    <button class="edit-card__header" data-card="quick-add" aria-expanded="false">
+                        <div class="edit-card__top-row">
+                            <div class="edit-card__icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                            <span class="edit-card__label">Quick Add</span>
+                            <div class="edit-card__actions">
+                                <span class="edit-card__summary-inline">Import from URL or paste recipe text</span>
+                                <i class="fa-solid fa-chevron-down edit-card__chevron"></i>
+                            </div>
+                        </div>
+                    </button>
+                    <div class="edit-card__body">
+                        <div class="edit-card__body-inner">
+                            <div class="reimport-warning" id="reimport-warning" hidden>
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                This will overwrite existing fields
+                            </div>
+                            <div class="quick-add-input-group">
+                                <input type="text" id="quick-add-input"
+                                    placeholder="Paste recipe URL, or recipe text"
+                                    class="quick-add-input" />
+                                <button id="quick-add-parse-btn" class="btn-parse">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Parse Recipe
+                                </button>
+                            </div>
+                            <div id="quick-add-status" class="quick-add-status"></div>
+                            <p class="quick-add-hint">
+                                💡 Tip: Paste a URL from AllRecipes, Food Network, etc., or paste the full recipe text
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================================================
+                 CORE GROUP
+                 ================================================ -->
+            <div class="bento-group" data-group="core">
+                <div class="bento-group__label">Core</div>
+                <div class="bento-core">
+
+                    <!-- Identity — preview tile only -->
+                    <div class="edit-card" id="card-identity">
+                        <button class="edit-card__header" aria-label="Edit Identity">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-pen"></i></div>
+                                <span class="edit-card__label">Identity</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-identity"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview" id="preview-identity">
+                                <span class="edit-card__preview-name" id="preview-identity-name">—</span>
+                                <div class="edit-card__preview-pills" id="preview-identity-cats"></div>
+                                <span class="edit-card__preview-slug" id="preview-identity-slug"></span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Description — preview tile only -->
+                    <div class="edit-card" id="card-description">
+                        <button class="edit-card__header" aria-label="Edit Description">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-align-left"></i></div>
+                                <span class="edit-card__label">Description</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-description"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview" id="preview-description">
+                                <span class="edit-card__preview-text edit-card__preview-empty" id="preview-description-text">No description yet</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Images — preview tile only -->
+                    <div class="edit-card bento-core__images" id="card-images">
+                        <button class="edit-card__header" aria-label="Edit Images">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-image"></i></div>
+                                <span class="edit-card__label">Images</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-images"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview" id="preview-images">
+                                <div class="edit-card__preview-thumbs" id="preview-images-thumbs">
+                                    <span class="edit-card__preview-empty">No images yet</span>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================================================
+                 ARTICLE
+                 ================================================ -->
+            <div class="bento-group" data-group="article">
+                <div class="bento-row bento-row--full">
+                    <div class="edit-card" id="card-article">
+                        <button class="edit-card__header" aria-label="Edit Article">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-newspaper"></i></div>
+                                <span class="edit-card__label">Article</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-article"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview" id="preview-article">
+                                <span class="edit-card__preview-empty" id="preview-article-text">No article yet</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================================================
+                 RECIPE GROUP
+                 ================================================ -->
+            <div class="bento-group" data-group="recipe">
+                <div class="bento-group__label">Recipe</div>
+                <div class="bento-row bento-row--halves">
+
+                    <div class="edit-card" id="card-ingredients">
+                        <button class="edit-card__header" aria-label="Edit Ingredients">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-list"></i></div>
+                                <span class="edit-card__label">Ingredients</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-ingredients"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview" id="preview-ingredients">
+                                <span class="edit-card__preview-count" id="preview-ingredients-count"></span>
+                                <ul class="preview-bullets" id="preview-ingredients-list"></ul>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="edit-card" id="card-directions">
+                        <button class="edit-card__header" aria-label="Edit Directions">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-list-ol"></i></div>
+                                <span class="edit-card__label">Directions</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-directions"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview" id="preview-directions">
+                                <span class="edit-card__preview-count" id="preview-directions-count"></span>
+                                <ul class="preview-bullets" id="preview-directions-first"></ul>
+                            </div>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================================================
+                 CONTEXT GROUP — placeholders
+                 ================================================ -->
+            <div class="bento-group" data-group="context">
+                <div class="bento-group__label">Context</div>
+                <div class="bento-row bento-row--quarters">
+                    <div class="edit-card edit-card--placeholder" id="card-servings">
+                        <button class="edit-card__header" disabled>
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-users"></i></div>
+                                <span class="edit-card__label">Servings</span>
+                            </div>
+                            <div class="edit-card__preview"><span class="edit-card__preview-empty">Serves how many?</span></div>
+                        </button>
+                    </div>
+                    <div class="edit-card edit-card--placeholder" id="card-difficulty">
+                        <button class="edit-card__header" disabled>
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-gauge"></i></div>
+                                <span class="edit-card__label">Difficulty</span>
+                            </div>
+                            <div class="edit-card__preview"><span class="edit-card__preview-empty">Beginner · Intermediate · Advanced</span></div>
+                        </button>
+                    </div>
+                    <div class="edit-card edit-card--placeholder" id="card-season">
+                        <button class="edit-card__header" disabled>
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-leaf"></i></div>
+                                <span class="edit-card__label">Season</span>
+                            </div>
+                            <div class="edit-card__preview"><span class="edit-card__preview-empty">Spring · Summer · Fall · Winter</span></div>
+                        </button>
+                    </div>
+                    <div class="edit-card edit-card--placeholder" id="card-source">
+                        <button class="edit-card__header" disabled>
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-link"></i></div>
+                                <span class="edit-card__label">Source</span>
+                            </div>
+                            <div class="edit-card__preview"><span class="edit-card__preview-empty">Original recipe attribution or URL</span></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================================================
+                 NUTRITION & ALLERGENS — placeholders
+                 ================================================ -->
+            <div class="bento-group" data-group="nutrition">
+                <div class="bento-group__label">Nutrition &amp; Allergens</div>
+                <div class="bento-row bento-row--halves">
+                    <div class="edit-card edit-card--placeholder" id="card-nutrition">
+                        <button class="edit-card__header" disabled>
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                                <span class="edit-card__label">Nutrition</span>
+                                <div class="edit-card__actions"><span class="edit-card__future-badge">coming soon</span></div>
+                            </div>
+                            <div class="edit-card__preview"><span class="edit-card__preview-empty">Calories, macros — auto-calculated via Spoonacular</span></div>
+                        </button>
+                    </div>
+                    <div class="edit-card edit-card--placeholder" id="card-allergens">
+                        <button class="edit-card__header" disabled>
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                <span class="edit-card__label">Allergens</span>
+                                <div class="edit-card__actions"><span class="edit-card__future-badge">coming soon</span></div>
+                            </div>
+                            <div class="edit-card__preview"><span class="edit-card__preview-empty">Nuts · Dairy · Gluten · Eggs · Shellfish</span></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================================================
+                 EDITORIAL GROUP
+                 ================================================ -->
+            <div class="bento-group" data-group="editorial">
+                <div class="bento-group__label">Editorial</div>
+
+                <div class="bento-row bento-row--thirds">
+
+                    <div class="edit-card" id="card-categories">
+                        <button class="edit-card__header" aria-label="Edit Categories">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-table-cells"></i></div>
+                                <span class="edit-card__label">Categories</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-categories"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview" id="preview-categories">
+                                <div class="edit-card__preview-pills" id="preview-categories-pills">
+                                    <span class="edit-card__preview-empty">No categories selected</span>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="edit-card" id="card-tags">
+                        <button class="edit-card__header" aria-label="Edit Tags">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-tag"></i></div>
+                                <span class="edit-card__label">Tags</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-tags"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview" id="preview-tags">
+                                <div class="edit-card__preview-pills" id="preview-tags-pills">
+                                    <span class="edit-card__preview-empty">No tags yet</span>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="edit-card" id="card-times">
+                        <button class="edit-card__header" aria-label="Edit Times and Author">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-clock"></i></div>
+                                <span class="edit-card__label">Times &amp; Author</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-times"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview" id="preview-times">
+                                <div class="edit-card__preview-meta" id="preview-editorial-times"></div>
+                            </div>
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="bento-row bento-row--thirds">
+
+                    <div class="edit-card edit-card--placeholder" id="card-notes">
+                        <button class="edit-card__header" disabled>
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-note-sticky"></i></div>
+                                <span class="edit-card__label">Notes &amp; Tips</span>
+                                <div class="edit-card__actions"><span class="edit-card__future-badge">coming soon</span></div>
+                            </div>
+                            <div class="edit-card__preview"><span class="edit-card__preview-empty">Make-ahead tips, substitutions, chef's notes</span></div>
+                        </button>
+                    </div>
+
+                    <div class="edit-card" id="card-article-editorial">
+                        <button class="edit-card__header" aria-label="Edit Article" onclick="document.getElementById('card-article').querySelector('.edit-card__header').click()">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-newspaper"></i></div>
+                                <span class="edit-card__label">Article</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-article-2"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview">
+                                <span class="edit-card__preview-empty">Long-form content about this recipe</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="edit-card" id="card-video">
+                        <button class="edit-card__header" aria-label="Edit Video">
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-brands fa-youtube"></i></div>
+                                <span class="edit-card__label">Video</span>
+                                <div class="edit-card__actions">
+                                    <span class="edit-card__status-dot" id="dot-video"></span>
+                                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
+                                </div>
+                            </div>
+                            <div class="edit-card__preview" id="preview-video">
+                                <span class="edit-card__preview-empty">YouTube or Vimeo link</span>
+                            </div>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================================================
+                 META GROUP
+                 ================================================ -->
+            <div class="bento-group" data-group="meta">
+                <div class="bento-group__label">Meta</div>
+                <div class="bento-row bento-row--halves">
+                    <div class="edit-card edit-card--placeholder" id="card-versions">
+                        <button class="edit-card__header" disabled>
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                                <span class="edit-card__label">Version History</span>
+                                <div class="edit-card__actions"><span class="edit-card__future-badge">coming soon</span></div>
+                            </div>
+                            <div class="edit-card__preview"><span class="edit-card__preview-empty">Track changes, restore previous versions</span></div>
+                        </button>
+                    </div>
+                    <div class="edit-card edit-card--placeholder" id="card-testing">
+                        <button class="edit-card__header" disabled>
+                            <div class="edit-card__top-row">
+                                <div class="edit-card__icon"><i class="fa-solid fa-flask"></i></div>
+                                <span class="edit-card__label">Testing Log</span>
+                                <div class="edit-card__actions"><span class="edit-card__future-badge">coming soon</span></div>
+                            </div>
+                            <div class="edit-card__preview"><span class="edit-card__preview-empty">Record test batches, notes per iteration</span></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /edit-form-wrap -->
+
+    </main>
+
+    <!-- ================================================
+         FORM CONTENT STASHES
+         Hidden containers holding form HTML.
+         Modal moves content in/out of these on open/close.
+         ================================================ -->
+    <div id="form-stashes" hidden aria-hidden="true">
+
+        <div id="modal-content-identity">
+            <div class="em-form-content">
+                <div class="form-group">
+                    <label for="recipe-name">Recipe Name</label>
+                    <input id="recipe-name" type="text" required placeholder="e.g., Authentic Italian Carbonara">
+                </div>
+                <div class="form-group slug-editor">
+                    <label for="recipe-slug">Recipe URL</label>
+                    <div class="slug-preview-container">
+                        <span id="url-base">http://</span>
+                        <input type="text" id="recipe-slug" placeholder="carbonara" maxlength="100" />
+                    </div>
+                    <small class="slug-help">Use lowercase letters, numbers, and hyphens.</small>
+                    <div id="slug-feedback" class="slug-feedback"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-content-description">
+            <div class="em-form-content">
+                <div class="form-group">
+                    <label for="recipe-description">Description</label>
+                    <textarea id="recipe-description"
+                        placeholder="A short excerpt that appears above the hero image. Keep it to 2–3 sentences."
+                        maxlength="500"></textarea>
+                    <div class="char-counter">
+                        <span id="description-char-count">0</span> / 280 suggested
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-content-images">
+            <div class="em-form-content">
+                <div class="upload-option">
+                    <label for="cloudinary-upload" class="upload-button">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Add Image
+                    </label>
+                    <input type="file" id="cloudinary-upload" accept="image/*" style="display:none;" />
+                    <div id="upload-status"></div>
+                </div>
+                <div class="upload-divider"><span>OR</span></div>
+                <div class="search-option">
+                    <fieldset id="image" class="feature-image">
+                        <input id="feature-keyword" placeholder="Search stock photos">
+                        <button class="feature-image" id="feature-image-button" type="button">
+                            <i class="fa fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </fieldset>
+                </div>
+                <div id="image-gallery" class="image-gallery">
+                    <p class="no-images" style="display:none;">No images yet.</p>
+                </div>
+                <p class="img-legend">
+                    <span class="legend-badge"><i class="fa-solid fa-check"></i></span>
+                    Featured image
+                </p>
+            </div>
+        </div>
+
+        <div id="modal-content-article">
+            <div class="em-form-content em-form-content--wide">
+                <div class="form-group">
+                    <div id="article">
+                        <div id="editor"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-content-ingredients">
+            <div class="em-form-content">
+                <article id="recipe" class="article__recipe">
+                    <ul class="recipe recipe-list"></ul>
+                    <footer class="edit-form-ingredient-footer">
+                        <button id="add-an-ingredient">
+                            <i class="fa fa-plus" aria-hidden="true"></i> Add an Ingredient
+                        </button>
+                    </footer>
+                </article>
+                <div id="ingredients" class="edit-ingredients"></div>
+            </div>
+        </div>
+
+        <div id="modal-content-directions">
+            <div class="em-form-content">
+                <article>
+                    <ol id="directions-list" class="directions"></ol>
+                    <div id="add-container">
+                        <a id="add-step" href="#">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            <span class="hide-text">Add another step</span>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <div id="modal-content-categories">
+            <div class="em-form-content">
+                <div class="form-group">
+                    <div class="categories-section">
+                        <p class="help-text">Select all that apply</p>
+                        <div id="categories-container">
+                            <p class="loading-text">Loading categories...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-content-tags">
+            <div class="em-form-content">
+                <div class="form-group" id="tags">
+                    <label for="tag-input">Tags</label>
+                    <input type="text" id="tag-input" placeholder="Type a tag and press Enter">
+                    <div id="tags-container" class="tags-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-content-times">
+            <div class="em-form-content">
+                <div class="form-group">
+                    <label for="recipe-author">Author Display Name</label>
+                    <input id="recipe-author" type="text" placeholder="Chef Smith" value="">
+                </div>
+                <div class="form-cols-2">
+                    <div class="form-group">
+                        <label for="recipe-prep-time">Prep Time</label>
+                        <input id="recipe-prep-time" type="text" placeholder="20 minutes">
+                    </div>
+                    <div class="form-group">
+                        <label for="recipe-total-time">Total Time</label>
+                        <input id="recipe-total-time" type="text" placeholder="1.5 hours">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-content-video">
+            <div class="em-form-content">
+                <div class="form-group video-section">
+                    <div class="video-input-group">
+                        <input type="url" id="quick-video-url"
+                            placeholder="https://youtube.com/watch?v=..."
+                            class="video-url-input" />
+                        <button type="button" id="add-video-btn" class="btn-add-video">
+                            <i class="fa-solid fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <small class="form-help">Supports YouTube and Vimeo links</small>
+                    <div class="video-list" id="video-list"></div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /form-stashes -->
+
+    <!-- ================================================
+         EDIT SECTION MODAL — single dialog, reused
+         ================================================ -->
+    <dialog id="edit-section-modal" class="edit-section-modal">
+        <div class="em-header">
+            <div class="em-title">
+                <i class="fa-solid fa-pen em-title-icon"></i>
+                <span class="em-title-text">Section</span>
+            </div>
+            <div class="em-header-actions">
+                <span class="em-draft-indicator">Auto-saved to draft</span>
+                <button class="em-revert-btn" hidden>
+                    <i class="fa-solid fa-rotate-left"></i> Revert
+                </button>
+                <button class="em-done-btn">Done</button>
+                <button class="em-close-btn" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+        <div class="em-body">
+            <!-- content injected here -->
+        </div>
+    </dialog>
+
+    <!-- Legacy modals kept for ingredient/direction sub-dialogs -->
+    <dialog id="select-images" class="modal-dialog image-dialog" closedby="any">
+        <div class="carousel"><ul class="carousel-track"></ul></div>
+    </dialog>
+
+    <dialog id="ingredient-modal" class="modal-dialog ingredient-modal" closedby="any">
+        <ul id="ingredient">
+            <li><label><div>Name:</div> <input id="name" /></label></li>
+            <li><label><div>Description:</div> <input id="description" /></label></li>
+            <li><label><div>Amount:</div> <input id="amount" /></label></li>
+            <li><label><div>Unit:</div> <input id="unit" /></label></li>
+            <li><label><div>Measure Word (Optional):</div> <input id="measureWord" placeholder="i.e. a splash, a pinch, a dollop" /></label></li>
+            <div class="button__footer">
+                <button class="close-ingredient-modal" id="close-ingredient-modal">Close</button>
+            </div>
+        </ul>
+    </dialog>
+
+    <dialog id="add-directions" class="modal-dialog direction-dialog" closedby="any">
+        Edit or add step:
+        <textarea placeholder="Start by preheating the oven to 350 degrees fahrenheit." id="enter-next-step"></textarea>
+        <div class="button__footer">
+            <button class="dialog-close-button">Finished</button>
+        </div>
+    </dialog>
+
+    <dialog id="preview-dialog" class="preview-dialog" closedby="any">
+        <div id="preview-content"></div>
+        <button id="close-preview">Close Preview</button>
+    </dialog>
+
+    <footer class="page-footer">
+        <p>© Caleb Hamilton 2022 - current revisions underway 2025</p>
+    </footer>
+
+    <div id="nav-overlay" class="nav-overlay"></div>
+    <script type="module" src="/scripts/edit-bundle.js"></script>
+</div>
+</body>
 </html>

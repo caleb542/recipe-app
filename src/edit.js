@@ -1,8 +1,13 @@
+// /src/styles/edit-form.scss
+import './styles/_edit-form.scss';
+import { setupEditModal } from './helpers/editModal.js';
+
 // /src/edit.js - Entry point for Recipe Editor
 import { v4 as uuidv4 } from 'uuid';
 import { loadRecipes, saveRecipes, hideWarning } from './functions.js';
 import { showQuickAddModal } from './helpers/quickAdd.js';
 import '@toast-ui/editor/dist/toastui-editor.css';
+import { initProgressBar, updateProgress } from './helpers/editProgressBar.js';
 
 // Helpers
 import { populateFields, wireFieldListeners, loadCategories } from './helpers/fields.js';
@@ -22,9 +27,27 @@ import { loadUserProfile } from './userContext.js';
 
 import { setupPreview } from './helpers/preview.js'
 import { initStatusToggle, getCurrentPublishedState } from './helpers/statusToggle.js'
-import { setupVideoHelper } from './helpers/setupVideoHelper.js';
+import { listVideos, setupVideoDelegation, setupVideoInput, addVideo, removeVideo } from './helpers/videoHelper.js';
 import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
+
+import {
+  updateCategoriesSummary,
+  updateTagsSummary,
+  updateArticleSummary,
+  setupAccordion,
+  setupQuickAddCard,
+  setupRestoreBanner,
+  setupDescriptionCounter,
+  markUnsaved,
+  markSaved,
+  updateIdentitySummary,
+  updateIngredientsSummary,
+  updateDirectionsSummary,
+  updateImagesSummary,
+  updateDescriptionSummary,
+  updateEditorialSummary
+} from './helpers/editAccordion.js';
 
 loadHeader();
 
@@ -44,6 +67,7 @@ const authenticated = await isAuthenticated();
 if (!authenticated) {
   alert('Please log in to edit recipes');
   window.location.href = '/index.html';
+ 
 }
 
 
@@ -114,6 +138,23 @@ hideWarning();
   populateFields(recipe);
   setupSlugEditor(recipe, currentUser)
 
+  // setupAccordion();
+  setupEditModal();
+  setupQuickAddCard(true);
+  setupRestoreBanner(recipeId);
+  setupDescriptionCounter();
+
+  updateIdentitySummary(recipe);
+  updateDescriptionSummary(recipe.description);
+  updateImagesSummary(recipe.images || []);
+  updateIngredientsSummary(recipe.ingredients || []);
+  updateDirectionsSummary(recipe.directions || []);
+  updateEditorialSummary(recipe);
+  updateCategoriesSummary(recipe.categories || []);
+  updateTagsSummary(recipe.tags || []);
+  updateArticleSummary(recipe.article || recipe.articleHTML || '');
+
+
   wireFieldListeners(recipeId);
 
   listDirections(recipe.directions);
@@ -140,7 +181,18 @@ hideWarning();
   // Pass both recipeId and article content into editor
   setupEditor(recipeId, recipe.article || recipe.articleHTML || '');
   const editorInstance = window.editorInstance; // If you're storing it globally
-  setupVideoHelper(editorInstance);
+
+window._videoModalInit = () => {
+  listVideos(recipeId);
+  setupVideoDelegation(recipeId);
+  setupVideoInput(recipeId);
+
+  const addBtn = document.getElementById('add-video-btn');
+  if (addBtn && !addBtn.dataset.bound) {
+    addBtn.dataset.bound = 'true';
+    addBtn.addEventListener('click', () => addVideo(recipeId));
+  }
+};
 
   setupRecipeDeletion(recipe);
   setupSaveButton(recipe);
@@ -151,6 +203,7 @@ hideWarning();
 
   setupPreview(recipeId);
   initStatusToggle();
+  initProgressBar(recipe);
 }
 
 /**
@@ -185,13 +238,14 @@ const newRecipe = {
     ingredients: [],
     // NEW: Use images array instead of single photoURL
     images: [], // Start with empty array
+    videos: [], // Start with empty array    
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
   setupEditor(newRecipeId, newRecipe.article || '');
   // ✅ NEW: Setup video helper
   const editorInstance = window.editorInstance;
-  setupVideoHelper(editorInstance);
+
 
   location.hash = newRecipe.id;
   recipes.push(newRecipe);
