@@ -2,6 +2,7 @@
 // Manages user profile state, loading, and impersonation
 
 import { getToken, isAuthenticated, getUser as getAuth0User } from './auth/auth0.js';
+import { updateAuthUI } from './auth/updateAuthUI.js';
 import { ProfileSetupModal } from './components/ProfileSetupModal.js';
 import { getIdTokenClaims } from './auth/auth0.js';
 
@@ -21,48 +22,43 @@ const SUPERADMINS = [
 // Load user profile from API
 export async function loadUserProfile(skipFetch = false) {
   try {
-    const authenticated = await isAuthenticated();
-    if (!authenticated) {
+    // Get token first — this handles refresh and expiry
+    const token = await getToken();
+    
+    if (!token) {
+      console.warn('⚠️ No token — clearing session');
       currentUserProfile = null;
       localStorage.removeItem('userProfile');
+      localStorage.removeItem('username');
+      await updateAuthUI();
       return null;
     }
 
-    // ✅ CHANGED: Only check for username in localStorage (safe data)
+    // Skip fetch if we have everything cached
     const cachedUsername = localStorage.getItem('username');
-    
-    // ✅ Skip fetch if requested AND we have cached username
     if (skipFetch && cachedUsername && currentUserProfile) {
-      // ✅ NEW: Check if user is superadmin
       if (currentUserProfile) {
         currentUserProfile.isSuperadmin = SUPERADMINS.includes(currentUserProfile.email);
       }
-      
-      // ✅ NEW: Restore impersonation state if exists
       await restoreImpersonationState();
-      
       return currentUserProfile;
     }
-    
-    // Fetch fresh profile from API
-    const idToken = await getIdTokenClaims();
-    console.log("idToken: ", idToken);
+
     const response = await fetch('/.netlify/functions/user-profile', {
-      headers: {
-        'Authorization': `Bearer ${idToken.__raw}` // Use ID token instead
-      }
+      headers: { 'Authorization': `Bearer ${token}` }
     });
-    console.log('response',response);
-    
-    if (response.status === 404) {
-      // Profile doesn't exist - show setup modal
-      const data = await response.json();
-      if (data.needsSetup) {
-        console.log('👋 First-time user - showing profile setup');
-        new ProfileSetupModal();
-        return null;
-      }
+
+    if (response.status === 401) {
+      console.warn('⚠️ 401 — token rejected, clearing session');
+      currentUserProfile = null;
+      localStorage.removeItem('userProfile');
+      localStorage.removeItem('username');
+      await updateAuthUI();
+      return null;
     }
+    
+    // ... rest unchanged
+
 
     if (!response.ok) {
       // ✅ Better error logging

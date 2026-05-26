@@ -14,45 +14,45 @@ export async function updateAuthUI() {
   }
   
   if (authenticated) {
-  loginBtn.style.display = 'none';
-  userInfo.style.display = 'flex';
-  userInfo.style.alignItems = 'center';
-  userInfo.style.gap = '0.5rem';
+    loginBtn.style.visibility = 'hidden';
+    userInfo.style.visibility = 'visible';
 
-  const user = getUserProfile();
-  const userNameElement = document.getElementById('user-name');
-  const avatarContainer = document.getElementById('user-avatar-container');
+    const user = getUserProfile();
+    const userNameElement = document.getElementById('user-name');
+    const avatarContainer = document.getElementById('user-avatar-container');
 
-  if (user) {
-    const avatar = getUserAvatar();
-    setupAvatarDropdown(user, avatar);
+    if (user) {
+      const avatar = getUserAvatar();
+      setupAvatarDropdown(user, avatar);
 
-   if (userNameElement) {
-      const displayName = user.profile?.displayName || user.username || 'User';
-      userNameElement.innerHTML = `
-        <button class="user-profile-link" id="username-btn">${displayName}</button>
-      `;
+      if (userNameElement) {
+        const displayName = user.profile?.displayName || user.username || 'User';
+        userNameElement.innerHTML = `
+          <button class="user-profile-link" id="username-btn">${displayName}</button>
+        `;
 
-      // Wire to same dropdown as avatar
-      document.getElementById('username-btn')?.addEventListener('click', () => {
-        document.getElementById('avatar-btn')?.click();
-      });
+        document.getElementById('username-btn')?.addEventListener('click', () => {
+          document.getElementById('avatar-btn')?.click();
+        });
+      }
+    } else {
+      // Profile not loaded yet — show SVG default
+      if (avatarContainer) {
+        avatarContainer.innerHTML = `
+          <button class="avatar-btn" id="avatar-btn" aria-expanded="false" aria-haspopup="true">
+            <svg class="header-avatar-default" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="18" cy="18" r="18" fill="#e8e0d5"/>
+              <circle cx="18" cy="14" r="6" fill="#c8a882"/>
+              <path d="M6 30c0-6.627 5.373-10 12-10s12 3.373 12 10" fill="#c8a882"/>
+            </svg>
+          </button>
+        `;
+      }
     }
   } else {
-    // Profile not loaded yet - show loading state
-    if (userNameElement) {
-      userNameElement.textContent = 'Loading...';
-    }
-    if (avatarContainer) {
-      avatarContainer.innerHTML = `
-        <div class="header-avatar-initials">...</div>
-      `;
-    }
+    loginBtn.style.visibility = 'visible';
+    userInfo.style.visibility = 'hidden';
   }
-} else {
-  loginBtn.style.display = 'inline-block';
-  userInfo.style.display = 'none';
-}
 }
 // Set up login/logout button listeners
 export const setupAuthListeners = () => {

@@ -16,15 +16,16 @@ export const initAuth0 = async () => {
     console.error('❌ CRITICAL: AUTH0_AUDIENCE is undefined!');
   }
 
-  auth0 = await createAuth0Client({
-    domain: process.env.AUTH0_DOMAIN,
-    clientId: process.env.AUTH0_CLIENT_ID,
-    authorizationParams: {
-      redirect_uri: window.location.origin + '/callback',
-      audience: process.env.AUTH0_AUDIENCE, // ← Add this!
-      scope: 'openid profile email'
-    }
-  });
+auth0 = await createAuth0Client({
+  domain: process.env.AUTH0_DOMAIN,
+  clientId: process.env.AUTH0_CLIENT_ID,
+  cacheLocation: 'localstorage', // ← add this
+  authorizationParams: {
+    redirect_uri: window.location.origin + '/callback',
+    audience: process.env.AUTH0_AUDIENCE,
+    scope: 'openid profile email'
+  }
+});
 
   // Handle callback if returning from Auth0
   await handleCallback();
@@ -37,39 +38,37 @@ export const initAuth0 = async () => {
 
 // Handle the redirect callback
 const handleCallback = async () => {
-  // ✅ Get the ACTUAL URL from the browser (not window.location)
   const url = new URL(window.location.href);
   
   console.log('🔍 handleCallback called');
   console.log('   Full href:', window.location.href);
   console.log('   URL pathname:', url.pathname);
   console.log('   URL search:', url.search);
-  
-  // ✅ Check if URL has auth code params
+
+  // Handle error first — declined consent, etc.
+  if (url.searchParams.has('error')) {
+    const error = url.searchParams.get('error');
+    const desc = url.searchParams.get('error_description');
+    console.error('❌ Auth error:', error, desc);
+    window.location.href = '/';
+    return;
+  }
+
   if (url.searchParams.has('code') && url.searchParams.has('state')) {
     console.log('✅ Auth code found in URL');
-    
     try {
       console.log('🔄 Processing callback...');
       const result = await auth0.handleRedirectCallback();
-      
       console.log('📦 Result:', result);
-      console.log('📦 appState:', result.appState);
-      
       const returnTo = result.appState?.returnTo || '/';
-      
       console.log('✅ Login successful, redirecting to:', returnTo);
-      
       window.location.href = returnTo;
     } catch (error) {
       console.error('❌ Error handling callback:', error);
-      console.error('Error details:', error.message, error.error_description);
       window.location.href = '/';
     }
   } else {
     console.log('⚠️ No auth code in URL');
-    console.log('   Has code?', url.searchParams.has('code'));
-    console.log('   Has state?', url.searchParams.has('state'));
   }
 };
 
@@ -170,14 +169,30 @@ export const getToken = async () => {
   }
   
   try {
-    // ✅ Check if authenticated first
     const authenticated = await auth0.isAuthenticated();
-    if (!authenticated) {
-      return null; // No token if not logged in
-    }
+    if (!authenticated) return null;
     
     return await auth0.getTokenSilently();
   } catch (error) {
+    // Token expired or refresh token expired — force fresh token from server
+    if (
+      error.error === 'login_required' ||
+      error.error === 'consent_required' ||
+      error.error === 'missing_refresh_token' ||
+      error.message?.includes('expired')
+    ) {
+      console.warn('⚠️ Token expired, attempting silent refresh...');
+      try {
+        return await auth0.getTokenSilently({ cacheMode: 'off' });
+      } catch (refreshError) {
+        console.warn('⚠️ Silent refresh failed, user needs to re-authenticate');
+        // Clear stale state
+        localStorage.removeItem('userProfile');
+        // Don't force redirect here — let the caller decide
+        return null;
+      }
+    }
+
     console.error('Error getting token:', error);
     return null;
   }
