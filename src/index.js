@@ -34,7 +34,7 @@ import { initAuth0, login, isAuthenticated, getUser } from './auth/auth0.js';
 
 import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
-import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+// import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
 import { loadFooter } from './components/FooterComponent.js';
 
@@ -51,10 +51,11 @@ console.log('🔍 After loadHeader, checking box:', document.querySelector('.meg
 setupSanityMegaMenu();
 await loadFooter();
 const container = document.getElementById("spinner-container");
-showSpinner(container);
+// showSpinner(container);
 
 // Then initialize auth
 await initAuth0();
+console.log('🔐 initAuth0 complete, authenticated:', await isAuthenticated());
 const authenticated = await isAuthenticated();
 
 if (authenticated) {
@@ -96,7 +97,7 @@ try {
     console.warn('Could not get user:', e.message);
 }
 await loadCuratedSections();
-await removeSpinner(1500);
+// await removeSpinner(1500);
 showDevNotice();
 await listRecipes(recipes, currentUser?.sub);
  
@@ -107,7 +108,7 @@ await listRecipes(recipes, currentUser?.sub);
 } else {
   // Show splash for first-time visitors
   overlay.style.display = "flex";
-  removeSpinner(200);
+  // removeSpinner(200);
   // Warm the cache while user reads the splash
   loadRecipes();    // fire and forget - no await
   loadCategories(); // fire and forget - no await

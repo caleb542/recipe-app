@@ -4,6 +4,8 @@
 // ========================================
 
 #curated-sections {
+  width:100%;
+  max-width: var(--width-cards);
   padding: 2rem 0;
 }
 
@@ -36,8 +38,8 @@
 // Card grid
 .curated-cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 1.25rem;
+  grid-template-columns:repeat(4, 1fr);
 
   &:hover {
     text-decoration: none;
@@ -45,7 +47,7 @@
 }
 
 // 3-col for drinks
-.curated-section:has([href*="cocktails"]) .curated-cards {
+.curated-section:has([href*="martini"],[href*="coffee"]) .curated-cards {
   grid-template-columns: repeat(3, 1fr);
 }
 
@@ -112,7 +114,7 @@
 
 @media screen and (min-width: 1400px) {
   .curated-cards {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -136,7 +138,7 @@
     gap: 0.75rem;
   }
 
-  .curated-section:has([href*="cocktails"]) .curated-cards {
+  .curated-section:has([href*="martini"]) .curated-cards {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -162,18 +164,18 @@
 }
 
 // Drinks — portrait, tall glass/cocktail photography
-.curated-section:has([href*="drinks"]) .curated-card figure {
+.curated-section:has([href*="martini"]) .curated-card figure {
   aspect-ratio: 2/3;
 }
 
 // Something Sweet — wider landscape, indulgent spread shots
-.curated-section:has([href*="desserts"]) .curated-card figure {
-  aspect-ratio: 16/9;
+.curated-section:has([href*="pie"]) .curated-card figure {
+  aspect-ratio: 1/1;
 }
 
 // Appetizers — standard landscape
 .curated-section:has([href*="appetizers"]) .curated-card figure {
-  aspect-ratio: 4/3;
+  aspect-ratio: 1/1;
 }
 
 // Quick & Easy — square, clean and no fuss
