@@ -178,7 +178,8 @@ console.log('💾 Slug being saved:', baseSlug);
       
       // NEW: Save images array instead of single photoURL
       images: recipe.images || [],
-      
+      videos: (recipe.videos || []).filter(v => v.url && v.url.trim() !== ''),
+      isPublic: recipe.isPublic === true,
       // ✅ NEW: Include slug (backend will handle uniqueness)
       slug: baseSlug,
       fullSlug: baseSlug,  // Same as slug for simple format

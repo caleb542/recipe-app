@@ -1,72 +1,170 @@
-// src/helpers/videoHelper.js
+import { v4 as uuidv4 } from 'uuid';
+import { loadRecipesFromLocalStorage } from '../functions.js';
+import { syncRecipeUpdate } from './syncRecipe.js';
 import { extractYouTubeId, extractVimeoId } from './youtubeEmbed.js';
 
+let _activeVideoId = null;
+let _currentRecipeId = null;
+
 /**
- * Setup video helper UI in edit page
+ * Render all videos for a given recipe
  */
-export function setupVideoHelper(editorInstance) {
-  const addVideoBtn = document.getElementById('add-video-btn');
-  const videoUrlInput = document.getElementById('quick-video-url');
-  
-  if (!addVideoBtn || !videoUrlInput) return;
+async function listVideos(recipeId) {
+  const container = document.querySelector('#video-list');
+  if (!container) return;
 
-  addVideoBtn.addEventListener('click', () => {
-    const url = videoUrlInput.value.trim();
-    
-    if (!url) {
-      alert('Please paste a YouTube or Vimeo URL');
-      return;
-    }
+  _currentRecipeId = recipeId;
+  container.innerHTML = '';
 
-    // Validate URL
-    const youtubeId = extractYouTubeId(url);
-    const vimeoId = extractVimeoId(url);
-    
-    if (!youtubeId && !vimeoId) {
-      alert('❌ Invalid video URL. Please use a YouTube or Vimeo link.');
-      return;
-    }
+  const recipes = await loadRecipesFromLocalStorage();
+  const recipe = recipes.find(r => r.id === recipeId);
+  const videos = recipe?.videos || [];
 
-    // Insert URL into editor
-    if (editorInstance) {
-      // Toast UI Editor
-      const currentContent = editorInstance.getMarkdown();
-      const newContent = currentContent + `\n\n${url}\n\n`;
-      editorInstance.setMarkdown(newContent);
-    } else {
-      // Fallback: Plain textarea
-      const textarea = document.getElementById('article-textarea');
-      if (textarea) {
-        textarea.value += `\n\n${url}\n\n`;
+  if (videos.length === 0) {
+    container.innerHTML = '<p class="video-list-empty">No videos added yet.</p>';
+    return;
+  }
+
+  videos.forEach(video => {
+    container.appendChild(renderVideoItem(video));
+  });
+}
+
+/**
+ * Render a single video row
+ */
+function renderVideoItem(video) {
+  const li = document.createElement('li');
+  li.className = 'video-item';
+  li.dataset.id = video.id;
+
+  const isYoutube = extractYouTubeId(video.url);
+  const icon = isYoutube
+    ? '<i class="fa-brands fa-youtube"></i>'
+    : '<i class="fa-brands fa-vimeo"></i>';
+
+  li.innerHTML = `
+    <span class="video-item-icon">${icon}</span>
+    <span class="video-item-url">${video.url || 'No URL'}</span>
+    <button class="item-buttons edit-video" data-id="${video.id}">
+      <i class="fa fa-pencil"></i> Edit
+    </button>
+    <button class="item-buttons remove-video" data-id="${video.id}">
+      <i class="fa fa-trash-can"></i> Delete
+    </button>
+  `;
+  return li;
+}
+
+/**
+ * Setup the single URL input listener
+ * Fires once when the video modal opens
+ */
+function setupVideoInput(recipeId) {
+  const input = document.getElementById('quick-video-url');
+  if (!input || input.dataset.bound) return;
+
+  input.dataset.bound = 'true';
+
+  input.addEventListener('input', async e => {
+    const val = e.target.value.trim();
+    const youtubeId = extractYouTubeId(val);
+    const vimeoId = extractVimeoId(val);
+
+    if (!val || (!youtubeId && !vimeoId)) return;
+    if (!_activeVideoId) return;
+
+    await syncRecipeUpdate(recipeId, recipe => {
+      recipe.videos = (recipe.videos || []).map(v =>
+        v.id === _activeVideoId ? { ...v, url: val } : v
+      );
+    });
+
+    await listVideos(recipeId);
+  });
+}
+
+/**
+ * Delegated listener for edit/remove buttons in the list
+ */
+function setupVideoDelegation(recipeId) {
+  const container = document.querySelector('#video-list');
+  if (!container || container.dataset.bound) return;
+  container.dataset.bound = 'true';
+
+  container.addEventListener('click', async e => {
+    const removeBtn = e.target.closest('button.remove-video');
+    const editBtn = e.target.closest('button.edit-video');
+
+    if (removeBtn) {
+      const id = removeBtn.dataset.id;
+      if (confirm('Remove this video?')) {
+        await removeVideo(recipeId, id);
       }
     }
 
-    // Clear input and show success
-    videoUrlInput.value = '';
-    showVideoSuccess(youtubeId ? 'YouTube' : 'Vimeo');
-  });
+    if (editBtn) {
+      const id = editBtn.dataset.id;
+      _activeVideoId = id;
 
-  // Enter key support
-  videoUrlInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addVideoBtn.click();
+      // Load current URL into input
+      const recipes = await loadRecipesFromLocalStorage();
+      const recipe = recipes.find(r => r.id === recipeId);
+      const video = recipe?.videos?.find(v => v.id === id);
+
+      const input = document.getElementById('quick-video-url');
+      if (input && video) {
+        input.value = video.url || '';
+        input.focus();
+      }
     }
   });
 }
 
 /**
- * Show success message
+ * Add a new video entry and set it as active
  */
-function showVideoSuccess(platform) {
-  const btn = document.getElementById('add-video-btn');
-  const originalText = btn.innerHTML;
-  
-  btn.innerHTML = `<i class="fa-solid fa-check"></i> ${platform} Video Added!`;
-  btn.style.background = '#2ecc71';
-  
-  setTimeout(() => {
-    btn.innerHTML = originalText;
-    btn.style.background = '';
-  }, 2000);
+async function addVideo(recipeId) {
+  const newVideo = {
+    id: uuidv4(),
+    url: '',
+    order: 0
+  };
+
+  await syncRecipeUpdate(recipeId, recipe => {
+    if (!recipe.videos) recipe.videos = [];
+    newVideo.order = recipe.videos.length;
+    recipe.videos.push(newVideo);
+  });
+
+  _activeVideoId = newVideo.id;
+
+  const input = document.getElementById('quick-video-url');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+
+  await listVideos(recipeId);
 }
+
+/**
+ * Remove video by ID
+ */
+async function removeVideo(recipeId, id) {
+  await syncRecipeUpdate(recipeId, recipe => {
+    recipe.videos = (recipe.videos || []).filter(v => v.id !== id);
+    recipe.videos.forEach((v, i) => v.order = i);
+  });
+
+  if (_activeVideoId === id) _activeVideoId = null;
+  await listVideos(recipeId);
+}
+
+export {
+  listVideos,
+  setupVideoDelegation,
+  setupVideoInput,
+  addVideo,
+  removeVideo
+};

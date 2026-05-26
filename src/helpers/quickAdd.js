@@ -6,6 +6,14 @@ import { loadRecipes, saveRecipes } from '../functions.js';
 import { populateFields } from './fields.js';
 import { listDirections } from './directions.js';
 import { listIngredients } from './ingredients.js';
+import {
+  updateIdentitySummary,
+  updateDescriptionSummary,
+  updateIngredientsSummary,
+  updateDirectionsSummary,
+  updateEditorialSummary,
+  markUnsaved
+} from './editAccordion.js';
 
 // Polyfill for crypto.randomUUID if not available
 const generateUUID = () => {
@@ -393,6 +401,12 @@ if (parsedRecipe.ingredients?.length) {
     
     // Populate form fields
     populateFields(recipe);
+    updateIdentitySummary(recipe);
+updateDescriptionSummary(recipe.description || '');
+updateIngredientsSummary(recipe.ingredients || []);
+updateDirectionsSummary(recipe.directions || []);
+updateEditorialSummary(recipe);
+markUnsaved();
     listDirections(recipe.directions);
     await listIngredients(recipeId);
     

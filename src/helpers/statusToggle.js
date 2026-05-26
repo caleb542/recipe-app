@@ -3,6 +3,7 @@
  * Handles the Published/Unpublished state toggle
  */
 
+import { syncRecipeUpdate } from './syncRecipe.js';
 // Initialize the status toggle
 function initStatusToggle() {
     const statusToggle = document.getElementById('statusToggle');
@@ -67,13 +68,12 @@ function updateToggleUI(toggleElement, isPublished) {
  * Replace this with your actual implementation
  */
 function loadPublishedState() {
-    // Example: Load from localStorage, or from your recipe data
-    // const recipeId = getRecipeIdFromURL();
-    // const recipe = getRecipeData(recipeId);
-    // return recipe.published || false;
-    
-    // Placeholder - returns false by default
+  try {
+    const recipe = JSON.parse(localStorage.getItem('editingRecipe'));
+    return recipe?.isPublic === true;
+  } catch {
     return false;
+  }
 }
 
 /**
@@ -81,17 +81,17 @@ function loadPublishedState() {
  * Replace this with your actual implementation
  */
 async function savePublishedState(isPublished) {
-    // Example implementation:
-    // const recipeId = getRecipeIdFromURL();
-    // await updateRecipeInDatabase(recipeId, { published: isPublished });
-    
-    // Simulated API call
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log(`Published state saved: ${isPublished}`);
-            resolve();
-        }, 500);
-    });
+  const recipeId = location.hash.substring(1);
+  if (!recipeId) return;
+
+  const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+  const recipe = recipes.find(r => r.id === recipeId);
+  if (!recipe) return;
+
+  recipe.isPublic = isPublished;
+
+  localStorage.setItem('recipes', JSON.stringify(recipes));
+  localStorage.setItem('editingRecipe', JSON.stringify(recipe));
 }
 
 /**
@@ -146,15 +146,15 @@ function getCurrentPublishedState() {
 }
 
 // Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-        initStatusToggle();
-        initKeyboardShortcuts();
-    });
-} else {
-    initStatusToggle();
-    initKeyboardShortcuts();
-}
+// if (document.readyState === 'loading') {
+//     document.addEventListener('DOMContentLoaded', function() {
+//         initStatusToggle();
+//         initKeyboardShortcuts();
+//     });
+// } else {
+//     initStatusToggle();
+//     initKeyboardShortcuts();
+// }
 
 // Export functions for use in your existing code
 export {

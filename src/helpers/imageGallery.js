@@ -570,9 +570,22 @@ window.setFeaturedImage = async function(recipeId, imageId) {
   const recipe = recipes.find(r => r.id === recipeId);
   if (!recipe || !recipe.images) return;
 
+  // Clear all featured flags
   recipe.images.forEach(img => img.isFeatured = false);
+  
+  // Set new featured
   const image = recipe.images.find(img => img.id === imageId);
   if (image) image.isFeatured = true;
+
+  // Sort: featured first, then by current order
+  recipe.images.sort((a, b) => {
+    if (a.isFeatured) return -1;
+    if (b.isFeatured) return 1;
+    return a.order - b.order;
+  });
+
+  // Renumber order to match new positions
+  recipe.images.forEach((img, i) => img.order = i);
 
   recipe.updatedAt = new Date().toISOString();
   saveRecipes(recipes);
@@ -589,12 +602,46 @@ window.moveImageUp = async function(recipeId, imageId) {
   const recipe = recipes.find(r => r.id === recipeId);
   if (!recipe || !recipe.images) return;
 
-  const index = recipe.images.findIndex(img => img.id === imageId);
+  // Work on sorted array
+  const sorted = [...recipe.images].sort((a, b) => a.order - b.order);
+  const index = sorted.findIndex(img => img.id === imageId);
   if (index <= 0) return;
 
-  const temp = recipe.images[index].order;
-  recipe.images[index].order = recipe.images[index - 1].order;
-  recipe.images[index - 1].order = temp;
+  // Swap orders
+  const tempOrder = sorted[index].order;
+  sorted[index].order = sorted[index - 1].order;
+  sorted[index - 1].order = tempOrder;
+
+  // Write back
+  sorted.forEach(sortedImg => {
+    const img = recipe.images.find(i => i.id === sortedImg.id);
+    if (img) img.order = sortedImg.order;
+  });
+
+  recipe.updatedAt = new Date().toISOString();
+  saveRecipes(recipes);
+  localStorage.setItem('editingRecipe', JSON.stringify(recipe));
+  
+  await renderImageGallery(recipeId);
+};
+
+window.moveImageDown = async function(recipeId, imageId) {
+  const recipes = await loadRecipes();
+  const recipe = recipes.find(r => r.id === recipeId);
+  if (!recipe || !recipe.images) return;
+
+  const sorted = [...recipe.images].sort((a, b) => a.order - b.order);
+  const index = sorted.findIndex(img => img.id === imageId);
+  if (index === -1 || index >= sorted.length - 1) return;
+
+  const tempOrder = sorted[index].order;
+  sorted[index].order = sorted[index + 1].order;
+  sorted[index + 1].order = tempOrder;
+
+  sorted.forEach(sortedImg => {
+    const img = recipe.images.find(i => i.id === sortedImg.id);
+    if (img) img.order = sortedImg.order;
+  });
 
   recipe.updatedAt = new Date().toISOString();
   saveRecipes(recipes);

@@ -1,8 +1,15 @@
 import { updateLocalStorage, loadRecipes, saveRecipes } from '../functions.js';
+import { markUnsaved, updateIdentitySummary, updateDescriptionSummary, updateEditorialSummary, updateCategoriesSummary, updateTagsSummary } from './editAccordion.js';
 
 /**
  * Populate the form fields with recipe data
  */
+document.querySelector('.edit-form-wrap')?.addEventListener('click', (e) => {
+  if (e.target.closest('.remove-tag') || e.target.closest('.image-actions')) {
+    markUnsaved();
+  }
+});
+
 function populateFields(recipe) {
   document.getElementById('heading-name').textContent = recipe.name || '';
   document.getElementById('recipe-name').value = recipe.name || '';
@@ -12,6 +19,7 @@ function populateFields(recipe) {
   const authorInput = document.getElementById('recipe-author');
   if (authorInput) {
     authorInput.value = recipe.displayAuthor || recipe.author?.name || '';
+   
   }
   
   document.getElementById('recipe-prep-time').value = recipe.prepTime || '';
@@ -21,17 +29,21 @@ function populateFields(recipe) {
 const categoryInputs = document.querySelectorAll('input[name="category"]:not(.cuisine-hidden-checkbox)');
 categoryInputs.forEach(input => {
   input.checked = Array.isArray(recipe.categories) && recipe.categories.includes(input.value);
+ 
 });
 
   // Tags (comma‑delimited textarea)
   const tagsInput = document.getElementById('recipe-tags');
+  
   if (tagsInput) {
     tagsInput.value = Array.isArray(recipe.tags) ? recipe.tags.join(', ') : '';
+    markUnsaved();
   }
 
   // Toast UI editor content
   if (window.toastEditor) {
     window.toastEditor.setHTML(recipe.content || '');
+    markUnsaved();
   }
 }
 
@@ -39,6 +51,12 @@ categoryInputs.forEach(input => {
  * Wire up listeners so changes to fields update localStorage
  */
 function wireFieldListeners(recipeId) {
+
+  const getCurrentRecipe = () => {
+    try {
+      return JSON.parse(localStorage.getItem('editingRecipe')) || {};
+    } catch { return {}; }
+  };
   // ✅ Validate recipeId
   if (!recipeId) {
     console.error('❌ wireFieldListeners called without recipeId');
@@ -59,7 +77,9 @@ function wireFieldListeners(recipeId) {
 if (nameInput) {
   nameInput.addEventListener('input', e => {
     updateLocalStorage(recipeId, { name: e.target.value });
+    markUnsaved();
   });
+  
 }
 
 // ✅ NEW: Slug input - updates as you type
@@ -70,7 +90,9 @@ if (slugInput) {
       slug: e.target.value,
       fullSlug: e.target.value 
     });
+    markUnsaved();
   });
+  
 }
 
 
@@ -78,6 +100,7 @@ if (slugInput) {
   if (descriptionInput) {
     descriptionInput.addEventListener('input', e => {
       updateLocalStorage(recipeId, { description: e.target.value });
+      markUnsaved();
     });
   }
 
@@ -86,6 +109,7 @@ if (slugInput) {
     authorInput.addEventListener('input', e => {
       console.log('📝 Updating displayAuthor:', e.target.value);
       updateLocalStorage(recipeId, { displayAuthor: e.target.value });
+      markUnsaved();
     });
   }
 
@@ -93,6 +117,7 @@ if (slugInput) {
   if (prepTimeInput) {
     prepTimeInput.addEventListener('input', e => {
       updateLocalStorage(recipeId, { prepTime: e.target.value });
+      markUnsaved();
     });
   }
   
@@ -100,6 +125,7 @@ if (slugInput) {
   if (totalTimeInput) {
     totalTimeInput.addEventListener('input', e => {
       updateLocalStorage(recipeId, { totalTime: e.target.value });
+      markUnsaved();
     });
   }
 
@@ -111,6 +137,8 @@ if (slugInput) {
         .map(tag => tag.trim())
         .filter(tag => tag.length > 0);
       updateLocalStorage(recipeId, { tags: tagsArray });
+      alert("mark unsaved")
+      markUnsaved();
     });
   }
 
@@ -121,8 +149,12 @@ if (slugInput) {
         document.querySelectorAll('input[name="category"]:checked')
       ).map(cb => cb.value);
       updateLocalStorage(recipeId, { categories: selectedCategories });
+      markUnsaved();
     }
   });
+  // Catch-all — any interaction inside the form marks it unsaved
+document.querySelector('.edit-form-wrap')?.addEventListener('input', () => markUnsaved());
+document.querySelector('.edit-form-wrap')?.addEventListener('change', () => markUnsaved());
 }
 
 /**
@@ -255,6 +287,7 @@ function initCuisineTagInput(cuisines) {
     // Check the hidden checkbox
     const checkbox = document.querySelector(`.cuisine-hidden-checkbox[value="${value}"]`);
     if (checkbox) checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
 
     // Add pill
     const tag = document.createElement('span');
@@ -270,6 +303,7 @@ function initCuisineTagInput(cuisines) {
   function removeTag(value) {
     const checkbox = document.querySelector(`.cuisine-hidden-checkbox[value="${value}"]`);
     if (checkbox) checkbox.checked = false;
+    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
 
     const tag = tagsContainer.querySelector(`.cuisine-tag[data-value="${value}"]`);
     if (tag) tag.remove();

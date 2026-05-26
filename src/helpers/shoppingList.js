@@ -17,7 +17,8 @@ export function setupShoppingList(recItem, recipeId) {
     const shoppingListArr = [];
 
     function getShareText(recipeName) {
-        return `Shopping list for ${recipeName}:\n\n` + shoppingListArr.join('\n');
+        return `Shopping list for ${recipeName}:\n\n` +
+         shoppingListArr.map(item => `• ${item}`).join('\n');
     }
 
 function showSharePopover(recipeName, anchorEl) {
@@ -83,7 +84,6 @@ popover.style.position = 'fixed';
 popover.style.visibility = 'hidden';
 popover.style.zIndex = '9999';
 popover.style.left = `${rect.left}px`;
-document.body.appendChild(popover);
 
 document.body.appendChild(popover);
 
@@ -156,7 +156,7 @@ function renderShoppingList(recipeName) {
 
     shoppingListArr.forEach(item => {
         const li = document.createElement('li');
-        li.textContent = item;
+        li.textContent = `• ${item}`;
         list.appendChild(li);
     });
 
