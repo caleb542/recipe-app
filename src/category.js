@@ -1,9 +1,13 @@
 import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { loadFooter } from './components/FooterComponent.js';
+import { initAuth0, isAuthenticated } from './auth/auth0.js';
+import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
+import { initImpersonationBanner } from './components/ImpersonationBanner.js';
+import { loadUserProfile, getUserProfile } from './userContext.js';
 import { listRecipes } from './recipes.js';
 import { loadRecipes, getFeaturedImage } from './functions.js';
 import { hideWarning } from './functions.js';
-import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
+// import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
 
 let allRecipes = [];
@@ -29,7 +33,18 @@ async function init() {
     await loadHeader();
     hideWarning();
     await loadFooter();
+      // Initialize Auth0
+    await initAuth0();
+    const authenticated = await isAuthenticated();
+    if (authenticated) {
+      await loadUserProfile(true);
+    }
+    
+    await updateAuthUI();
+    setupAuthListeners();
+    initImpersonationBanner();
     await loadCategoriesMap();
+  
 
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('category');
@@ -46,7 +61,7 @@ async function init() {
 
     if (!currentCategory) {
       console.error('Category not found for slug:', currentSlug);
-      removeSpinner(0);
+      // removeSpinner(0);
       renderError(`Category "${currentSlug}" not found`);
       return;
     }
@@ -55,7 +70,7 @@ async function init() {
     setupSanityMegaMenu();
     renderBreadcrumbs(currentCategory, currentSlug);
 
-    showSpinner();
+    // showSpinner();
 
     allRecipes = await loadRecipes();
     allRecipes = allRecipes.filter(recipe => {
@@ -71,7 +86,8 @@ async function init() {
 
     renderHero(currentCategory);
     renderRecipes();
-    removeSpinner(1500);
+    document.body.classList.add('is-hydrated');
+    // removeSpinner(1500);
     showDevNotice()
 
     const sortSelect = document.getElementById('filter-by');
@@ -84,7 +100,7 @@ async function init() {
 
   } catch (error) {
     console.error('Category page error:', error);
-    removeSpinner(0);
+    // removeSpinner(0);
     renderError('Failed to load category page: ' + error.message);
   }
 }
@@ -92,28 +108,54 @@ async function init() {
 function renderBreadcrumbs(categoryName, slug) {
   const breadcrumbs = document.getElementById('breadcrumbs');
   if (!breadcrumbs) return;
-  
-  breadcrumbs.innerHTML = `
-    <nav aria-label="Breadcrumb" class="breadcrumb">
-      <a href="/">Home</a>
-      <span aria-hidden="true"> › </span>
-      <span aria-current="page">${categoryName}</span>
-    </nav>
-  `;
-}
 
+  const params = new URLSearchParams(window.location.search);
+  const from = params.get('from');
+
+  let breadcrumbHTML = `<nav aria-label="Breadcrumb" class="breadcrumb"><a href="/">Home</a>`;
+
+  if (from === 'categories') {
+    breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/categories">Categories</a>`;
+  }
+
+  breadcrumbHTML += ` <span aria-hidden="true">›</span> <span aria-current="page">${categoryName}</span>`;
+  breadcrumbHTML += `</nav>`;
+
+  breadcrumbs.innerHTML = breadcrumbHTML;
+}
 function renderHero(categoryName) {
   const hero = document.getElementById('category-hero');
   if (!hero) return;
-  
+
   const count = filteredRecipes.length;
+  const recipesWithImages = filteredRecipes.filter(r => r.images?.length);
+  const randomRecipe = recipesWithImages[Math.floor(Math.random() * recipesWithImages.length)];
+  const featuredImg = randomRecipe?.images?.find(i => i.isFeatured) || randomRecipe?.images?.[0];
+
   hero.innerHTML = `
     <div class="category-hero">
-      <h1>${categoryName}</h1>
-      <p class="recipe-count">${count} recipe${count !== 1 ? 's' : ''}</p>
+      <div class="category-hero-text">
+        <h1>${categoryName}</h1>
+        <p class="recipe-count">${count} recipe${count !== 1 ? 's' : ''}</p>
+      </div>
+      ${featuredImg ? `
+        <div class="category-hero-img" style="background-image: url('${featuredImg.url}')"></div>
+      ` : ''}
     </div>
   `;
 }
+// function renderHero(categoryName) {
+//   const hero = document.getElementById('category-hero');
+//   if (!hero) return;
+  
+//   const count = filteredRecipes.length;
+//   hero.innerHTML = `
+//     <div class="category-hero">
+//       <h1>${categoryName}</h1>
+//       <p class="recipe-count">${count} recipe${count !== 1 ? 's' : ''}</p>
+//     </div>
+//   `;
+// }
 
 function sortRecipes(sortBy) {
   switch (sortBy) {

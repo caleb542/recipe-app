@@ -1,0 +1,101 @@
+// ========================================
+// CATEGORIES PAGE
+// ========================================
+
+.categories-page {
+
+  .content-wrap {
+    padding-top: 1rem;
+  }
+
+  // ----------------------------------------
+  // PAGE TITLE
+  // ----------------------------------------
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    font-family: var(--font-heading);
+  }
+
+  // ----------------------------------------
+  // GROUP SECTIONS
+  // ----------------------------------------
+
+  .categories-group {
+    margin-bottom: 3rem;
+  }
+
+  .categories-group-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #999;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 0.5px solid #e8e8e8;
+  }
+
+  // ----------------------------------------
+  // CATEGORY CARDS GRID
+  // ----------------------------------------
+
+  .categories-group-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  // ----------------------------------------
+  // CATEGORY CARD
+  // ----------------------------------------
+
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    border: 0.5px solid #e8e8e8;
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fff;
+
+    &:hover {
+      border-color: #c8892a;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  .category-card-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 0.25rem;
+  }
+
+  .category-card-desc {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .category-card-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #c8892a;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}

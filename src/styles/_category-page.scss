@@ -1,0 +1,71 @@
+body.category-page {
+
+#breadcrumbs,
+.category-hero-text h1,
+.recipe-count,
+.category-hero-img,
+.sort-bar,
+.card {
+    opacity: 0;
+    }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+.category-page.is-hydrated {
+  #breadcrumbs {
+    opacity: 0;
+    animation: fade-up 0.4s ease forwards 0.05s;
+  }
+
+  .category-hero-text h1 {
+    opacity: 0;
+    animation: fade-up 0.4s ease forwards 0.1s;
+  }
+
+  .recipe-count {
+    opacity: 0;
+    animation: fade-up 0.4s ease forwards 0.15s;
+  }
+
+  .category-hero-img {
+    opacity: 0;
+    animation: fade-up 0.4s ease forwards 0.1s;
+  }
+
+  .sort-bar {
+    opacity: 0;
+    animation: fade-up 0.4s ease forwards 0.2s;
+  }
+
+  .card {
+    opacity: 0;
+    animation: fade-up 0.4s ease forwards;
+
+    @for $i from 1 through 12 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{0.25s + ($i - 1) * 0.07s};
+      }
+    }
+  }
+}
+//     .cards{
+//         display:flex;
+//         gap:20px;
+
+//         img {
+//             flex:1;
+//             aspect-ratio:3/4;
+//             aspect-ratio:4/4;
+//             aspect-ratio:4/3;
+//         }
+//     }
+// }
