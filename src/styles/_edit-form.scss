@@ -1391,7 +1391,103 @@ fieldset.feature-image {
 
   .quick-add-input-group { flex-direction: column; }
 }
+// ----------------------------------------
+// QUICK ADD MODAL
+// ----------------------------------------
+.quick-add-modal {
+  max-width: min(90vw, 700px) !important;
+  padding: 2rem;
+  position: relative;
 
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 4px 8px;
+    line-height: 1;
+    &:hover { color: #111827; }
+  }
+
+  h2 { font-size: 1.125rem; font-weight: 600; margin: 0 0 0.25rem; color: #111827; font-family: var(--font-body)}
+  .modal-subtitle { font-size: 0.875rem; color: #6b7280; margin: 0 0 1.5rem; }
+
+  .quick-add-options {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .quick-add-option {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quick-add-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 2.5rem;
+    color: #9ca3af;
+    font-size: 0.875rem;
+  }
+
+  .option-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  h3 { font-size: 0.9375rem; font-weight: 600; margin: 0 0 0.25rem; }
+  p { font-size: 0.8125rem; color: #6b7280; margin: 0 0 0.75rem; }
+
+  #quick-add-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    font-family: inherit;
+    resize: vertical;
+    margin-bottom: 0.75rem;
+
+
+  min-height: 200px; 
+    &:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+  }
+
+  .quick-add-footer {
+    margin-top: 1.25rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #9ca3af;
+  }
+
+  .modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;  // ← bigger
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px 8px;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover { color: #111827; }
+}
+
+  @media (max-width: 600px) {
+    .quick-add-options { grid-template-columns: 1fr; }
+    .quick-add-divider { padding-top: 0; }
+  }
+
+}
 // ----------------------------------------
 // PROGRESS SIDEBAR
 // ----------------------------------------

@@ -67,7 +67,7 @@ button {
 }
 
 /* Edit Page Buttons */
-.edit-page button:not(#editor button, .avatar-btn) {
+.edit-page button:not(#editor button, .avatar-btn, .modal-close) {
     --b-color: lch(71.39% 0 67.2);
     font-weight: 400;
     font-size: 0.9rem;

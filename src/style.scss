@@ -976,30 +976,22 @@ p.description.summary:empty {
 //         background-color: pink !important;
 //     }
 // }
-
 a.article-edit-button {
-  position: sticky;
-  display: flex;
-  align-content: center;
-  border-radius: 15px;
-  border:1px solid #333;
-    color:#fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 18px 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #fff;
+  color: #fff;
   background: hotpink;
-  flex-wrap: wrap;  
-  padding:5px 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
 
-  span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0 1rem;
-    position: absolute;
-    inset: 0;
-    font-size: 0.875rem;
-    font-weight: 600;
-    white-space: nowrap;
-  }
 
+  i { font-size: 0.875rem; }
 }
 
 @keyframes slideDown {
