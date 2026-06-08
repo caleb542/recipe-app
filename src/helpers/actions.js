@@ -200,6 +200,7 @@ console.log('💾 Slug being saved:', baseSlug);
     }
 
     try {
+      console.log('💾 displayAuthor being sent:', updates.displayAuthor);
       const result = await updateRecipeInDatabase(recipe.id, updates);
       localStorage.setItem('editingRecipe', JSON.stringify(result.recipe));
       
