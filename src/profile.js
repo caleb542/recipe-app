@@ -1,6 +1,7 @@
 // profile.js - User profile page with avatar upload
 import './style.scss'; 
 import { initAuth0, getToken } from './auth/auth0.js';
+import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { optimizeImage, IMAGE_PRESETS } from './helpers/imageOptimizer.js';
 import { generateFileHash } from './helpers/duplicateCheck.js';
@@ -27,6 +28,8 @@ async function init() {
   // Initialize Auth0
   await initAuth0();
   await loadUserProfile();
+  await updateAuthUI();
+  setupAuthListeners();  
   initImpersonationBanner();
 
   // Get username from URL

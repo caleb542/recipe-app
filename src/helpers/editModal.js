@@ -331,17 +331,30 @@ export function setupEditModal() {
   _dialog.addEventListener('change', flashDraftSaved);
 
   // Wire bento cards — click header opens modal
-  document.querySelectorAll('.edit-card:not(.edit-card--placeholder)').forEach(card => {
-    const header = card.querySelector('.edit-card__header');
+  // document.querySelectorAll('.edit-card:not(.edit-card--placeholder)').forEach(card => {
+  //   const header = card.querySelector('.edit-card__header');
+  //   if (!header) return;
+
+  //   // Skip quick-add card — it uses accordion
+  //   if (card.id === 'card-quick-add') return;
+
+  //   header.addEventListener('click', (e) => {
+  //     e.preventDefault();
+  //     openModal(card.id);
+  //   });
+  // });
+  // Use delegation on the form wrap instead of direct card listeners
+  document.querySelector('.edit-form-wrap')?.addEventListener('click', (e) => {
+    const header = e.target.closest('.edit-card__header');
     if (!header) return;
 
-    // Skip quick-add card — it uses accordion
+    const card = header.closest('.edit-card');
+    if (!card) return;
     if (card.id === 'card-quick-add') return;
+    if (card.classList.contains('edit-card--placeholder')) return;
 
-    header.addEventListener('click', (e) => {
-      e.preventDefault();
-      openModal(card.id);
-    });
+    e.preventDefault();
+    openModal(card.id);
   });
 }
 

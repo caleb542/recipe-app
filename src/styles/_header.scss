@@ -529,7 +529,7 @@ nav.hide {
 }
 
 .user-profile-link {
-    color: #fff;
+    color: #333;
     text-decoration: none;
     font-weight: 600;
     transition: color 0.2s;
@@ -1190,6 +1190,21 @@ header {
   justify-content: flex-end;
 }
 
+.recipe-page header, 
+.category-page header,
+.edit-page header,
+.profile-page header, 
+.admin-page-header  {
+  width:100%;
+  height: 94px;
+  position: fixed;
+  top:0;
+
+  .nav-bar-logo {
+    animation-range: entry 0px exit 0px;
+  }
+}
+
 .dev-notice {
   position: relative;
   background: transparent;
@@ -1325,9 +1340,20 @@ nav.main-nav {
     align-items: center;
     justify-content: center;
   }
-
-
 }
+.recipe-page .nav-list-links,
+.category-page,
+.edit-page,
+.profile-page,
+.admin-page {
+  a,
+  button.nav-link {
+    color:#c8892a;
+    animation-range: entry 0px exit 0px;
+  }
+}
+
+
 .nav-list-actions {
     overflow-x: unset !important;
     display:flex;
@@ -1455,8 +1481,14 @@ nav.main-nav {
 }
 
 .user-profile-link {
-  color: #c8892a;
-}
+  color:#333;
+  
+   animation-name:  bv-toggle-cl;
+  animation-timing-function: linear;
+  animation-timeline: scroll();
+  animation-range: entry 0px exit 100px;
+  animation-fill-mode: forwards;
+  }
 
 #user-info button {
   outline: none;

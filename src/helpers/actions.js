@@ -113,7 +113,16 @@ function setupRecipeDeletion(recipe) {
     try {
       console.log('🗑️ Deleting recipe:', recipe.id);
       await deleteRecipeFromDatabase(recipe);
+
+      // Clean up localStorage
+  const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+  const updated = recipes.filter(r => r.id !== recipe.id);
+  localStorage.setItem('recipes', JSON.stringify(updated));
+  localStorage.removeItem('editingRecipe');
+  localStorage.removeItem('recipes_timestamp'); // bust cache
       notyf.success("Recipe deleted!");
+
+
       setTimeout(() => (window.location.href = '/'), 2000);
     } catch (err) {
       console.error("❌ Delete failed:", err);

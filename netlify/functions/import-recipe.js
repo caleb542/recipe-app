@@ -223,6 +223,30 @@ function extractRecipeFromHTML(html, sourceUrl) {
         }
     }
 
+
+    const bodyText = $('body').text();
+const extractTime = (pattern) => {
+  const normalized = bodyText.replace(/(\d+)(mins?|minutes?|hours?|hrs?)/gi, '$1 $2');
+  const match = normalized.match(pattern);
+  if (!match) return '';
+  const val = parseInt(match[1]);
+  const u = match[2].toLowerCase();
+  return u.startsWith('h') ? `${val} hour${val > 1 ? 's' : ''}` : `${val} minutes`;
+};
+
+recipe.prepTime = extractTime(/prep\s*time:?\s*(\d+)\s*(mins?|minutes?|hours?|hrs?)/i);
+recipe.cookTime = extractTime(/cook\s*time:?\s*(\d+)\s*(mins?|minutes?|hours?|hrs?)/i);
+recipe.totalTime = extractTime(/total\s*time:?\s*(\d+)\s*(mins?|minutes?|hours?|hrs?)/i);
+
+const servingsMatch = bodyText.match(/(?:serves?|servings?|yield):?\s*(\d+)/i);
+if (servingsMatch) recipe.servings = servingsMatch[1];
+
+// Final check
+if (!recipe.name || (recipe.ingredients.length === 0 && recipe.directions.length === 0)) {
+  console.log('❌ HTML fallback failed - insufficient data');
+  return null;
+}
+
     if (!recipe.name || (recipe.ingredients.length === 0 && recipe.directions.length === 0)) {
         console.log('❌ HTML fallback failed - insufficient data');
         return null;
@@ -249,6 +273,7 @@ function transformSchemaToRecipe(schema, sourceUrl) {
         servings: parseServings(schema.recipeYield),
         ingredients: (schema.recipeIngredient || []).map(parseIngredient),
         directions: parseInstructions(schema.recipeInstructions || []),
+        notes: schema.notes || schema.recipeNotes || schema.comment || '',
         sourceUrl: sourceUrl,
         image: extractImage(schema.image),
         author: schema.author?.name || '',

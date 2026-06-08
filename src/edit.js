@@ -214,71 +214,95 @@ export async function initCreate() {
   const recipes = await loadRecipes();
   const newRecipeId = uuidv4();
 
+  const rawName = currentUser.name || currentUser.nickname || '';
+  const safeName = rawName.includes('@') ? '' : rawName;
 
- const rawName = currentUser.name || currentUser.nickname || '';
-const safeName = rawName.includes('@') ? '' : rawName;
-
-const newRecipe = {
-  id: newRecipeId,
-  name: "New unnamed recipe",
-  prepTime: "",
-  totalTime: "",
-  description: "",
-  author: {
-    auth0Id: currentUser.sub,
-    name: safeName,
-    // email removed entirely — no reason to store it on the recipe
-  },
-  displayAuthor: safeName,
+  const newRecipe = {
+    id: newRecipeId,
+    name: "New unnamed recipe",
+    prepTime: "",
+    totalTime: "",
+    description: "",
+    author: {
+      auth0Id: currentUser.sub,
+      name: safeName,
+    },
+    displayAuthor: safeName,
     isPublic: false,
     directions: [],
     tags: [],
     categories: [],
     article: "",
     ingredients: [],
-    // NEW: Use images array instead of single photoURL
-    images: [], // Start with empty array
-    videos: [], // Start with empty array    
+    images: [],
+    videos: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
-  setupEditor(newRecipeId, newRecipe.article || '');
-  // ✅ NEW: Setup video helper
-  const editorInstance = window.editorInstance;
-
 
   location.hash = newRecipe.id;
   recipes.push(newRecipe);
   saveRecipes(recipes);
   localStorage.setItem('editingRecipe', JSON.stringify(newRecipe));
 
-   // ✅ Show Quick Add modal FIRST
+  // Setup editor before modal opens
+  setupEditor(newRecipeId, newRecipe.article || '');
+
+  // Show Quick Add modal
   showQuickAddModal(newRecipeId);
-  
-  // Orchestration: call helpers
+
+  // Setup edit page
+  setupEditModal();
+  setupQuickAddCard(true);
+  setupRestoreBanner(newRecipeId);
+  setupDescriptionCounter();
+
+  await loadCategories(newRecipe.categories || []);
   populateFields(newRecipe);
   setupSlugEditor(newRecipe, currentUser);
+
+  updateIdentitySummary(newRecipe);
+  updateDescriptionSummary(newRecipe.description);
+  updateImagesSummary(newRecipe.images || []);
+  updateIngredientsSummary(newRecipe.ingredients || []);
+  updateDirectionsSummary(newRecipe.directions || []);
+  updateEditorialSummary(newRecipe);
+  updateCategoriesSummary(newRecipe.categories || []);
+  updateTagsSummary(newRecipe.tags || []);
+  updateArticleSummary(newRecipe.article || '');
 
   wireFieldListeners(newRecipe.id);
 
   listDirections(newRecipe.directions);
   setupDirections(newRecipe.id);
+  setupTagsUI(newRecipeId, newRecipe);
 
-  await listIngredients(newRecipe.id);
-  setupIngredientDelegation(newRecipe.id);
+  await listIngredients(newRecipeId);
+  setupIngredientDelegation(newRecipeId);
 
   setupFeatureImage(newRecipe);
-  setupImageGallery(newRecipe.id);
+  setupImageGallery(newRecipeId);
 
-  // Pass both recipeId and article content into editor
-  setupEditor(newRecipe.id, newRecipe.article || '');
+  window._videoModalInit = () => {
+    listVideos(newRecipeId);
+    setupVideoDelegation(newRecipeId);
+    setupVideoInput(newRecipeId);
+    const addBtn = document.getElementById('add-video-btn');
+    if (addBtn && !addBtn.dataset.bound) {
+      addBtn.dataset.bound = 'true';
+      addBtn.addEventListener('click', () => addVideo(newRecipeId));
+    }
+  };
 
   setupRecipeDeletion(newRecipe);
   setupSaveButton(newRecipe);
   setupUpdateDatabase();
-
   setupAccessibility();
-  hamburger(); // menu toggle
+  hamburger();
+
+  setupPreview(newRecipeId);
+  initStatusToggle();
+  initProgressBar(newRecipe);
 }
 
 /**

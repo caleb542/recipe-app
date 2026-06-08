@@ -1,7 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { loadRecipes, loadRecipesFromLocalStorage, saveRecipes } from '../functions.js';
 import { updateIngredient } from '../update.js';
-import { syncRecipeUpdate } from './syncRecipe.js'
+import { syncRecipeUpdate } from './syncRecipe.js';
+import { formatAmount } from './ingredientParser.js';
+
 
 /**
  * Render all ingredients for a given recipe
@@ -30,11 +32,10 @@ function renderIngredientItem(ingred, recipeId) {
   
   // Build display text, filtering out empty values
 const parts = [
-    ingred.amount,
+    formatAmount(ingred.amount),
     ingred.unit || ingred.measureWord,
     ingred.name
-].filter(part => part !== undefined && part !== null && String(part).trim() !== '' && part !== 'undefined');
-  
+].filter(part => part !== undefined && part !== null && String(part).trim() !== '' && part !== 'undefined');  
   const displayText = parts.join(' ');
   
   li.innerHTML = `

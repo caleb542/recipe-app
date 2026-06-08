@@ -7,12 +7,12 @@ export async function updateAuthUI() {
   const authenticated = await isAuthenticated();
   const loginBtn = document.getElementById('login-btn');
   const userInfo = document.getElementById('user-info');
-  
+
   if (!loginBtn || !userInfo) {
     console.warn('Auth UI elements not found');
     return;
   }
-  
+
   if (authenticated) {
     loginBtn.style.visibility = 'hidden';
     userInfo.style.visibility = 'visible';
@@ -30,23 +30,37 @@ export async function updateAuthUI() {
         userNameElement.innerHTML = `
           <button class="user-profile-link" id="username-btn">${displayName}</button>
         `;
-
         document.getElementById('username-btn')?.addEventListener('click', () => {
           document.getElementById('avatar-btn')?.click();
         });
       }
     } else {
-      // Profile not loaded yet — show SVG default
-      if (avatarContainer) {
-        avatarContainer.innerHTML = `
-          <button class="avatar-btn" id="avatar-btn" aria-expanded="false" aria-haspopup="true">
-            <svg class="header-avatar-default" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="18" cy="18" r="18" fill="#e8e0d5"/>
-              <circle cx="18" cy="14" r="6" fill="#c8a882"/>
-              <path d="M6 30c0-6.627 5.373-10 12-10s12 3.373 12 10" fill="#c8a882"/>
-            </svg>
-          </button>
-        `;
+      // Profile not loaded yet — try Auth0 user directly
+      const auth0User = await getUser();
+      if (auth0User) {
+        setupAvatarDropdown(auth0User, auth0User.picture);
+        if (userNameElement) {
+          const displayName = auth0User.name || auth0User.nickname || 'User';
+          userNameElement.innerHTML = `
+            <button class="user-profile-link" id="username-btn">${displayName}</button>
+          `;
+          document.getElementById('username-btn')?.addEventListener('click', () => {
+            document.getElementById('avatar-btn')?.click();
+          });
+        }
+      } else {
+        // No Auth0 user either — show SVG default
+        if (avatarContainer) {
+          avatarContainer.innerHTML = `
+            <button class="avatar-btn" id="avatar-btn" aria-expanded="false" aria-haspopup="true">
+              <svg class="header-avatar-default" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="18" cy="18" r="18" fill="#e8e0d5"/>
+                <circle cx="18" cy="14" r="6" fill="#c8a882"/>
+                <path d="M6 30c0-6.627 5.373-10 12-10s12 3.373 12 10" fill="#c8a882"/>
+              </svg>
+            </button>
+          `;
+        }
       }
     }
   } else {
@@ -54,18 +68,18 @@ export async function updateAuthUI() {
     userInfo.style.visibility = 'hidden';
   }
 }
+
 // Set up login/logout button listeners
 export const setupAuthListeners = () => {
   const loginBtn = document.getElementById('login-btn');
   const logoutBtn = document.getElementById('logout-btn');
-  
+
   if (loginBtn) {
     loginBtn.addEventListener('click', async () => {
-      
       await login();
     });
   }
-  
+
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('userProfile');

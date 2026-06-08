@@ -97,7 +97,16 @@ $desktopCardHeight: 400px;
   
 }
 
+
 /* Article Styles */
+
+.recipe-page .content-wrap,
+.category-page .content-wrap,
+.edit-page .content-wrap,
+.profile-page .content-wrap,
+.admin-page .content-wrap{
+    margin-top: 134px;
+}
 article {
     width: 100%;
     height: inherit;
@@ -970,12 +979,14 @@ p.description.summary:empty {
 
 a.article-edit-button {
   position: sticky;
-  display: inline-flex;
-  height: 44px;
-  border-radius: 6px;
+  display: flex;
+  align-content: center;
+  border-radius: 15px;
   border:1px solid #333;
-
-  background: var(--color-secondary);
+    color:#fff;
+  background: hotpink;
+  flex-wrap: wrap;  
+  padding:5px 10px;
 
   span {
     display: inline-flex;
@@ -989,17 +1000,6 @@ a.article-edit-button {
     white-space: nowrap;
   }
 
-  .edit-btn-light {
-    background: white;
-    color: black;
-    // mix-blend-mode: lighten;
-  }
-
-  .edit-btn-dark {
-    background: black;
-    color: white;
-    // mix-blend-mode: darken;
-  }
 }
 
 @keyframes slideDown {
@@ -1046,6 +1046,9 @@ a.article-edit-button {
     border-left: 0;
     border-right: 0;
     border-bottom: 1px solid #f0f0f0;
+    top:94px;
+    position:sticky;
+    z-index:1000;
 }
 .also-in {
     

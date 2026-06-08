@@ -14,6 +14,7 @@ import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
 import { setupSanityMegaMenu } from "./components/MegaMenuSanity.js";
 import { CATEGORIES, getCategoryNames } from "./helpers/categories.js";
 import { extractYouTubeId, extractVimeoId } from './helpers/youtubeEmbed.js';
+import { formatAmount } from './helpers/ingredientParser.js';
 
 
 
@@ -294,8 +295,13 @@ if (videosContainer && recItem.videos && recItem.videos.length > 0) {
         checkbox.type = "checkbox";
         const amt = document.createElement("span");
         const parts = [
-          ingr.amount, ingr.unit || ingr.measureWord, ingr.name, ingr.description
-        ].filter(part => part && String(part).trim());
+            formatAmount(ingr.amount),
+            ingr.unit || ingr.measureWord,
+            ingr.name,
+            ingr.description
+          ].filter(part => part && String(part).trim());
+          amt.textContent = parts.join(' ');
+
         amt.textContent = parts.join(' ');
         label.append(checkbox, amt);
         li.appendChild(label);

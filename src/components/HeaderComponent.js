@@ -202,4 +202,21 @@ export function showAuthNotice() {
     dialog.close();
   }, { once: true });
 }
+export function showEditButton(recipeId) {
+  const createBtn = document.getElementById('create-recipe-link');
+  if (!createBtn) return;
 
+  const existing = document.getElementById('edit-recipe-nav-btn');
+  if (existing) return; // guard against double injection
+
+  const li = document.createElement('li');
+  li.className = 'nav-item';
+  li.innerHTML = `
+    <a id="edit-recipe-nav-btn" href="/edit.html#${recipeId}" class="nav-link edit-recipe-nav-btn">
+      <i class="fa-solid fa-pen-to-square"></i>
+      <span>Edit Recipe</span>
+    </a>
+  `;
+
+  createBtn.closest('li').insertAdjacentElement('beforebegin', li);
+}

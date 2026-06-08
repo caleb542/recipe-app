@@ -1,50 +1,63 @@
 import { isSuperadmin } from '../userContext.js';
 import { logout } from '../auth/auth0.js';
 
+const DEFAULT_AVATAR_SVG = `<svg class="header-avatar-default" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="18" cy="18" r="18" fill="#e8e0d5"/>
+  <circle cx="18" cy="14" r="6" fill="#c8a882"/>
+  <path d="M6 30c0-6.627 5.373-10 12-10s12 3.373 12 10" fill="#c8a882"/>
+</svg>`;
+
 export function setupAvatarDropdown(user, avatar) {
   const avatarContainer = document.getElementById('user-avatar-container');
-  if (!avatarContainer) return;
+  const dialog = document.getElementById('avatar-dialog');
 
-  const avatarHTML = avatar?.type === 'image'
-    ? `<img src="${avatar.url}" alt="Profile" class="header-avatar">`
-    : `<div class="header-avatar-initials">${avatar?.initials || '??'}</div>`;
+    console.log('avatarContainer:', avatarContainer);
+  console.log('dialog:', dialog);
+  if (!avatarContainer || !dialog) return;
 
   const displayName = user.profile?.displayName || user.username || 'User';
-  const role = isSuperadmin() ? 'Superadmin' : 'Member';
+  const isSuperAdmin = isSuperadmin();
 
+  // ----------------------------------------
+  // Render avatar button with SVG default
+  // ----------------------------------------
   avatarContainer.innerHTML = `
-    <button class="avatar-btn" id="avatar-btn" aria-expanded="false" aria-haspopup="true">
-      ${avatarHTML}
+    <button class="avatar-btn" id="avatar-btn" 
+      aria-expanded="false" 
+      aria-haspopup="dialog"
+      aria-controls="avatar-dialog">
+      ${DEFAULT_AVATAR_SVG}
     </button>
   `;
 
-  const btn = document.getElementById('avatar-btn');
+  // Silently swap to real image once loaded
+  if (avatar?.type === 'image' && avatar.url) {
+    const img = new Image();
+    img.onload = () => {
+      const avatarBtn = document.getElementById('avatar-btn');
+      const svgEl = avatarBtn?.querySelector('.header-avatar-default');
+      if (svgEl) {
+        const imgEl = document.createElement('img');
+        imgEl.src = avatar.url;
+        imgEl.alt = displayName;
+        imgEl.className = 'header-avatar';
+        svgEl.replaceWith(imgEl);
+      }
+    };
+    img.src = avatar.url;
+  }
 
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-    if (isOpen) {
-      closeDropdown();
-    } else {
-      openDropdown(btn, user, displayName, role, avatar);
-    }
-  });
-}
-
-function openDropdown(btn, user, displayName, role, avatar) {
-  closeDropdown();
-
-  const dropdown = document.createElement('div');
-  dropdown.id = 'avatar-dropdown';
-  dropdown.className = 'avatar-dropdown';
-
-  const isSuperAdmin = isSuperadmin();
-
+  // ----------------------------------------
+  // Populate dialog content
+  // ----------------------------------------
   const avatarImgHTML = avatar?.type === 'image'
     ? `<img src="${avatar.url}" alt="${displayName}" class="avatar-dropdown-avatar">`
-    : `<div class="avatar-dropdown-avatar initials">${avatar?.initials || '??'}</div>`;
+    : DEFAULT_AVATAR_SVG;
 
-  dropdown.innerHTML = `
+  dialog.innerHTML = `
+  <button class="avatar-dialog-close" id="avatar-dialog-close" aria-label="Close menu">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
     <div class="avatar-dropdown-header">
       ${avatarImgHTML}
       <p class="avatar-dropdown-name">${displayName}</p>
@@ -71,60 +84,55 @@ function openDropdown(btn, user, displayName, role, avatar) {
     </button>
   `;
 
-  // Position relative to button
-  document.body.appendChild(dropdown);
+  // ----------------------------------------
+  // Wire up open/close
+  // ----------------------------------------
+  const btn = document.getElementById('avatar-btn');
 
-  const rect = btn.getBoundingClientRect();
-
-  dropdown.style.top = `${rect.bottom + 8}px`;
-  dropdown.style.right = `${window.innerWidth - rect.right}px`;
-
-  btn.setAttribute('aria-expanded', 'true');
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (dialog.open) {
+      closeDialog();
+    } else {
+      openDialog();
+    }
+  });
 
   // Sign out
-  document.getElementById('avatar-signout')?.addEventListener('click', () => {
+  dialog.querySelector('#avatar-signout')?.addEventListener('click', () => {
     localStorage.removeItem('userProfile');
     logout();
   });
 
-  // Close on outside click
-  setTimeout(() => {
-    document.addEventListener('click', outsideClickHandler);
-  }, 0);
+  // Close on item click
+  dialog.querySelectorAll('.avatar-dialog-close').forEach(item => {
+    item.addEventListener('click', () => closeDialog());
+  });
 
-  // Close on scroll
-  window.addEventListener('scroll', closeDropdown, { passive: true, once: true });
-}
+  // Close on backdrop click
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) closeDialog();
+  });
 
-function outsideClickHandler(e) {
-  const dropdown = document.getElementById('avatar-dropdown');
-  const btn = document.getElementById('avatar-btn');
-  if (dropdown && !dropdown.contains(e.target) && e.target !== btn) {
-    closeDropdown();
+  // Escape key handled natively by dialog
+
+  function openDialog() {
+    const rect = btn.getBoundingClientRect();
+    dialog.style.position = 'fixed';
+    dialog.style.margin = '0';
+    dialog.style.top = `${rect.bottom + 6}px`;
+    dialog.style.left = `unset`;
+    dialog.style.right = `${window.innerWidth - (rect.right)}px`;
+    dialog.showModal();
+    btn.setAttribute('aria-expanded', 'true');
   }
-}
 
-function closeDropdown() {
-  const dropdown = document.getElementById('avatar-dropdown');
-  const btn = document.getElementById('avatar-btn');
-
-  if (dropdown) {
-    // Both animations start at the same time
-    dropdown.style.animation = 'avatarDropdownClose 0.35s linear forwards';
-    
-    if (btn) {
-      btn.style.animation = 'avatarGulp 0.7s linear forwards 0.1s';
-      btn.addEventListener('animationend', () => {
-        btn.style.animation = '';
-      }, { once: true });
-    }
-
-    // Remove dropdown after its animation completes
-    dropdown.addEventListener('animationend', () => {
-      dropdown.remove();
+  function closeDialog() {
+    dialog.style.animation = 'avatarDropdownClose 0.35s ease-in forwards';
+    dialog.addEventListener('animationend', () => {
+      dialog.close();
+      dialog.style.animation = '';
+      btn.setAttribute('aria-expanded', 'false');
     }, { once: true });
   }
-
-  btn?.setAttribute('aria-expanded', 'false');
-  document.removeEventListener('click', outsideClickHandler);
 }

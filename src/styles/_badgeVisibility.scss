@@ -10,7 +10,11 @@
 body.badges-hidden .recipe-badges {
   display: none !important;
 }
-
+ @keyframes bv-toggle-cl {
+   to {
+    color:#cd9541;
+   }
+ }
 /**
  * Badge visibility toggle button in header
  * Eye icon that shows/hides recipe status badges
@@ -18,7 +22,7 @@ body.badges-hidden .recipe-badges {
 .badge-visibility-toggle {
   background: transparent;
   border: none;
-  color: #fff;
+  color: #333; //#cd9541;
   font-size: 1.2rem;
   cursor: pointer;
   padding: 0.5rem;
@@ -29,6 +33,12 @@ body.badges-hidden .recipe-badges {
   justify-content: center;
   border-radius: 4px;
   will-change: transform; 
+
+   animation-name:  bv-toggle-cl;
+  animation-timing-function: linear;
+  animation-timeline: scroll();
+  animation-range: entry 0px exit 100px;
+  animation-fill-mode: forwards;
   
   &:hover {
     background: rgba(255, 255, 255, 0.1);

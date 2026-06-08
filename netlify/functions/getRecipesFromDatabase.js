@@ -62,8 +62,24 @@ export async function handler(event) {
       }
     }
 
-    // TEMPORARILY: Get ALL recipes to see what's there
-    let recipes = await collection.find({}).toArray();
+// Build query based on auth state
+let query;
+
+if (auth0Id) {
+  // Authenticated: public recipes + user's own private recipes
+  query = {
+    $or: [
+      { isPublic: true },
+      { 'author.auth0Id': auth0Id },
+      { authorId: auth0Id }
+    ]
+  };
+} else {
+  // Unauthenticated: public only
+  query = { isPublic: true };
+}
+
+let recipes = await collection.find(query).toArray();
 
     console.log("Found recipes:", recipes.length);
 

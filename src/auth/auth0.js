@@ -15,7 +15,20 @@ export const initAuth0 = async () => {
   if (!process.env.AUTH0_AUDIENCE) {
     console.error('❌ CRITICAL: AUTH0_AUDIENCE is undefined!');
   }
-
+// Clear expired Auth0 tokens before initializing
+Object.keys(localStorage)
+  .filter(k => k.startsWith('@@auth0spajs@@'))
+  .forEach(k => {
+    try {
+      const val = JSON.parse(localStorage.getItem(k));
+      const exp = val?.decodedToken?.claims?.exp;
+      if (exp && Date.now() / 1000 > exp) {
+        console.log('🧹 Removing expired Auth0 token');
+        localStorage.removeItem(k);
+      }
+    } catch (e) {}
+  });
+  
 auth0 = await createAuth0Client({
   domain: process.env.AUTH0_DOMAIN,
   clientId: process.env.AUTH0_CLIENT_ID,
@@ -29,6 +42,15 @@ auth0 = await createAuth0Client({
 
   // Handle callback if returning from Auth0
   await handleCallback();
+
+  const authenticated = await auth0.isAuthenticated();
+if (!authenticated) {
+  // Clear stale Auth0 keys from localStorage
+  Object.keys(localStorage)
+    .filter(k => k.startsWith('@@auth0spajs@@'))
+    .forEach(k => localStorage.removeItem(k));
+  localStorage.removeItem('userProfile');
+}
   
   // Update UI based on auth state
   await updateUI();
@@ -58,8 +80,13 @@ const handleCallback = async () => {
     console.log('✅ Auth code found in URL');
     try {
       console.log('🔄 Processing callback...');
+
       const result = await auth0.handleRedirectCallback();
       console.log('📦 Result:', result);
+
+      // Bust recipe cache on login
+      localStorage.removeItem('recipes_timestamp');
+
       const returnTo = result.appState?.returnTo || '/';
       console.log('✅ Login successful, redirecting to:', returnTo);
       window.location.href = returnTo;
@@ -138,6 +165,7 @@ export const logout = () => {
   console.log('   From:', window.location.pathname);
   
   localStorage.removeItem('userProfile');
+  localStorage.removeItem('recipes_timestamp');
   
   auth0.logout({
     logoutParams: {
