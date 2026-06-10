@@ -281,7 +281,7 @@
 }
 
 .bento-group__label {
-  font-size: 0.6875rem; // 11px — uppercase section label only
+  font-size: 0.6875rem;
   font-weight: 600;
   color: var(--ef-text-3);
   text-transform: uppercase;
@@ -400,7 +400,7 @@
 
 .edit-card__label {
   flex: 1;
-  font-size: 0.6875rem; // 11px uppercase
+  font-size: 0.6875rem;
   font-weight: 700;
   color: var(--ef-text-2);
   text-transform: uppercase;
@@ -449,14 +449,14 @@
 }
 
 .edit-card__preview-name {
-  font-size: 1rem; // 16px — recipe name, must be readable
+  font-size: 1rem;
   font-weight: 500;
   color: var(--ef-text);
   line-height: 1.3;
 }
 
 .edit-card__preview-text {
-  font-size: 0.875rem; // 14px
+  font-size: 0.875rem;
   color: var(--ef-text-2);
   line-height: 1.5;
   display: -webkit-box;
@@ -466,19 +466,19 @@
 }
 
 .edit-card__preview-empty {
-  font-size: 0.8125rem; // 13px
+  font-size: 0.8125rem;
   font-style: italic;
   color: var(--ef-text-3);
 }
 
 .edit-card__preview-slug {
-  font-size: 0.75rem; // 12px mono
+  font-size: 0.75rem;
   color: var(--ef-text-3);
   font-family: 'Courier New', monospace;
 }
 
 .edit-card__preview-count {
-  font-size: 0.75rem; // 12px
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--ef-text-2);
   text-transform: uppercase;
@@ -545,7 +545,7 @@
   gap: 3px;
 
   li {
-    font-size: 0.8125rem; // 13px
+    font-size: 0.8125rem;
     color: var(--ef-text-2);
     display: flex;
     align-items: baseline;
@@ -626,7 +626,7 @@
     width: 100%;
     height: 38px;
     padding: 0 12px;
-    font-size: 0.875rem; // 14px
+    font-size: 0.875rem;
     font-family: inherit;
     color: var(--ef-text);
     background: var(--ef-surface);
@@ -970,31 +970,42 @@ fieldset.feature-image {
 // INGREDIENTS & DIRECTIONS
 // ----------------------------------------
 .recipe-list,
-.directions { display: flex; flex-direction: column; gap: 6px; }
+.directions { display: flex; flex-direction: column; gap: 0; }
 
 .edit-card__body-inner {
   .recipe li,
   .directions li {
-    border: 1px solid var(--ef-border);
-    border-radius: var(--ef-radius);
-    padding: 9px 12px;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border: none;
+    border-bottom: 1px solid var(--ef-border);
+    border-radius: 0;
+    background: transparent;
+    font-size: 0.875rem;
     transition: background var(--ef-transition);
-    font-size: 0.875rem; // 14px
 
+    &:last-child { border-bottom: none; }
     &:hover { background: var(--ef-surface-2); }
   }
 
   a.remove { color: var(--ef-red); text-decoration: none; font-size: 0.75rem; }
 }
 
+.ingredient-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.875rem;
+  color: var(--ef-text);
+  cursor: default;
+}
+
 #add-container {
   margin-top: 8px;
-
+  display: flex;
+  justify-content: end;
   a {
     display: inline-flex;
     align-items: center;
@@ -1004,6 +1015,7 @@ fieldset.feature-image {
     padding: 6px 11px;
     border-radius: var(--ef-radius);
     border: 1px dashed #a5b4fc;
+    border:1px dashed var(--color-primary);
     transition: var(--ef-transition);
 
     &:hover { background: #eef2ff; }
@@ -1012,6 +1024,8 @@ fieldset.feature-image {
 
 .edit-form-ingredient-footer {
   margin-top: 8px;
+  display: flex;
+  justify-content: end;
 
   button {
     display: inline-flex;
@@ -1037,35 +1051,52 @@ fieldset.feature-image {
 .item-buttons {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  height: 30px;
-  padding: 0 10px;
-  border-radius: 6px;
-  border: 1px solid var(--ef-border);
-  background: var(--ef-surface);
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
   font-size: 0.75rem;
   font-family: inherit;
-  color: var(--ef-text-2);
+  color: #9ca3af;
   cursor: pointer;
-  white-space: nowrap;
   transition: var(--ef-transition);
   flex-shrink: 0;
 
-  &:hover { background: var(--ef-surface-2); border-color: var(--ef-border-hover); }
+  &:hover {
+    background: var(--ef-surface-2);
+    color: var(--ef-text-2);
+  }
 
   &.edit-ingredient,
   &.edit-direction {
-    color: #3730a3; border-color: #c7d2fe;
-    &:hover { background: #eef2ff; }
+    &:hover {
+      background: #eef2ff;
+      color: #3730a3;
+    }
   }
 
   &.remove-ingredient,
   &.remove-direction {
-    color: var(--ef-red); border-color: var(--ef-red-border);
-    &:hover { background: var(--ef-red-bg); }
+    &:hover {
+      background: var(--ef-red-bg);
+      color: var(--ef-red);
+    }
   }
 }
 
+.ingredient-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.direction-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
 .btn-small {
   padding: 4px 8px;
   border: 1px solid var(--ef-border);
@@ -1208,7 +1239,13 @@ fieldset.feature-image {
 }
 
 .ingredient-modal {
-  ul { display: flex; flex-direction: column; gap: 10px; }
+  display: block !important;
+  padding: 1.5rem;
+  min-width: min(90vw, 480px);
+
+  
+
+  ul { display: flex; flex-direction: column; gap: 14px; margin-bottom: 1.5rem;}
 
   label {
     display: flex;
@@ -1233,6 +1270,9 @@ fieldset.feature-image {
 
     &:focus { border-color: var(--ef-border-focus); box-shadow: var(--ef-focus-ring); }
   }
+
+  padding: 1.5rem;
+  min-width: min(90vw, 480px);
 }
 
 .direction-dialog {
@@ -1295,7 +1335,24 @@ fieldset.feature-image {
   font-family: inherit;
   cursor: pointer;
 }
+.edit-section-modal {
+  .recipe li,
+  .directions li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border: none;
+    border-bottom: 1px solid var(--ef-border);
+    border-radius: 0;
+    background: transparent;
+    font-size: 0.875rem;
 
+    &:last-child { border-bottom: none; }
+    &:hover { background: var(--ef-surface-2); }
+  }
+}
 // ----------------------------------------
 // CUISINE TAG INPUT
 // ----------------------------------------
@@ -1342,10 +1399,10 @@ fieldset.feature-image {
   background: var(--ef-surface);
   border: 1px solid var(--ef-border); border-top: none;
   border-radius: 0 0 var(--ef-radius) var(--ef-radius);
-  max-height: 180px; overflow-y: auto; z-index: 100;
+  max-height: 180px; overflow-y: auto;
   list-style: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  z-index:1000;
+  z-index: 1000;
 }
 
 .cuisine-option {
@@ -1391,6 +1448,7 @@ fieldset.feature-image {
 
   .quick-add-input-group { flex-direction: column; }
 }
+
 // ----------------------------------------
 // QUICK ADD MODAL
 // ----------------------------------------
@@ -1405,15 +1463,20 @@ fieldset.feature-image {
     right: 1rem;
     background: none;
     border: none;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     cursor: pointer;
     color: #6b7280;
     padding: 4px 8px;
     line-height: 1;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     &:hover { color: #111827; }
   }
 
-  h2 { font-size: 1.125rem; font-weight: 600; margin: 0 0 0.25rem; color: #111827; font-family: var(--font-body)}
+  h2 { font-size: 1.125rem; font-weight: 600; margin: 0 0 0.25rem; color: #111827; }
   .modal-subtitle { font-size: 0.875rem; color: #6b7280; margin: 0 0 1.5rem; }
 
   .quick-add-options {
@@ -1443,6 +1506,7 @@ fieldset.feature-image {
 
   #quick-add-textarea {
     width: 100%;
+    min-height: 200px;
     padding: 10px 12px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
@@ -1451,8 +1515,6 @@ fieldset.feature-image {
     resize: vertical;
     margin-bottom: 0.75rem;
 
-
-  min-height: 200px; 
     &:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
   }
 
@@ -1463,31 +1525,12 @@ fieldset.feature-image {
     color: #9ca3af;
   }
 
-  .modal-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;  // ← bigger
-  cursor: pointer;
-  color: #6b7280;
-  padding: 4px 8px;
-  line-height: 1;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  &:hover { color: #111827; }
-}
-
   @media (max-width: 600px) {
     .quick-add-options { grid-template-columns: 1fr; }
     .quick-add-divider { padding-top: 0; }
   }
-
 }
+
 // ----------------------------------------
 // PROGRESS SIDEBAR
 // ----------------------------------------
@@ -1539,7 +1582,7 @@ fieldset.feature-image {
 }
 
 .progress-item__label {
-  font-size: 0.6875rem; // 11px — navigational chrome, not content
+  font-size: 0.6875rem;
   font-weight: 500;
   color: #6b7280;
   white-space: nowrap;
@@ -1588,7 +1631,7 @@ fieldset.feature-image {
 }
 
 .legend-item {
-  font-size: 0.625rem; // 10px — tiny legend
+  font-size: 0.625rem;
   color: #9ca3af;
   display: flex;
   align-items: center;
@@ -1606,14 +1649,11 @@ fieldset.feature-image {
 
 // ----------------------------------------
 // EDIT SECTION MODAL
-// Append this block to _edit-form.scss
 // ----------------------------------------
 
-// Bento cards are now pure preview tiles — pointer cursor on header
 .edit-card:not(.edit-card--placeholder) .edit-card__header {
   cursor: pointer;
 
-  // Chevron points right (→) instead of down on tile cards
   .edit-card__chevron {
     transform: none !important;
   }
@@ -1642,7 +1682,6 @@ fieldset.feature-image {
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  // Wide variant for article editor
   &.is-wide {
     width: min(96vw, 1100px);
   }
@@ -1652,7 +1691,6 @@ fieldset.feature-image {
     backdrop-filter: blur(6px);
   }
 
-  // Not open — hide (dialog default handles this but be explicit)
   &:not([open]) {
     display: none;
   }
@@ -1669,7 +1707,7 @@ fieldset.feature-image {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 18px;
+  padding: 0.75rem 1.25rem;
   background: #fff;
   border-bottom: 1px solid var(--ef-border);
   flex-shrink: 0;
@@ -1689,7 +1727,7 @@ fieldset.feature-image {
 }
 
 .em-title-text {
-  font-size: 0.9375rem; // 15px
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--ef-text);
   white-space: nowrap;
@@ -1708,20 +1746,18 @@ fieldset.feature-image {
 // DRAFT SAVED INDICATOR
 // ----------------------------------------
 .em-draft-indicator {
-  font-size: 0.75rem; // 12px
+  font-size: 0.75rem;
   color: var(--ef-text-3);
   white-space: nowrap;
   transition: color 200ms ease, opacity 200ms ease;
   opacity: 0.7;
 
-  // Saving state
   &.is-saving {
     color: var(--ef-amber);
     opacity: 1;
     animation: em-draft-pulse 0.6s ease infinite alternate;
   }
 
-  // Saved state — green glow
   &.is-saved {
     color: var(--ef-green);
     opacity: 1;
@@ -1789,9 +1825,7 @@ fieldset.feature-image {
   transition: var(--ef-transition);
   white-space: nowrap;
 
-  &:hover {
-    background: #374151;
-  }
+  &:hover { background: #374151; }
 }
 
 // ----------------------------------------
@@ -1832,16 +1866,14 @@ fieldset.feature-image {
 // FORM CONTENT INSIDE MODAL
 // ----------------------------------------
 .em-form-content {
-  padding: 1.25rem 1.375rem 2rem;
-  max-width: 680px;
+  padding: 1.25rem;
+  
 
-  // Wide variant for article editor
   &--wide {
     max-width: 100%;
     padding: 1rem;
   }
 
-  // All inputs inside modal body inherit edit-card__body-inner styles
   input[type="text"],
   input[type="url"],
   input[type="email"],
@@ -1880,8 +1912,7 @@ fieldset.feature-image {
 }
 
 // ----------------------------------------
-// FIELD FLASH — brief border glow on save
-// Applied programmatically after each LS write
+// FIELD FLASH
 // ----------------------------------------
 @keyframes em-field-flash {
   0%   { box-shadow: 0 0 0 0 rgba(99, 153, 34, 0); }

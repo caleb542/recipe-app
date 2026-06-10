@@ -175,7 +175,7 @@ console.log('💾 Slug being saved:', baseSlug);
       name: recipe.name || '',
       article: window.toastEditor ? window.toastEditor.getMarkdown() : recipe.article || '',
       createdAt: recipe.createdAt || '',
-      author: recipe.author || '',
+      displayAuthor: (recipe.displayAuthor ?? '').trim(),
       displayAuthor: recipe.displayAuthor || '',
       description: recipe.description || '',
       tags: recipe.tags || [],

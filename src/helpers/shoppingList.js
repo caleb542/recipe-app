@@ -156,7 +156,9 @@ function renderShoppingList(recipeName) {
 
     shoppingListArr.forEach(item => {
         const li = document.createElement('li');
-        li.textContent = `• ${item}`;
+        li.className = 'shopping-list-item';
+        li.innerHTML = `<span class="shopping-bullet" aria-hidden="true">•</span><span class="shopping-text">${item}</span>`
+        // li.textContent = `• ${item}`;
         list.appendChild(li);
     });
 

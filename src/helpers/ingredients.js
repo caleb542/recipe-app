@@ -42,11 +42,14 @@ const parts = [
     <label class="ingredient-label" for="${ingred.id}">
         ${displayText}
     </label>   
-    <button id="${ingred.id}" data-id="${ingred.id}" class="item-buttons edit-ingredient"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button> 
-   
-    <button class="item-buttons remove-ingredient" data-name="${ingred.name}" data-id="${ingred.id}">
-      <i class="fa fa-trash-can"></i> Delete
+   <div class="ingredient-actions">
+    <button id="${ingred.id}" data-id="${ingred.id}" class="item-buttons edit-ingredient" aria-label="Edit ${ingred.name}">
+      <i class="fa fa-pencil" aria-hidden="true"></i>
     </button>
+    <button class="item-buttons remove-ingredient" data-name="${ingred.name}" data-id="${ingred.id}" aria-label="Delete ${ingred.name}">
+      <i class="fa fa-trash-can" aria-hidden="true"></i>
+    </button>
+  </div>
   `;
   return li;
 }

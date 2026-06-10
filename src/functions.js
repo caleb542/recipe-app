@@ -44,15 +44,16 @@ const listDirections = (directions) => {
 
     directions.forEach((step, index) => {
         const li = document.createElement('li')
-        li.innerHTML = `<label for="${step.id}"></ <span>${sanitizeText(step.text)}</span></label> 
+        li.innerHTML = ` <label for="${step.id}"><span>${sanitizeText(step.text)}</span></label> 
+ <div class="ingredient-actions">
+  <button id="${step.id}" data-id="${step.id}" aria-label="Edit ${step.name}" class="item-buttons edit-direction">
+    <i class="fa fa-pencil" aria-hidden="true"></i>
+  </button> 
 
-      <button id="${step.id}" data-id="${step.id}" class="item-buttons edit-direction">
-        <i class="fa fa-pencil" aria-hidden="true"></i> Edit
-      </button> 
-
-      <button class="item-buttons remove-direction" data-name="${step.id}" data-id="${step.id}">
-        <i class="fa fa-trash-can"></i> Delete
-      </button>`;
+  <button class="item-buttons remove-direction" aria-label="Delete ${step.name}" data-name="${step.id}" data-id="${step.id}">
+    <i class="fa fa-trash-can" aria-hidden="true"></i>
+  </button>
+  </div>`;
         directionsList.appendChild(li)
     })
 

@@ -14,8 +14,8 @@ export async function updateAuthUI() {
   }
 
   if (authenticated) {
-    loginBtn.style.visibility = 'hidden';
-    userInfo.style.visibility = 'visible';
+    loginBtn.style.display = 'none';
+    userInfo.style.display = 'flex';
 
     const user = getUserProfile();
     const userNameElement = document.getElementById('user-name');
@@ -64,8 +64,8 @@ export async function updateAuthUI() {
       }
     }
   } else {
-    loginBtn.style.visibility = 'visible';
-    userInfo.style.visibility = 'hidden';
+    loginBtn.style.display = 'block';
+    userInfo.style.display = 'none';
   }
 }
 

@@ -67,7 +67,7 @@ button {
 }
 
 /* Edit Page Buttons */
-.edit-page button:not(#editor button, .avatar-btn, .modal-close) {
+.edit-page button:not(#editor button, .avatar-btn, .modal-close, .item-buttons, .remove-ingredient, .edit-ingredient) {
     --b-color: lch(71.39% 0 67.2);
     font-weight: 400;
     font-size: 0.9rem;
@@ -77,51 +77,6 @@ button {
     border-width: 1px;
 }
 
-.edit-page button:is(.remove-ingredient) {
-    --color: hwb(35 0% 0%);
-    --hover-color: #fff;
-    background: #fff;
-    color: var(--color);
-    border-style: solid;
-    border-color: var(--b-color);
-
-    &:hover {
-        background-color: var(--color);
-        border-color: var(--color);
-        color: var(--hover-color);
-    }
-    &:focus-visible {
-        background-color: var(--color);
-        border-color: var(--color);
-        color: var(--hover-color);
-    }
-}
-
-.edit-page button:is(.edit-ingredient) {
-    --color: hwb(211 0% 0%);
-    --hover-color: #fff;
-    background: #fff;
-    color: var(--color);
-    border-color: var(--b-color);
-    border-style: solid;
-    border-color: var(--b-color);
-
-    &:hover {
-        background-color: var(--color);
-        color: var(--hover-color);
-        border-color: var(--color);
-    }
-    &:focus-visible {
-        background-color: var(--color);
-        border-color: var(--color);
-        color: var(--hover-color);
-    }
-}
-
-.edit-page button:is(.remove-ingredient) {
-    border-color: orange;
-    color: orange;
-}
 
 /* Add Ingredient Button */
 .edit-page button#add-an-ingredient {
@@ -539,19 +494,35 @@ button.feature-image {
 
 /* Add Direction Button */
 #add-step {
-    color: #333;
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    border: 2px solid #fff;
-    font-size: 1.5rem;
-    position: absolute;
+    color: #000;
+    background-color: #ebfaff;
+    border: none;
+    text-decoration: none;
     display: grid;
+    overflow: hidden;
     place-content: center;
-    border-radius: 50%;
-    right: 2.5rem;
-    bottom: 0;
-    border: 1px solid #333;
+    border-radius: 12px;
+    outline: none;
+    position: relative;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.25rem;
+    display: inline-block;
+    border: 0;
+    border-radius: 6px;
+
+    &:focus {
+        background-color: #0dd;
+    }
+
+    &:hover {
+        background-color: #0dd;
+    }
+
+    span {
+        position: absolute;
+    }
 }
 
 /* Upload Button */

@@ -8,7 +8,7 @@ import { RatingDisplay } from './components/RatingDisplay.js';
 import { CommunityNotes } from './components/CommunityNotes.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { autoEmbedVideos } from './helpers/youtubeEmbed.js';
-import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
+import { loadHeader, showDevNotice, showEditButton } from './components/HeaderComponent.js';
 // import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
 import { setupSanityMegaMenu } from "./components/MegaMenuSanity.js";
@@ -201,8 +201,8 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
 
   const a = tpl.querySelector(".author");
   if (a) {
-    const authorName = recItem.displayAuthor || recItem.author?.name || "Anonymous";
-    a.innerHTML = `by ${authorName}`;
+    const authorName = (recItem.displayAuthor ?? '').trim() || 'Anonymous';
+  a.innerHTML = `by ${authorName}`;
   }
 
   const pt = tpl.querySelector(".prep-time-value");
@@ -318,27 +318,16 @@ if (videosContainer && recItem.videos && recItem.videos.length > 0) {
     }
   }
 
-  // Edit button
-  const editBtn = tpl.getElementById?.('edit-recipe-btn') || tpl.querySelector("#edit-recipe-btn");
-  if (editBtn) {
-    const authenticated = await isAuthenticated();
-    if (authenticated) {
-      const currentUser = await getUser();
-      const isAuthor = recItem.author?.auth0Id === currentUser.sub;
-      const isLegacy = !recItem.author || recItem.author.name === "Legacy User";
-      
-      if (isAuthor || isLegacy) {
-        editBtn.href = `/edit.html#${currentRecipeId}`;
-        editBtn.title = isLegacy ? "Claim and edit recipe" : "Edit recipe";
-        editBtn.style.display = 'inline-block';
-      } else {
-        editBtn.style.display = 'none';
-      }
-    } else {
-      editBtn.style.display = 'none';
-    }
+// Check ownership and show header edit button
+const authenticated = await isAuthenticated();
+if (authenticated) {
+  const currentUser = await getUser();
+  const isAuthor = recItem.author?.auth0Id === currentUser.sub;
+  const isLegacy = !recItem.author || recItem.author.name === "Legacy User";
+  if (isAuthor || isLegacy) {
+    showEditButton(currentRecipeId);
   }
-
+}
   container.appendChild(tpl);
 
   // Wrap .lists and .directions in a recipe-body div

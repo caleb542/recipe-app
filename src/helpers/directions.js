@@ -18,14 +18,15 @@ function listDirections(directions) {
     li.dataset.id = step.id;
     li.innerHTML = `
   <label for="${step.id}"><span>${sanitizeText(step.text)}</span></label> 
-
-  <button id="${step.id}" data-id="${step.id}" class="item-buttons edit-direction">
-    <i class="fa fa-pencil" aria-hidden="true"></i> Edit
+ <div class="ingredient-actions">
+  <button id="${step.id}" data-id="${step.id}" aria-label="Edit ${step.name}" class="item-buttons edit-direction">
+    <i class="fa fa-pencil" aria-hidden="true"></i>
   </button> 
 
-  <button class="item-buttons remove-direction" data-name="${step.id}" data-id="${step.id}">
-    <i class="fa fa-trash-can"></i> Delete
+  <button class="item-buttons remove-direction" aria-label="Delete ${step.name}" data-name="${step.id}" data-id="${step.id}">
+    <i class="fa fa-trash-can" aria-hidden="true"></i>
   </button>
+  </div>
 `;
     return li;
   });

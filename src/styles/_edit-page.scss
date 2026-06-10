@@ -1052,6 +1052,14 @@ ol.directions {
   }
 }
 
+.edit-form-ingredient-footer,
+.edit-form-direction-footer {
+  display: flex;
+  align-items:center;
+  justify-content: end;
+  margin:0 20px;
+}
+
 // ----------------------------------------
 // EDITORIAL CARD SPECIFICS
 // ----------------------------------------
