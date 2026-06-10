@@ -1,11 +1,5 @@
 <a href="#main-content" class="skip-to-content">Skip to content</a>
-<!-- Search bar — absolute, top center, hides on scroll -->
-  <!-- <div class="site-search">
-    <div class="search-bar">
-      <i class="fa fa-search" aria-hidden="true"></i>
-      <input type="text" placeholder="Search recipes, ingredients..." aria-label="Search recipes">
-    </div>
-  </div> -->
+
 <!-- TIER 1: Dev notice — scrolls away -->
 <div class="dev-notice">
   <div class="dev-notice-inner">
@@ -29,7 +23,9 @@
 </dialog>
 <!-- TIER 2: Tall flex bar — logo left, auth right, search absolute center top, nav bottom center -->
 <div class="site-header">
-
+  <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open the navigation menu">
+    <i class="fa fa-bars" aria-hidden="true"></i>
+  </button>
   <!-- Logo — top left -->
   <h1 class="nav-bar-logo">
     <a href="/">
@@ -80,12 +76,7 @@
           </button>
         </li>
 
-         <!-- Search icon — hidden until scroll collapses the search bar -->
-        <li class="nav-item nav-search-trigger">
-          <button class="nav-link search-trigger-btn" aria-label="Open search">
-            <i class="fa fa-search" aria-hidden="true"></i>
-          </button>
-        </li>
+        
       </ul>
        
       
@@ -96,8 +87,8 @@
 
   <!-- Auth — top right -->
 <div class="top-bar-user">
-  <button id="login-btn" class="primary sm" style="visibility: hidden;">Login</button>
-  <div id="user-info" style="visibility: hidden;">
+  <button id="login-btn" class="primary sm" style="display:none;">Login</button>
+  <div id="user-info" style="display:none">
     <div class="user-specific">
       <div class="user-avatar-container" id="user-avatar-container"></div>
       <dialog id="avatar-dialog" aria-label="User menu" autofocus></dialog>
@@ -105,10 +96,11 @@
     </div>
     <button id="logout-btn" style="display:none;">Logout</button>
   </div>
-  <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open the menu">
-    <i class="fa fa-bars" aria-hidden="true"></i>
-  </button>
-
+  
+   <!-- Search icon — hidden until scroll collapses the search bar -->
+  <button id="search-trigger-btn" class="search-trigger-btn" aria-label="Open search">
+  <i class="fa fa-search" aria-hidden="true"></i>
+</button>
   <div id="header-edit-action"></div>
   
 </div>

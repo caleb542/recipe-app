@@ -137,58 +137,6 @@ header select.dropdown:focus {
     outline: none;
 }
 
-
-// /* Checkbox Lists */
-// .section-1 :is(label.checkbox) {
-//     font-size: 1rem;
-// }
-
-// .checklist ul:has(label.checkbox) {
-//     gap: 1rem;
-//     display: flex;
-//     flex-wrap: wrap;
-// }
-
-// .checklist ul:has(label.checkbox) li {
-//     --pink: lch(50.25% 90.11 347.93);
-//     display: flex;
-//     width: auto;
-//     display: inline-block;
-//     flex-direction: row;
-//     justify-content: center;
-//     align-items: center;
-//     gap: 16px;
-// }
-
-// .checklist ul:has(label.checkbox) li .form-group {
-//     padding: 0.5rem 0.8rem;
-//     border: 1px solid var(--pink);
-//     border-radius: 6px;
-//     height: 60px;
-//     line-height: 60px;
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     flex-direction: row;
-
-//     label {
-//         cursor: pointer;
-//         height: inherit;
-//     }
-// }
-
-// .checklist ul:has(label.checkbox) li .form-group:has(input:checked) {
-//     background-color: var(--pink);
-// }
-
-// .checklist ul:has(label.checkbox) li .form-group input:checked {
-//     accent-color: pink;
-// }
-
-// .checklist ul:has(label.checkbox) li .form-group:has(input:checked) label {
-//     color: #fff;
-// }
-
 /* Tags */
 .tags-container {
     display: flex;

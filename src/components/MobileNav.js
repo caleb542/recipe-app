@@ -1,5 +1,7 @@
 import { CATEGORIES } from '../helpers/categories.js';
 import { loadCategories } from '../functions.js';
+import { isAuthenticated, getUser, login, logout } from '../auth/auth0.js';
+import { getUserProfile, getUserAvatar } from '../userContext.js';
 
 export async function buildMobileNav() {
   const mobileNav = document.getElementById('mobile-nav');
@@ -39,14 +41,65 @@ export async function buildMobileNav() {
         <li class="mobile-nav-divider"></li>
         <li><a href="/" class="mobile-nav-link">Home</a></li>
         <li><a href="/category/quick-and-easy" class="mobile-nav-link">Quick &amp; Easy</a></li>
-        <li><a href="/edit.html" class="mobile-nav-link mobile-nav-create">
+         <li><a href="/edit.html" class="mobile-nav-link mobile-nav-create">
           <i class="fa fa-plus"></i> Create Recipe
         </a></li>
+
+        <li class="mobile-nav-divider"></li>
+        <li class="mobile-nav-divider"></li>
+        <li>
+          <button class="mobile-nav-link" id="mobile-badge-toggle">
+            <i class="fa fa-eye"></i> Hide recipe badges
+          </button>
+        </li>
+        <li id="mobile-nav-auth"></li>
       </ul>
     `;
 
     mobileNav.innerHTML = html;
-
+const badgeBtn = mobileNav.querySelector('#mobile-badge-toggle');
+if (badgeBtn) {
+  // sync with existing badge toggle state
+  const existing = document.getElementById('badgeToggle');
+  badgeBtn.addEventListener('click', () => {
+    existing?.click();
+    const hidden = document.body.classList.contains('badges-hidden');
+    badgeBtn.innerHTML = `<i class="fa fa-eye${hidden ? '' : '-slash'}"></i> ${hidden ? 'Show' : 'Hide'} recipe badges`;
+  });
+}
+// Inject auth state
+const authEl = mobileNav.querySelector('#mobile-nav-auth');
+if (authEl) {
+  const authenticated = await isAuthenticated();
+  if (authenticated) {
+    const profile = getUserProfile();
+    const avatar = getUserAvatar();
+    const displayName = profile?.profile?.displayName || profile?.username || 'Chef';
+    authEl.innerHTML = `
+      <div class="mobile-nav-user">
+        <img src="${avatar}" alt="${displayName}" class="mobile-nav-avatar">
+        <span class="mobile-nav-username">${displayName}</span>
+      </div>
+      <a href="/profile.html" class="mobile-nav-link">My Profile</a>
+      <button class="mobile-nav-link mobile-nav-logout" id="mobile-nav-logout-btn">
+        <i class="fa fa-sign-out"></i> Log out
+      </button>
+    `;
+    mobileNav.querySelector('#mobile-nav-logout-btn')?.addEventListener('click', () => {
+      localStorage.removeItem('userProfile');
+      logout();
+    });
+  } else {
+    authEl.innerHTML = `
+      <button class="mobile-nav-link mobile-nav-login" id="mobile-nav-login-btn">
+        <i class="fa fa-user"></i> Log in
+      </button>
+    `;
+    mobileNav.querySelector('#mobile-nav-login-btn')?.addEventListener('click', () => {
+      login();
+    });
+  }
+}
     // Wire accordion
     mobileNav.querySelectorAll('.mobile-nav-group-btn').forEach(btn => {
       btn.addEventListener('click', () => {

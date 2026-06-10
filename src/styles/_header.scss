@@ -268,12 +268,12 @@
     gap:0.5rem;
 }
 .user-avatar-container {
-  width: 84px;
-  height: 84px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   
   // Placeholder circle before image loads
-  background: #e5e7eb;
+  background: transparent;
   border-radius: 50%;
 }
 #user-info {
@@ -334,7 +334,7 @@
   unicode-range: U+0052;
 }
 
-.nav-bar-logo a span.logo-r{
+.logo-r{
    font-family: 'Monoton-R', cursive;
   color:hsl(36, 70%, 52%);
   font-size: 3.4rem !important;
@@ -362,15 +362,6 @@
     align-items: center;
     gap: 1rem;
 }
-
-/* Legacy Header Styles */
-// header {
-//   position: sticky;
-//   top: 0;
-//   left: 0;
-//   width: 100%;
-//   z-index: 200;
-// }
 
 .site__title {
     font-weight: 500;
@@ -886,15 +877,6 @@ header label:has(input[type="radio"]:checked) {
     background: hsl(10, 60%, 45%);
     cursor: none;
 }
-// header {
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-//   align-items: center;
-//   min-height: 100px;
-//   background: transparent;
-// }
-
 
 
 .home-page header {
@@ -1034,7 +1016,7 @@ header input[type="radio"] {
     justify-content: center;
     background: none;
     border: none;
-    color: white;
+    color: #c8892a;
     font-size: 1.5rem;
     padding: 0.5rem;
     margin: 0;
@@ -1231,7 +1213,7 @@ header {
 .profile-page header, 
 .admin-page-header  {
   width:100%;
-  height: 94px;
+  height: 52px;
   position: fixed;
   top:0;
 
