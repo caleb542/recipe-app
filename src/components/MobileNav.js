@@ -40,7 +40,7 @@ export async function buildMobileNav() {
         }).join('')}
         <li class="mobile-nav-divider"></li>
         <li><a href="/" class="mobile-nav-link">Home</a></li>
-        <li><a href="/category/quick-and-easy" class="mobile-nav-link">Quick &amp; Easy</a></li>
+   
          <li><a href="/edit.html" class="mobile-nav-link mobile-nav-create">
           <i class="fa fa-plus"></i> Create Recipe
         </a></li>
@@ -70,7 +70,12 @@ if (badgeBtn) {
 // Inject auth state
 const authEl = mobileNav.querySelector('#mobile-nav-auth');
 if (authEl) {
-  const authenticated = await isAuthenticated();
+  let authenticated =- false;
+ try {
+    authenticated = await isAuthenticated();
+  } catch (e) {
+    // Auth0 not yet initialized — treat as logged out, nav will render login button
+  }
   if (authenticated) {
     const profile = getUserProfile();
     const avatar = getUserAvatar();

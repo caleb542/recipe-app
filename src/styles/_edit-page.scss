@@ -15,6 +15,10 @@
     margin-bottom: 0;
   }
 
+  #header-edit-action {
+    display:none;
+  }
+
   .toastui-editor-defaultUI-toolbar {
     flex-wrap: wrap;
   }
@@ -933,6 +937,7 @@ fieldset.feature-image {
 // ----------------------------------------
 
 .edit-page {
+
   article:not(.recipe-article) {
     display: flex;
     flex-direction: column;
@@ -945,7 +950,7 @@ fieldset.feature-image {
       background: transparent;
     }
   }
-
+ 
   .article__recipe ul {
     display: flex;
     flex-direction: column;
@@ -1257,3 +1262,4 @@ label.ingredient-label {
   padding-top: 1rem;
   border-top: 1px solid var(--surface-border);
 }
+

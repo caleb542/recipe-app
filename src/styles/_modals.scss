@@ -627,6 +627,251 @@ dialog#preview-dialog {
 
 dialog#preview-dialog[open] {
     display: flex;
+    align-self:center;
+    justify-self:center;
+
+
+    .hero {
+        
+        display: block;
+
+        .hero-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            align-items: baseline;
+            justify-content: start;
+            background-color: #fff;
+            height: auto;
+            text-align: center;
+            text-wrap: balance;
+        }
+       
+
+    } 
+    .article-meta {
+        display:none;
+    }
+
+    // ============================================================
+  // LEFT COLUMN — INGREDIENTS + SHOPPING LIST
+  // ============================================================
+
+  .lists {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    // position: sticky;
+    top: 80px;
+    margin: 0;
+    border-right: 0.5px solid var(--surface-border);
+    padding-right: 48px;
+  }
+
+  .checklist ul,
+  .checklist li,
+  .checklist label {
+      padding: 0;
+      margin: 0;
+  }
+  .checklist {
+    display: flex;
+    align-items: baseline;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .checklist input {
+      // height: 1rem;
+      // padding: 0 1em;
+      // font-size: 1rem;
+      // margin-right: 0em;
+      // margin-bottom: 0;
+  }
+
+  input[type="checkbox"]:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0px 3px #000;
+  }
+
+  .checklist-container {
+    padding: 0;
+  }
+
+  .checklist-hint {
+    font-size: var(--text-sm);
+    color: #595959;
+    margin-top: 0.25rem;
+    font-style: italic;
+  }
+
+  .checklistHeader h3,
+  .directions-heading h3 {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 0.5px solid var(--surface-border);
+  }
+
+  .list-container {
+    filter: none;
+  }
+
+  .shoppinglist-container {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 0.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-md);
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.08),
+      0 1px 4px rgba(0, 0, 0, 0.04);
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+
+    h3 {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      font-weight: var(--font-semibold);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wider);
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 0.5px solid var(--surface-border);
+    }
+
+
+
+  }
+.shoppinglist-container,
+.checklist-container {
+    position: relative;
+    border: 0px dashed #333;
+    padding: 1em 0;
+}
+
+.shoppinglist-container {
+    padding: 1rem 1rem 1rem 1rem;
+    min-height: 8rem;
+    border: 0;
+    opacity: 1;
+    transform: translateX(0);
+    left: 0;
+    transition: all 0.3s;
+}
+
+.shoppinglist-container.hide {
+    transform: translateY(-3px);
+    left: 0em;
+    top: 0rem;
+    transition: all 0.3s;
+    display: block !important;
+    opacity: 0;
+    height: 0;
+}
+
+.shopping-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  .shopping-list-item {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 2px 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .shopping-bullet {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .shopping-text {
+    flex: 1;
+    line-height: 1.25;
+  }
+}
+
+.article-checklist-items {
+  display: flex;
+  align-items: flex-start;
+  column-gap: .5rem;
+  cursor: pointer;
+}
+
+.article-checklist-items input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  accent-color: var(--color-accent, #c8a882);
+}
+
+.article-checklist-items span {
+  flex: 1;
+  line-height: 1.25;
+}
+
+  // ============================================================
+  // RIGHT COLUMN — DIRECTIONS
+  // ============================================================
+
+  .directions {
+    grid-column: 2;
+    margin: 0;
+  }
+
+  #recipe {
+    scroll-margin-top: 150px;
+  }
+
+  .directions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: step;
+
+    li {
+      counter-increment: step;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      line-height: 1.7;
+      border-bottom: 0.5px solid var(--surface-border);
+
+      &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      &::before {
+        content: "Step " counter(step);
+        display: block;
+        font-size: var(--text-sm);
+        font-weight: var(--font-semibold);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-wider);
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+
 }
 
 dialog #preview-content {

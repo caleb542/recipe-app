@@ -29,7 +29,7 @@
 
 /* Navigation links and buttons */
 .nav-link:not(.create-recipe-link) {
-  color: #d1d5db;
+
   text-decoration: none;
   font-weight: 500;
   display: flex;
@@ -72,7 +72,7 @@
   }
 }
 .nav-link:is(.create-recipe-link) {
-  color: #d1d5db;
+  
   text-decoration: none;
   font-weight: 500;
   display: flex;
