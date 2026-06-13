@@ -18,20 +18,20 @@
     padding-top:0;
   }
   .home-page header,
-.recipe-page header,
-.category-page header,
-.edit-page header,
-.profile-page header, 
-.admin-page-header  {
-  width:100%;
-  height: 52px;
-  position: fixed;
-  top:0;
+  .recipe-page header,
+  .category-page header,
+  .edit-page header,
+  .profile-page header, 
+  .admin-page-header  {
+    width:100%;
+    height: 52px;
+    position: fixed;
+    top:0;
 
-  .nav-bar-logo {
-    animation-range: entry 0px exit 0px;
+    .nav-bar-logo {
+      animation-range: entry 0px exit 0px;
+    }
   }
-}
 
   .site-header {
     display: flex;
@@ -78,23 +78,17 @@
       flex-direction: row;
       align-items: center;
       gap: 0;
+
+       .logo-wordmark {
+     border-left: 0 solid #c8892a;
+     padding-left: 0rem;
+     margin-left: 0rem;
     }
 
- 
-    .nav-bar-logo a span.logo-r {
-      font-family: 'Cormorant Garamond', 'Georgia', serif;
-      font-size: 1.4rem !important;
-      font-weight: 600;
-      color: #c8892a;
+    span.logo-r {
+      font-size:3rem !important;
     }
-
-    .logo-wordmark {
-       border-left: 1.5px solid #c8892a;
-    padding-left: 0.5rem;
-    margin-left: 0.5rem;
-    }
-
-    
+  }
   }
 
   // ----------------------------------------

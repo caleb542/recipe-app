@@ -186,17 +186,6 @@
   flex: 1;
 }
 
-/* Logo */
-.nav-bar-logo {
-  margin: 0;
-  font-size:1.5rem;
-  a {
-    color: white;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-}
-
 /* Search */
 .top-bar-search {
   position: relative;
@@ -335,27 +324,51 @@
 }
 
 .logo-r{
-   font-family: 'Monoton-R', cursive;
+  //  font-family: 'Monoton-R', cursive;
+  font-family: "Playfair Disaplay";
+  font-weight: 700;
   color:hsl(36, 70%, 52%);
-  font-size: 3.4rem !important;
+  font-size: 2.2rem !important;
   line-height: 1;
-  font-weight: 400;
   text-align:center;
+  transition:all 0.5s ease-out;
 }
+.logo-separator {
+   display: inline-block;
+  width: 1.5px;
+  height: 1.8rem;        // taller than "Recipe Me", shorter than R
+  background: hsl(36 70% 40% / 40%);
+  margin: 0 0.5rem;
+  vertical-align: middle;
+  position: relative;
+  top: 0.2rem; 
+  transition:all 0.5s ease-out;
+}
+
 .nav-bar-logo a:hover {
   text-decoration: none;
 }
 .nav-bar-logo a:hover span {
     color:hsl(36, 70%, 40%);  
 }
+.nav-bar-logo a:hover .logo-separator {
+  background:hsl(36 70% 40% / 30% ); 
+}
+.nav-bar-logo:has(a:hover) .logo-r{
+   color:hsl(36, 70%, 40%);  
+}
 .logo-wordmark {
   font-family: 'Roboto Mono', monospace;
   font-weight: 300;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   letter-spacing: 4px;
-  color: #c8892a;
+  color: hsl(36, 70%, 52%);
+  text-transform: none;
   vertical-align: middle;
   margin-left: 0rem;
+ margin-top:0.5em;
+
+
 }
 .nav-bar-controls {
     display: flex;
@@ -1211,11 +1224,12 @@ header {
 }
 
 .nav-bar-logo a span.logo-r{
-   font-family: 'Monoton-R', cursive;
+  //  font-family: 'Monoton-R', cursive;
+  font-family: "Playfair Display";
   color:hsl(36, 70%, 52%);
-  font-size: 3.4rem !important;
+  font-size: 4rem !important;
   line-height: 1;
-  font-weight: 400;
+  font-weight: 700;
   text-align:center;
 }
 
@@ -1259,14 +1273,19 @@ header {
 }
 
 .nav-bar-logo {
-  position: sticky;
-  top: 16px;
+  position: relative;
+  top: 0;
+  display: block;
+  height:100%;
   flex-shrink: 0;
-  align-self: flex-start;
+  display: flex;
+  align-items: center;
 
   a {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
     gap: 0.3rem;
     text-decoration: none;
   }
@@ -1286,20 +1305,20 @@ header {
   // }
 }
 
-.logo-r {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: hsl(36, 65%, 47%);
-  line-height: 1;
-  font-family: var(--font-heading);
-}
+// .logo-r {
+//   font-size: 1.8rem;
+//   font-weight: 700;
+//   color: hsl(36, 65%, 47%);
+//   line-height: 1;
+//   font-family: var(--font-heading);
+// }
 
-.logo-wordmark {
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  color: #c8892a;
-  text-transform: lowercase;
-}
+// .logo-wordmark {
+//   font-size: 0.65rem;
+//   letter-spacing: 0.15em;
+//   color: #c8892a;
+//   text-transform: lowercase;
+// }
 
 nav.main-nav {
 
