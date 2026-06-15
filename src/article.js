@@ -1,5 +1,6 @@
 import "./style.scss";
 import { loadRecipes, formatDate, hamburger, getFeaturedImage, getAllImages, hideWarning, loadRecipesFromLocalStorage, loadCategories } from "./functions.js";
+import { renderBreadcrumbs } from "./components/Breadcrumbs.js";
 import { marked } from "marked";
 import { setupShoppingList } from "./helpers/shoppingList.js";
 import { initAuth0, getToken, isAuthenticated, getUser } from './auth/auth0.js';
@@ -346,9 +347,58 @@ if (authenticated) {
       console.log('recipe-body created');
     }
 
-  renderBreadcrumbs(recItem);
+/// -----------------
+// Breadcrumbs
+// ------------------
 
-  const notesContainer = document.getElementById("community-notes");
+const params = new URLSearchParams(window.location.search);
+let fromCategory = params.get('from');
+
+const storageKey = `breadcrumb-${recItem.slug || recItem._id}`;
+
+if (fromCategory) {
+  sessionStorage.setItem(storageKey, fromCategory);
+} else {
+  fromCategory = sessionStorage.getItem(storageKey);
+}
+
+const primary = [{ label: 'Home', href: '/' }];
+if (fromCategory && CATEGORIES_MAP[fromCategory]) {
+  primary.push({ label: CATEGORIES_MAP[fromCategory], href: `/category/${fromCategory}` });
+}
+
+const alsoIn = (recItem.categories || [])
+  .filter(cat => {
+    const catSlug = Object.keys(CATEGORIES_MAP).find(k => CATEGORIES_MAP[k] === cat) || cat;
+    return catSlug !== fromCategory;
+  })
+  .map(cat => {
+    const catSlug = Object.keys(CATEGORIES_MAP).find(k => CATEGORIES_MAP[k] === cat) || cat;
+    return { label: cat, href: `/category/${catSlug}` };
+  });
+
+renderBreadcrumbs({ primary, current: recItem.name, alsoIn });
+
+requestAnimationFrame(() => {
+  const alsoInEl = document.querySelector('.breadcrumb-also-in');
+  if (alsoInEl && alsoInEl.scrollWidth > alsoInEl.clientWidth) {
+    const btn = document.createElement('button');
+    btn.className = 'breadcrumb-expand';
+    btn.textContent = 'more';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.addEventListener('click', () => {
+      const expanded = alsoInEl.classList.toggle('is-expanded');
+      btn.textContent = expanded ? 'less' : 'more';
+      btn.setAttribute('aria-expanded', String(expanded));
+    });
+    alsoInEl.appendChild(btn);
+  }
+});
+
+// ------------------
+// Notes
+// ------------------
+const notesContainer = document.getElementById("community-notes");
   if (notesContainer) {
     new CommunityNotes(notesContainer, currentRecipeId);
   }
@@ -539,47 +589,47 @@ function formatImageAttribution(image) {
 /**
  * Render breadcrumbs based on referrer
  */
-function renderBreadcrumbs(recipe) {
-  const breadcrumbContainer = document.getElementById('breadcrumbs');
-  if (!breadcrumbContainer) return;
+// function renderBreadcrumbs(recipe) {
+//   const breadcrumbContainer = document.getElementById('breadcrumbs');
+//   if (!breadcrumbContainer) return;
 
-  const params = new URLSearchParams(window.location.search);
-  let fromCategory = params.get('from');
+//   const params = new URLSearchParams(window.location.search);
+//   let fromCategory = params.get('from');
 
-  const storageKey = `breadcrumb-${recipe.slug || recipe._id}`;
+//   const storageKey = `breadcrumb-${recipe.slug || recipe._id}`;
 
-  if (fromCategory) {
-    sessionStorage.setItem(storageKey, fromCategory);
-  } else {
-    fromCategory = sessionStorage.getItem(storageKey);
-  }
+//   if (fromCategory) {
+//     sessionStorage.setItem(storageKey, fromCategory);
+//   } else {
+//     fromCategory = sessionStorage.getItem(storageKey);
+//   }
 
-  const otherCategories = (recipe.categories || []).filter(cat => {
-    const catSlug = Object.keys(CATEGORIES_MAP).find(key => CATEGORIES_MAP[key] === cat) || cat;
-    return catSlug !== fromCategory;
-  });
+//   const otherCategories = (recipe.categories || []).filter(cat => {
+//     const catSlug = Object.keys(CATEGORIES_MAP).find(key => CATEGORIES_MAP[key] === cat) || cat;
+//     return catSlug !== fromCategory;
+//   });
 
-  let breadcrumbHTML = '<nav aria-label="Breadcrumb" class="breadcrumb"><a href="/">Home</a>';
+//   let breadcrumbHTML = '<nav aria-label="Breadcrumb" class="breadcrumb"><a href="/">Home</a>';
 
-  if (fromCategory && CATEGORIES_MAP[fromCategory]) {
-    breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/category/${fromCategory}">${CATEGORIES_MAP[fromCategory]}</a>`;
-  }
+//   if (fromCategory && CATEGORIES_MAP[fromCategory]) {
+//     breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/category/${fromCategory}">${CATEGORIES_MAP[fromCategory]}</a>`;
+//   }
 
-  breadcrumbHTML += ` <span aria-hidden="true">›</span> <span aria-current="page">${recipe.name}</span>`;
+//   breadcrumbHTML += ` <span aria-hidden="true">›</span> <span aria-current="page">${recipe.name}</span>`;
 
-  if (otherCategories.length > 0) {
-    breadcrumbHTML += ` <span class="also-in-label">Also in:</span> ${
-      otherCategories.map(cat => {
-        const slug = Object.keys(CATEGORIES_MAP).find(key => CATEGORIES_MAP[key] === cat) || cat;
-        return `<a href="/category/${slug}" class="also-in-pill">${cat}</a>`;
-      }).join('')
-    }`;
-  }
+//   if (otherCategories.length > 0) {
+//     breadcrumbHTML += ` <span class="also-in-label">Also in:</span> ${
+//       otherCategories.map(cat => {
+//         const slug = Object.keys(CATEGORIES_MAP).find(key => CATEGORIES_MAP[key] === cat) || cat;
+//         return `<a href="/category/${slug}" class="also-in-pill">${cat}</a>`;
+//       }).join('')
+//     }`;
+//   }
 
-  breadcrumbHTML += '</nav>';
+//   breadcrumbHTML += '</nav>';
 
-  breadcrumbContainer.innerHTML = breadcrumbHTML;
-}
+//   breadcrumbContainer.innerHTML = breadcrumbHTML;
+// }
 // Like functionality
 async function initializeLikes(recipeId, container) {
   const likeButton = container.querySelector("#like-button");

@@ -1,5 +1,6 @@
 import { isSuperadmin } from '../userContext.js';
 import { logout } from '../auth/auth0.js';
+import { toggleBadgeVisibility, areBadgesHidden } from '../utils/badgeVisibility.js';
 
 const DEFAULT_AVATAR_SVG = `<svg class="header-avatar-default" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
   <circle cx="18" cy="18" r="18" fill="#e8e0d5"/>
@@ -58,31 +59,35 @@ export function setupAvatarDropdown(user, avatar) {
   <button class="avatar-dialog-close" id="avatar-dialog-close" aria-label="Close menu">
     <i class="fa-solid fa-xmark"></i>
   </button>
-    <div class="avatar-dropdown-header">
-      ${avatarImgHTML}
-      <p class="avatar-dropdown-name">${displayName}</p>
-      <p class="avatar-dropdown-role ${isSuperAdmin ? 'is-superadmin' : ''}">
-        ${isSuperAdmin ? '★ Superadmin' : 'Member'}
-      </p>
-    </div>
-    <div class="avatar-dropdown-divider"></div>
-    <a href="/profile.html?username=${user.username}" class="avatar-dropdown-item">
-      <i class="fa-solid fa-user"></i> Visit Profile
-    </a>
-    <a href="/profile.html?username=${user.username}#edit" class="avatar-dropdown-item">
-      <i class="fa-solid fa-pen"></i> Edit Profile
-    </a>
-    ${isSuperAdmin ? `
-    <div class="avatar-dropdown-divider"></div>
-    <a href="/admin.html" class="avatar-dropdown-item">
-      <i class="fa-solid fa-shield-halved"></i> Admin Panel
-    </a>
-    ` : ''}
-    <div class="avatar-dropdown-divider"></div>
-    <button class="avatar-dropdown-item avatar-dropdown-signout" id="avatar-signout">
-      <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
-    </button>
-  `;
+  <div class="avatar-dropdown-header">
+    ${avatarImgHTML}
+    <p class="avatar-dropdown-name">${displayName}</p>
+    <p class="avatar-dropdown-role ${isSuperAdmin ? 'is-superadmin' : ''}">
+      ${isSuperAdmin ? '★ Superadmin' : 'Member'}
+    </p>
+  </div>
+  <div class="avatar-dropdown-divider"></div>
+  <a href="/profile.html?username=${user.username}" class="avatar-dropdown-item">
+    <i class="fa-solid fa-user"></i> Visit Profile
+  </a>
+  <a href="/profile.html?username=${user.username}#edit" class="avatar-dropdown-item">
+    <i class="fa-solid fa-pen"></i> Edit Profile
+  </a>
+  ${isSuperAdmin ? `
+  <div class="avatar-dropdown-divider"></div>
+  <a href="/admin.html" class="avatar-dropdown-item">
+    <i class="fa-solid fa-shield-halved"></i> Admin Panel
+  </a>
+  ` : ''}
+  <div class="avatar-dropdown-divider"></div>
+  <button class="avatar-dropdown-item" id="avatar-badge-toggle">
+    <i class="fa-solid fa-eye"></i> <span id="avatar-badge-toggle-label">Hide recipe badges</span>
+  </button>
+  <div class="avatar-dropdown-divider"></div>
+  <button class="avatar-dropdown-item avatar-dropdown-signout" id="avatar-signout">
+    <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+  </button>
+`;
 
   // ----------------------------------------
   // Wire up open/close
@@ -104,6 +109,21 @@ export function setupAvatarDropdown(user, avatar) {
     logout();
   });
 
+  const badgeToggleBtn = dialog.querySelector('#avatar-badge-toggle');
+const badgeToggleLabel = dialog.querySelector('#avatar-badge-toggle-label');
+if (badgeToggleBtn) {
+  // sync initial state
+  const hidden = areBadgesHidden();
+  badgeToggleLabel.textContent = hidden ? 'Show recipe badges' : 'Hide recipe badges';
+  badgeToggleBtn.querySelector('i').className = `fa-solid fa-eye${hidden ? '' : '-slash'}`;
+
+  badgeToggleBtn.addEventListener('click', () => {
+    const nowVisible = toggleBadgeVisibility();
+    const nowHidden = !nowVisible;
+    badgeToggleLabel.textContent = nowHidden ? 'Show recipe badges' : 'Hide recipe badges';
+    badgeToggleBtn.querySelector('i').className = `fa-solid fa-eye${nowHidden ? '' : '-slash'}`;
+  });
+}
   // Close on item click
   dialog.querySelectorAll('.avatar-dialog-close').forEach(item => {
     item.addEventListener('click', () => closeDialog());

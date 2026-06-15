@@ -1,4 +1,5 @@
 import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
+import { renderBreadcrumbs } from './components/Breadcrumbs.js';
 import { loadFooter } from './components/FooterComponent.js';
 import { initAuth0, isAuthenticated } from './auth/auth0.js';
 import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
@@ -68,7 +69,10 @@ async function init() {
 
     document.title = `${currentCategory} - Recipe Me`;
     setupSanityMegaMenu();
-    renderBreadcrumbs(currentCategory, currentSlug);
+    renderBreadcrumbs({
+      primary: [{ label: 'Home', href: '/' }],
+      current: currentCategory
+    });
 
     // showSpinner();
 
@@ -105,24 +109,24 @@ async function init() {
   }
 }
 
-function renderBreadcrumbs(categoryName, slug) {
-  const breadcrumbs = document.getElementById('breadcrumbs');
-  if (!breadcrumbs) return;
+// function renderBreadcrumbs(categoryName, slug) {
+//   const breadcrumbs = document.getElementById('breadcrumbs');
+//   if (!breadcrumbs) return;
 
-  const params = new URLSearchParams(window.location.search);
-  const from = params.get('from');
+//   const params = new URLSearchParams(window.location.search);
+//   const from = params.get('from');
 
-  let breadcrumbHTML = `<nav aria-label="Breadcrumb" class="breadcrumb"><a href="/">Home</a>`;
+//   let breadcrumbHTML = `<nav aria-label="Breadcrumb" class="breadcrumb"><a href="/">Home</a>`;
 
-  if (from === 'categories') {
-    breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/categories">Categories</a>`;
-  }
+//   if (from === 'categories') {
+//     breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/categories">Categories</a>`;
+//   }
 
-  breadcrumbHTML += ` <span aria-hidden="true">›</span> <span aria-current="page">${categoryName}</span>`;
-  breadcrumbHTML += `</nav>`;
+//   breadcrumbHTML += ` <span aria-hidden="true">›</span> <span aria-current="page">${categoryName}</span>`;
+//   breadcrumbHTML += `</nav>`;
 
-  breadcrumbs.innerHTML = breadcrumbHTML;
-}
+//   breadcrumbs.innerHTML = breadcrumbHTML;
+// }
 function renderHero(categoryName) {
   const hero = document.getElementById('category-hero');
   if (!hero) return;

@@ -13,7 +13,7 @@
  *   - 270-330: Purples/magentas
  * 
  * Includes support for:
- * - Light and Dark modes (auto-detects system preference)
+
  * - User personalization overrides
  * - Consistent spacing, typography, colors, and effects
  */
@@ -23,6 +23,7 @@
    ============================================================================ */
 
 :root {
+    color-scheme: light;
   /* ----------------------------------------------------------------------------
      HSL HUE REFERENCE GUIDE
      
@@ -299,132 +300,6 @@
 --width-cards:1366px;
 
 }
-/* ============================================================================
-   DARK MODE
-   ============================================================================ */
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Override colors for dark mode - HSL makes this easy! */
-    
-    /* Primary colors - slightly brighter in dark mode */
-    --color-primary: hsl(var(--hue-primary), 92%, 63%);
-    --color-primary-hover: hsl(var(--hue-primary), 93%, 73%);
-    --color-primary-light: hsl(var(--hue-primary), 77%, 23%);
-    --color-primary-dark: hsl(var(--hue-primary), 83%, 35%);
-    
-    /* Secondary colors */
-    --color-secondary: hsl(var(--hue-secondary), 65%, 62%);
-    --color-secondary-hover: hsl(var(--hue-secondary), 65%, 73%);
-    --color-secondary-light: hsl(var(--hue-secondary), 88%, 15%);
-    --color-secondary-dark: hsl(var(--hue-secondary), 84%, 25%);
-    
-    /* Invert neutrals for dark mode */
-    --color-neutral-50: hsl(var(--hue-neutral), 24%, 10%);
-    --color-neutral-100: hsl(var(--hue-neutral), 20%, 16%);
-    --color-neutral-200: hsl(var(--hue-neutral), 13%, 27%);
-    --color-neutral-300: hsl(var(--hue-neutral), 12%, 38%);
-    --color-neutral-400: hsl(var(--hue-neutral), 9%, 53%);
-    --color-neutral-500: hsl(var(--hue-neutral), 10%, 64%);
-    --color-neutral-600: hsl(var(--hue-neutral), 14%, 83%);
-    --color-neutral-700: hsl(var(--hue-neutral), 16%, 90%);
-    --color-neutral-800: hsl(var(--hue-neutral), 18%, 95%);
-    --color-neutral-900: hsl(var(--hue-neutral), 20%, 98%);
-    
-    /* Surfaces - darker backgrounds */
-    --surface-background: hsl(var(--hue-neutral), 61%, 7%);
-    --surface-foreground: hsl(var(--hue-neutral), 15%, 95%);
-    --surface-card: hsl(var(--hue-neutral), 24%, 15%);
-    --surface-elevated: hsl(var(--hue-neutral), 15%, 25%);
-    --surface-input: hsl(var(--hue-neutral), 24%, 15%);
-    --surface-hover: hsl(var(--hue-neutral), 15%, 25%);
-    --surface-border: hsl(var(--hue-neutral), 11%, 38%);
-    --surface-divider: hsl(var(--hue-neutral), 15%, 25%);
-    
-    /* Text - lighter in dark mode */
-    --text-primary: hsl(var(--hue-neutral), 15%, 95%);
-    --text-secondary: hsl(var(--hue-neutral), 15%, 65%);
-    --text-tertiary: hsl(var(--hue-neutral), 13%, 50%);
-    --text-disabled: hsl(var(--hue-neutral), 11%, 38%);
-    --text-inverse: hsl(var(--hue-neutral), 61%, 7%);
-    --text-link: hsl(var(--hue-primary), 93%, 73%);
-    --text-link-hover: hsl(var(--hue-primary), 96%, 84%);
-    
-    /* Semantic colors - slightly muted in dark mode */
-    --color-success: hsl(var(--hue-success), 65%, 62%);
-    --color-success-bg: hsl(var(--hue-success), 88%, 15%);
-    --color-warning: hsl(var(--hue-warning), 93%, 66%);
-    --color-warning-bg: hsl(var(--hue-warning), 100%, 20%);
-    --color-error: hsl(var(--hue-error), 83%, 68%);
-    --color-error-bg: hsl(var(--hue-error), 86%, 23%);
-    --color-info: hsl(var(--hue-info), 93%, 73%);
-    --color-info-bg: hsl(var(--hue-info), 77%, 23%);
-    
-    /* Shadows - darker and more subtle */
-    --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
-    --shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.4), 0 1px 2px -1px hsl(0 0% 0% / 0.4);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4), 0 2px 4px -2px hsl(0 0% 0% / 0.4);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.4), 0 4px 6px -4px hsl(0 0% 0% / 0.4);
-    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.4), 0 8px 10px -6px hsl(0 0% 0% / 0.4);
-    --shadow-2xl: 0 25px 50px -12px hsl(0 0% 0% / 0.5);
-  }
-}
-
-/* Force dark mode (for testing or user preference toggle) */
-[data-theme="dark"] {
-  --color-primary: #3b82f6;
-  --color-primary-hover: #60a5fa;
-  --color-primary-light: #1e3a8a;
-  
-  --color-secondary: #34d399;
-  --color-secondary-hover: #6ee7b7;
-  --color-secondary-light: #064e3b;
-  
-  --color-neutral-50: #111827;
-  --color-neutral-100: #1f2937;
-  --color-neutral-200: #374151;
-  --color-neutral-300: #4b5563;
-  --color-neutral-400: #6b7280;
-  --color-neutral-500: #9ca3af;
-  --color-neutral-600: #d1d5db;
-  --color-neutral-700: #e5e7eb;
-  --color-neutral-800: #f3f4f6;
-  --color-neutral-900: #f9fafb;
-  
-  --surface-background: #0f172a;
-  --surface-foreground: #f1f5f9;
-  --surface-card: #1e293b;
-  --surface-elevated: #334155;
-  --surface-input: #1e293b;
-  --surface-hover: #334155;
-  --surface-border: #475569;
-  --surface-divider: #334155;
-  
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
-  --text-disabled: #475569;
-  --text-inverse: #0f172a;
-  --text-link: #60a5fa;
-  --text-link-hover: #93c5fd;
-  
-  --color-success: #34d399;
-  --color-success-bg: #064e3b;
-  --color-warning: #fbbf24;
-  --color-warning-bg: #78350f;
-  --color-error: #f87171;
-  --color-error-bg: #7f1d1d;
-  --color-info: #60a5fa;
-  --color-info-bg: #1e3a8a;
-  
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
 /* ============================================================================
    USER PERSONALIZATION OVERRIDES
    

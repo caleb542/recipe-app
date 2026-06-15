@@ -6,7 +6,6 @@
  */
 import { buildNav, setupSanityMegaMenu,setupEdgeWarning } from './MegaMenuSanity.js';
 import { isSuperadmin } from '../userContext.js';
-import { renderBadgeToggle } from './BadgeToggleButton.js';
 import { buildMobileNav } from './MobileNav.js';
 import { isAuthenticated, login } from '../auth/auth0.js';
 

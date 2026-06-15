@@ -39,8 +39,7 @@ import { initImpersonationBanner } from "./components/ImpersonationBanner.js";
 import { loadFooter } from './components/FooterComponent.js';
 
 import { initBadgeVisibility } from './utils/badgeVisibility.js';
-import { loadHeader, injectBadgeToggle, showDevNotice } from './components/HeaderComponent.js';
-import { renderBadgeToggle, initBadgeToggle } from './components/BadgeToggleButton.js';
+import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { generateRecipeBadges } from './components/RecipeBadges.js';
 import { setupSanityMegaMenu, openMegaMenu, closeMegaMenu } from './components/MegaMenuSanity.js';
 
@@ -103,8 +102,7 @@ await listRecipes(recipes, currentUser?.sub);
  
 
   initBadgeVisibility();
-  injectBadgeToggle();
-  initBadgeToggle();
+
 } else {
   // Show splash for first-time visitors
   overlay.style.display = "flex";
