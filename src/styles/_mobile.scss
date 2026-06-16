@@ -735,11 +735,18 @@
     object-fit: cover;
     object-position: center;
     display: block;
-
-
     }
   }
+    #curated-sections {
+      padding: 2rem 1rem;
 
+  }
+  .home-page p.curated-card-cuisine {
+    margin-bottom:0;
+  }
+  .home-page p.curated-card-title {
+    margin-bottom:1rem;
+  }
 }
 
 // ----------------------------------------
@@ -836,10 +843,7 @@
       margin: 0;
     }
   }
-  #curated-sections {
-      padding: 2rem 1rem;
 
-  }
 }
 @media (max-width: 360px) {
   .site-header {
