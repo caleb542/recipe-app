@@ -119,10 +119,220 @@ export function showQuickAddModal(recipeId) {
       }
 
       if (method === 'photo') {
-        // TODO: photo upload flow
-        modal.close();
-        modal.remove();
+        showPhotoUploadScreen(modal, recipeId);
         return;
+      }
+
+      /**
+       * Photo upload screen — replaces modal content in place
+       */
+      function showPhotoUploadScreen(modal, recipeId) {
+        const content = modal.querySelector('.quick-add-modal-content');
+        const photos = []; // { file, objectUrl, cloudinaryUrl }
+
+        content.innerHTML = `
+          <button class="modal-close" aria-label="Close">&times;</button>
+          <button class="quick-add-back" aria-label="Back">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <h2>Add photos</h2>
+          <p class="modal-subtitle">Drag to reorder. We'll read the text in sequence.</p>
+
+          <div class="photo-upload-grid" id="photo-grid"></div>
+
+          <label class="photo-add-btn" id="photo-add-label">
+            <i class="fa-solid fa-plus"></i> Add photos
+            <input 
+              type="file" 
+              id="photo-file-input"
+              accept="image/*"
+              multiple
+              capture="environment"
+              style="display:none"
+            >
+          </label>
+
+          <div id="photo-upload-status" class="parse-status"></div>
+
+          <button class="btn-primary" id="photo-extract-btn" disabled>
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            Extract text from photos
+          </button>
+
+          <div class="quick-add-footer">
+            <small>⚠️ Only import recipes you have permission to use</small>
+          </div>
+        `;
+
+        // Close
+        content.querySelector('.modal-close').addEventListener('click', () => {
+          modal.close();
+          modal.remove();
+        });
+
+        // Back
+        content.querySelector('.quick-add-back').addEventListener('click', () => {
+          showQuickAddModal.__reopen(modal, recipeId);
+        });
+
+        const grid = content.querySelector('#photo-grid');
+        const extractBtn = content.querySelector('#photo-extract-btn');
+        const statusDiv = content.querySelector('#photo-upload-status');
+
+        function renderGrid() {
+          grid.innerHTML = photos.map((p, i) => `
+            <div class="photo-thumb" data-index="${i}">
+              <div class="photo-thumb__num">${i + 1}</div>
+              <img src="${p.objectUrl}" alt="Photo ${i + 1}">
+              <button class="photo-thumb__remove" data-index="${i}" aria-label="Remove photo ${i + 1}">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            </div>
+          `).join('');
+
+          grid.querySelectorAll('.photo-thumb__remove').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const idx = parseInt(btn.dataset.index);
+              URL.revokeObjectURL(photos[idx].objectUrl);
+              photos.splice(idx, 1);
+              renderGrid();
+              extractBtn.disabled = photos.length === 0;
+            });
+          });
+
+          extractBtn.disabled = photos.length === 0;
+        }
+
+        // File input
+        content.querySelector('#photo-file-input').addEventListener('change', (e) => {
+          Array.from(e.target.files).forEach(file => {
+            photos.push({ file, objectUrl: URL.createObjectURL(file), cloudinaryUrl: null });
+          });
+          renderGrid();
+        });
+
+        // Extract
+        extractBtn.addEventListener('click', async () => {
+          extractBtn.disabled = true;
+          extractBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+          statusDiv.innerHTML = '<p class="loading">⏳ Uploading photos...</p>';
+
+          try {
+            // Upload each photo to Cloudinary
+            for (let i = 0; i < photos.length; i++) {
+              statusDiv.innerHTML = `<p class="loading">⏳ Uploading photo ${i + 1} of ${photos.length}...</p>`;
+              const formData = new FormData();
+              formData.append('file', photos[i].file);
+              formData.append('upload_preset', 'recipe_sources'); // create this preset in Cloudinary
+              formData.append('folder', 'recipe-sources');
+              formData.append('tags', 'recipe-source');
+
+              const res = await fetch(`https://api.cloudinary.com/v1_1/${window.CLOUDINARY_CLOUD_NAME || 'day1f5nz8'}/image/upload`, {
+                method: 'POST',
+                body: formData
+              });
+              const data = await res.json();
+              photos[i].cloudinaryUrl = data.secure_url;
+            }
+
+            // Extract text from each via OCR
+            statusDiv.innerHTML = '<p class="loading">⏳ Reading text from photos...</p>';
+            let combinedText = '';
+
+            for (let i = 0; i < photos.length; i++) {
+              statusDiv.innerHTML = `<p class="loading">⏳ Reading photo ${i + 1} of ${photos.length}...</p>`;
+              const res = await fetch('/.netlify/functions/ocr-recipe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ imageUrl: photos[i].cloudinaryUrl })
+              });
+              const data = await res.json();
+              if (data.text) combinedText += data.text + '\n\n';
+            }
+
+            if (!combinedText.trim()) {
+              throw new Error('Could not extract any text from the photos');
+            }
+
+            // Show review screen
+            showOCRReviewScreen(modal, recipeId, combinedText.trim(), photos);
+
+          } catch (error) {
+            statusDiv.innerHTML = `<p class="error">❌ ${error.message}</p>`;
+            extractBtn.disabled = false;
+            extractBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Extract text from photos';
+          }
+        });
+      }
+
+      /**
+       * OCR review screen — show extracted text alongside first photo
+       */
+      function showOCRReviewScreen(modal, recipeId, extractedText, photos) {
+        const content = modal.querySelector('.quick-add-modal-content');
+
+        content.innerHTML = `
+          <button class="modal-close" aria-label="Close">&times;</button>
+          <h2>Review extracted text</h2>
+          <p class="modal-subtitle">Edit anything that looks wrong, then import.</p>
+
+          <div class="ocr-review-grid">
+            <div class="ocr-review-original">
+              <p class="ocr-review-label">Original</p>
+              <img src="${photos[0].objectUrl}" alt="Recipe photo">
+              ${photos.length > 1 ? `<p class="ocr-review-more">+${photos.length - 1} more photo${photos.length > 2 ? 's' : ''}</p>` : ''}
+            </div>
+            <div class="ocr-review-text">
+              <p class="ocr-review-label">Extracted text</p>
+              <textarea id="ocr-text-area" rows="12">${extractedText}</textarea>
+            </div>
+          </div>
+
+          <div id="ocr-status" class="parse-status"></div>
+
+          <div class="ocr-review-actions">
+            <button class="btn-secondary" id="ocr-back-btn">Back</button>
+            <button class="btn-primary" id="ocr-import-btn">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              Import to recipe
+            </button>
+          </div>
+
+          <div class="quick-add-footer">
+            <small>⚠️ Only import recipes you have permission to use</small>
+          </div>
+        `;
+
+        content.querySelector('.modal-close').addEventListener('click', () => {
+          modal.close();
+          modal.remove();
+        });
+
+        content.querySelector('#ocr-back-btn').addEventListener('click', () => {
+          showPhotoUploadScreen(modal, recipeId);
+        });
+
+        content.querySelector('#ocr-import-btn').addEventListener('click', async () => {
+          const text = content.querySelector('#ocr-text-area').value;
+          const statusDiv = content.querySelector('#ocr-status');
+          const importBtn = content.querySelector('#ocr-import-btn');
+
+          importBtn.disabled = true;
+          importBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Importing...';
+
+          try {
+            const parsedRecipe = parseRecipeText(text);
+            await populateParsedRecipe(parsedRecipe, recipeId);
+            modal.close();
+            modal.remove();
+            showSuccessNotification(parsedRecipe);
+          } catch (error) {
+            statusDiv.innerHTML = `<p class="error">❌ ${error.message}</p>`;
+            importBtn.disabled = false;
+            importBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Import to recipe';
+          }
+        });
       }
 
       // URL or text
