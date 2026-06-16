@@ -39,63 +39,55 @@ export function showQuickAddModal(recipeId) {
   modal.innerHTML = `
     <div class="quick-add-modal-content">
       <button class="modal-close" aria-label="Close">&times;</button>
-      
-      <h2>Add New Recipe</h2>
-      <p class="modal-subtitle">Choose how you'd like to start</p>
-      
+      <h2>Add a recipe</h2>
+      <p class="modal-subtitle">How would you like to start?</p>
+
       <div class="quick-add-options">
-        <div class="quick-add-option import-option">
-          <div class="option-icon">🚀</div>
-          <h3>Quick Import</h3>
-          <p>Paste a recipe URL or full recipe text</p>
-          
-          <textarea 
-            id="quick-add-textarea"
-            placeholder="Paste URL (e.g., https://allrecipes.com/recipe/...)
+        <button class="quick-add-option" data-method="manual">
+          <i class="fa-solid fa-pencil"></i>
+          <div>
+            <strong>Type it in</strong>
+            <span>Fill in the form manually</span>
+          </div>
+        </button>
 
-OR paste full recipe text:
+        <button class="quick-add-option" data-method="url">
+          <i class="fa-solid fa-link"></i>
+          <div>
+            <strong>Import from URL</strong>
+            <span>Paste a link from any recipe site</span>
+          </div>
+        </button>
 
-Chocolate Chip Cookies
+        <button class="quick-add-option" data-method="text">
+          <i class="fa-solid fa-clipboard"></i>
+          <div>
+            <strong>Paste as text</strong>
+            <span>Already have the text? Drop it in</span>
+          </div>
+        </button>
 
-Ingredients:
-- 2 cups flour
-- 1 cup sugar
-...
-
-Instructions:
-1. Preheat oven...
-2. Mix ingredients..."
-            rows="8"
-          ></textarea>
-          
-          <button id="parse-recipe-btn" class="btn-primary">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            Import Recipe
-          </button>
-        </div>
-        
-        <div class="quick-add-divider">
-          <span>OR</span>
-        </div>
-        
-        <div class="quick-add-option manual-option">
-          <div class="option-icon">✏️</div>
-          <h3>Start from Scratch</h3>
-          <p>Fill out the form step-by-step</p>
-          
-          <button id="manual-entry-btn" class="btn-secondary">
-            <i class="fa-solid fa-pen"></i>
-            Create Manually
-          </button>
-        </div>
+        <button class="quick-add-option quick-add-option--featured" data-method="photo">
+          <i class="fa-solid fa-camera"></i>
+          <div>
+            <strong>Upload or snap photos</strong>
+            <span>Cards, pages, or a cookbook</span>
+          </div>
+        </button>
       </div>
-      
+
+      <div class="quick-add-input-area" hidden>
+        <textarea id="quick-add-textarea" rows="8" placeholder=""></textarea>
+        <button id="parse-recipe-btn" class="btn-primary">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          Import Recipe
+        </button>
+      </div>
+
       <div id="parse-status" class="parse-status"></div>
-      
+
       <div class="quick-add-footer">
-        <small>
-          ⚠️ Only import recipes you have permission to use (personal use)
-        </small>
+        <small>⚠️ Only import recipes you have permission to use</small>
       </div>
     </div>
   `;
@@ -103,26 +95,53 @@ Instructions:
   document.body.appendChild(modal);
   modal.showModal();
 
+  // Close
   modal.querySelector('.modal-close').addEventListener('click', () => {
     modal.close();
     modal.remove();
   });
 
+  modal.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { modal.close(); modal.remove(); }
+  });
+
+  // Option selection
+  modal.querySelectorAll('.quick-add-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const method = btn.dataset.method;
+      const inputArea = modal.querySelector('.quick-add-input-area');
+      const textarea = document.getElementById('quick-add-textarea');
+
+      if (method === 'manual') {
+        modal.close();
+        modal.remove();
+        return;
+      }
+
+      if (method === 'photo') {
+        // TODO: photo upload flow
+        modal.close();
+        modal.remove();
+        return;
+      }
+
+      // URL or text
+      inputArea.hidden = false;
+      textarea.placeholder = method === 'url'
+        ? 'Paste a recipe URL (e.g. https://allrecipes.com/recipe/...)'
+        : 'Paste the full recipe text here...';
+      textarea.focus();
+
+      // Highlight selected option
+      modal.querySelectorAll('.quick-add-option').forEach(o => o.classList.remove('is-selected'));
+      btn.classList.add('is-selected');
+    });
+  });
+
+  // Parse
   document.getElementById('parse-recipe-btn').addEventListener('click', async () => {
     const input = document.getElementById('quick-add-textarea').value;
     await handleQuickAdd(input, recipeId, modal);
-  });
-
-  document.getElementById('manual-entry-btn').addEventListener('click', () => {
-    modal.close();
-    modal.remove();
-  });
-
-  modal.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      modal.close();
-      modal.remove();
-    }
   });
 }
 
