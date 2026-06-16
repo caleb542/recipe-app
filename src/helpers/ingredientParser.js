@@ -19,55 +19,33 @@ const generateUUID = () => {
 
 // ----------------------------------------
 // UNIT LOOKUP TABLE
-// Case-sensitive single letters handled first
 // ----------------------------------------
 export const UNITS = {
-  // Single letter — case sensitive
-  'T': 'tbsp',
-  't': 'tsp',
-  'L': 'l',
-  'g': 'g',
-  'G': 'g',
-
-  // Tablespoon variants
+  'T': 'tbsp', 't': 'tsp', 'L': 'l', 'g': 'g', 'G': 'g',
   'tbsp': 'tbsp', 'Tbsp': 'tbsp', 'TBSP': 'tbsp',
   'tbs': 'tbsp', 'Tbs': 'tbsp',
   'tblsp': 'tbsp', 'Tblsp': 'tbsp',
   'tablespoon': 'tbsp', 'Tablespoon': 'tbsp',
   'tablespoons': 'tbsp', 'Tablespoons': 'tbsp',
-
-  // Teaspoon variants
-  'tsp': 'tsp', 'Tsp': 'tsp', 'TSP': 'tsp',
-  'ts': 'tsp',
+  'tsp': 'tsp', 'Tsp': 'tsp', 'TSP': 'tsp', 'ts': 'tsp',
   'teaspoon': 'tsp', 'Teaspoon': 'tsp',
   'teaspoons': 'tsp', 'Teaspoons': 'tsp',
-
-  // Cup variants
   'cup': 'cup', 'Cup': 'cup', 'cups': 'cup', 'Cups': 'cup',
   'c': 'cup', 'C': 'cup',
-
-  // Volume metric
   'ml': 'ml', 'mL': 'ml', 'ML': 'ml',
   'milliliter': 'ml', 'millilitre': 'ml',
   'milliliters': 'ml', 'millilitres': 'ml',
   'l': 'l', 'liter': 'l', 'litre': 'l',
   'liters': 'l', 'litres': 'l',
-
-  // Volume imperial
   'fl oz': 'fl oz', 'fluid oz': 'fl oz',
   'fluid ounce': 'fl oz', 'fluid ounces': 'fl oz',
   'pint': 'pint', 'pints': 'pint', 'pt': 'pint',
   'quart': 'quart', 'quarts': 'quart', 'qt': 'quart',
   'gallon': 'gallon', 'gallons': 'gallon', 'gal': 'gallon',
-
-  // Weight metric
-  'gram': 'g', 'grams': 'g', 'Gram': 'g', 'Grams': 'g',
-  'gr': 'g',
+  'gram': 'g', 'grams': 'g', 'Gram': 'g', 'Grams': 'g', 'gr': 'g',
   'kg': 'kg', 'Kg': 'kg', 'KG': 'kg',
   'kilogram': 'kg', 'kilograms': 'kg',
   'kilo': 'kg', 'kilos': 'kg',
-
-  // Weight imperial
   'oz': 'oz', 'Oz': 'oz', 'OZ': 'oz',
   'ounce': 'oz', 'ounces': 'oz',
   'lb': 'lb', 'Lb': 'lb', 'LB': 'lb',
@@ -77,36 +55,22 @@ export const UNITS = {
 };
 
 // ----------------------------------------
-// MEASURE WORDS — not convertible units
+// MEASURE WORDS
 // ----------------------------------------
 export const MEASURE_WORDS = [
-  'clove', 'cloves',
-  'bunch', 'bunches',
-  'pinch', 'pinches',
-  'sprig', 'sprigs',
-  'slice', 'slices',
-  'piece', 'pieces',
-  'can', 'cans',
-  'package', 'packages', 'pkg',
-  'box', 'boxes',
-  'head', 'heads',
-  'stalk', 'stalks',
-  'fillet', 'fillets',
-  'handful', 'handfuls',
-  'dash', 'dashes',
-  'drop', 'drops',
-  'knob', 'knobs',
-  'dollop', 'dollops',
-  'bushel', 'bushels',
-  'spoonful', 'spoonfuls',
-  'strip', 'strips',
-  'sheet', 'sheets',
-  'rack', 'racks',
-  'loaf', 'loaves',
+  'clove', 'cloves', 'bunch', 'bunches', 'pinch', 'pinches',
+  'sprig', 'sprigs', 'slice', 'slices', 'piece', 'pieces',
+  'can', 'cans', 'package', 'packages', 'pkg',
+  'box', 'boxes', 'head', 'heads', 'stalk', 'stalks',
+  'fillet', 'fillets', 'handful', 'handfuls',
+  'dash', 'dashes', 'drop', 'drops', 'knob', 'knobs',
+  'dollop', 'dollops', 'bushel', 'bushels',
+  'spoonful', 'spoonfuls', 'strip', 'strips',
+  'sheet', 'sheets', 'rack', 'racks', 'loaf', 'loaves',
 ];
 
 // ----------------------------------------
-// FOOD ADJECTIVES — stripped from name into description
+// FOOD ADJECTIVES
 // ----------------------------------------
 const FOOD_ADJECTIVES = [
   'large', 'medium', 'small', 'extra-large', 'extra large',
@@ -125,61 +89,111 @@ const FOOD_ADJECTIVES = [
 ];
 
 // ----------------------------------------
+// COOKING VERBS — triggers direction detection
+// Base forms + common gerunds
+// ----------------------------------------
+const COOKING_VERBS = new Set([
+  // A
+  'add', 'adding', 'adjust', 'adjusting', 'allow', 'allowing', 'arrange', 'arranging',
+  // B
+  'bake', 'baking', 'baste', 'basting', 'blend', 'blending', 'boil', 'boiling',
+  'braise', 'braising', 'bring', 'bringing', 'broil', 'broiling', 'brush', 'brushing',
+  'butter', 'buttering',
+  // C
+  'check', 'checking', 'chill', 'chilling', 'chop', 'chopping',
+  'coat', 'coating', 'combine', 'combining', 'continue', 'continuing',
+  'cook', 'cooking', 'cool', 'cooling', 'cover', 'covering', 'crush', 'crushing',
+  'cure', 'curing', 'cut', 'cutting',
+  // D
+  'deglaze', 'deglazing', 'dice', 'dicing', 'dip', 'dipping',
+  'discard', 'discarding', 'divide', 'dividing', 'drain', 'draining',
+  'drizzle', 'drizzling', 'dust', 'dusting',
+  // F
+  'ferment', 'fermenting', 'finish', 'finishing', 'flour', 'flouring',
+  'fold', 'folding', 'freeze', 'freezing', 'fry', 'frying',
+  // G
+  'garnish', 'garnishing', 'grate', 'grating', 'grease', 'greasing',
+  'grill', 'grilling',
+  // H
+  'heat', 'heating',
+  // I
+  'increase', 'increasing',
+  // K
+  'knead', 'kneading',
+  // L
+  'layer', 'layering', 'let', 'line', 'lining',
+  // M
+  'marinate', 'marinating', 'mash', 'mashing', 'mince', 'mincing',
+  'mix', 'mixing',
+  // O
+  'oil', 'oiling',
+  // P
+  'peel', 'peeling', 'place', 'placing', 'poach', 'poaching',
+  'pour', 'pouring', 'preheat', 'preheating', 'press', 'pressing',
+  'process', 'processing', 'pulse', 'pulsing', 'puree', 'pureeing',
+  // R
+  'reduce', 'reducing', 'refrigerate', 'refrigerating', 'remove', 'removing',
+  'repeat', 'repeating', 'reserve', 'reserving', 'rest', 'resting',
+  'return', 'returning', 'rinse', 'rinsing', 'roast', 'roasting',
+  'roll', 'rolling',
+  // S
+  'saute', 'sauteing', 'sauté', 'sautéing',
+  'scrape', 'scraping', 'score', 'scoring', 'season', 'seasoning',
+  'serve', 'serving', 'set', 'shape', 'shaping', 'simmer', 'simmering',
+  'slice', 'slicing', 'smoke', 'smoking', 'spread', 'spreading',
+  'sprinkle', 'sprinkling', 'squeeze', 'squeezing', 'steam', 'steaming',
+  'stew', 'stewing', 'stir', 'stirring', 'strain', 'straining',
+  // T
+  'taste', 'tasting', 'toast', 'toasting', 'top', 'topping',
+  'transfer', 'transferring', 'trim', 'trimming', 'truss', 'trussing',
+  'turn', 'turning',
+  // U
+  'uncover', 'uncovering',
+  // W
+  'warm', 'warming', 'whisk', 'whisking',
+  // Z
+  'zest', 'zesting',
+]);
+
+function startsWithCookingVerb(line) {
+  const firstWord = line.trim().split(/\s+/)[0].toLowerCase().replace(/[^a-zé]/g, '');
+  return COOKING_VERBS.has(firstWord);
+}
+
+// ----------------------------------------
 // CANADIAN CUP → mL LOOKUP
-// Standardized values, not mathematical
 // ----------------------------------------
 export const CUP_TO_ML = {
-  '1/8':  30,
-  '0.125': 30,
-  '1/4':  60,
-  '0.25': 60,
-  '1/3':  75,
-  '0.333': 75,
-  '1/2':  125,
-  '0.5':  125,
-  '2/3':  150,
-  '0.667': 150,
-  '3/4':  175,
-  '0.75': 175,
-  '1':    250,
-  '1.0':  250,
-  '1.5':  375,
-  '2':    500,
-  '2.0':  500,
-  '3':    750,
-  '4':    1000,
+  '1/8': 30, '0.125': 30, '1/4': 60, '0.25': 60,
+  '1/3': 75, '0.333': 75, '1/2': 125, '0.5': 125,
+  '2/3': 150, '0.667': 150, '3/4': 175, '0.75': 175,
+  '1': 250, '1.0': 250, '1.5': 375, '2': 500,
+  '2.0': 500, '3': 750, '4': 1000,
 };
 
 // ----------------------------------------
 // TSP → mL LOOKUP
 // ----------------------------------------
 export const TSP_TO_ML = {
-  '1/4':  1,
-  '0.25': 1,
-  '1/2':  2,
-  '0.5':  2,
-  '1':    5,
-  '1.0':  5,
-  '2':    10,
-  '3':    15,
+  '1/4': 1, '0.25': 1, '1/2': 2, '0.5': 2,
+  '1': 5, '1.0': 5, '2': 10, '3': 15,
 };
 
 // ----------------------------------------
 // CONVERSION TABLE
 // ----------------------------------------
 export const CONVERSIONS = {
-  tbsp: { factor: 15,     unit: 'mL', lookup: null },
-  tsp:  { factor: 5,      unit: 'mL', lookup: TSP_TO_ML },
-  cup:  { factor: 250,    unit: 'mL', lookup: CUP_TO_ML },
-  oz:   { factor: 28.35,  unit: 'g',  lookup: null },
-  lb:   { factor: 453.6,  unit: 'g',  lookup: null },
-  pint: { factor: 500,    unit: 'mL', lookup: null },
-  quart:{ factor: 1000,   unit: 'mL', lookup: null },
+  tbsp: { factor: 15,    unit: 'mL', lookup: null },
+  tsp:  { factor: 5,     unit: 'mL', lookup: TSP_TO_ML },
+  cup:  { factor: 250,   unit: 'mL', lookup: CUP_TO_ML },
+  oz:   { factor: 28.35, unit: 'g',  lookup: null },
+  lb:   { factor: 453.6, unit: 'g',  lookup: null },
+  pint: { factor: 500,   unit: 'mL', lookup: null },
+  quart:{ factor: 1000,  unit: 'mL', lookup: null },
 };
 
 // ----------------------------------------
 // FRACTION PARSER
-// Handles: "1/2", "1 1/2", "2¾", unicode fractions
 // ----------------------------------------
 export function parseAmount(str) {
   if (!str) return '';
@@ -194,16 +208,11 @@ export function parseAmount(str) {
     str = str.replace(char, ` ${frac}`);
   }
 
-  // Normalize internal whitespace
   str = str.replace(/\s+/g, ' ').trim();
 
-  // Mixed number: "1 1/2"
   const mixed = str.match(/^(\d+)\s+(\d+)\/(\d+)$/);
-  if (mixed) {
-    return parseFloat(mixed[1]) + parseInt(mixed[2]) / parseInt(mixed[3]);
-  }
+  if (mixed) return parseFloat(mixed[1]) + parseInt(mixed[2]) / parseInt(mixed[3]);
 
-  // Fraction: "1/2"
   const fraction = str.match(/^(\d+)\/(\d+)$/);
   if (fraction) return parseInt(fraction[1]) / parseInt(fraction[2]);
 
@@ -212,8 +221,7 @@ export function parseAmount(str) {
 }
 
 // ----------------------------------------
-// FORMAT AMOUNT for display
-// Returns canonical string representation
+// FORMAT AMOUNT
 // ----------------------------------------
 export function formatAmount(amount) {
   if (!amount && amount !== 0) return '';
@@ -237,8 +245,7 @@ export function formatAmount(amount) {
 }
 
 // ----------------------------------------
-// CONVERT AMOUNT to metric
-// Uses lookup tables for Canadian standard values
+// CONVERT TO METRIC
 // ----------------------------------------
 export function convertToMetric(amount, unit) {
   const conversion = CONVERSIONS[unit];
@@ -251,9 +258,7 @@ export function convertToMetric(amount, unit) {
     const key = String(amount);
     const fracKey = formatFractionKey(num);
     const metricVal = conversion.lookup[key] || conversion.lookup[fracKey];
-    if (metricVal) {
-      return { amount: metricVal, unit: conversion.unit };
-    }
+    if (metricVal) return { amount: metricVal, unit: conversion.unit };
   }
 
   const raw = num * conversion.factor;
@@ -281,20 +286,19 @@ function formatFractionKey(num) {
 
 // ----------------------------------------
 // STRIP LEADING NOISE
-// Removes bullets, numbers, step labels
 // ----------------------------------------
 export function stripLeadingNoise(line) {
   return line
     .trim()
-    .replace(/[\u2018\u2019]/g, "'")  // normalize curly single quotes → straight
-    .replace(/[\u201C\u201D]/g, '"')  // normalize curly double quotes → straight
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
     .replace(/^[-–—•·▪▸►]\s+/, '')
     .replace(/^\(?\[?\d+[\.\)\]:]\)?\s*/, '')
     .replace(/^step\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)[:\.\s]\s*/i, '')
     .replace(/^(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|finally|lastly|then|next)[:\.\s]\s*/i, '')
     .replace(/\s+/g, ' ')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // strip markdown links
-.replace(/^\[.*?\](\(.*?\))?\s*/g, '')    // strip leading link remnants
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/^\[.*?\](\(.*?\))?\s*/g, '')
     .trim();
 }
 
@@ -422,7 +426,7 @@ export function parseIngredientLine(rawLine) {
 }
 
 function buildIngredient(amount, unit, measureWord, name, description) {
-  if (!name && !amount) return null; 
+  if (!name && !amount) return null;
   return {
     id: generateUUID(),
     amount: amount || '',
@@ -442,22 +446,20 @@ function classifyLine(line) {
 
   if (!clean) return { type: 'empty' };
 
-  // Section header
   if (isSectionHeader(clean)) {
     return { type: 'section', label: clean.replace(/:$/, '').trim() };
   }
-// Skip obvious UI noise
-if (/^\d+\s*(reviews?|photos?|ratings?|comments?)$/i.test(clean)) {
-  return { type: 'empty' };
-}
-if (/^\d+\/?\d*\s*x$/i.test(clean)) {
-  return { type: 'empty' };  // scaling buttons
-}
 
-if (/^\d+\s*(mins?|minutes?|hours?|hrs?)(\s+\d+\s*(mins?|minutes?))?$/i.test(clean)) {
-  return { type: 'meta', text: clean };
-}
-  // Known section keywords
+  if (/^\d+\s*(reviews?|photos?|ratings?|comments?)$/i.test(clean)) {
+    return { type: 'empty' };
+  }
+  if (/^\d+\/?\d*\s*x$/i.test(clean)) {
+    return { type: 'empty' };
+  }
+  if (/^\d+\s*(mins?|minutes?|hours?|hrs?)(\s+\d+\s*(mins?|minutes?))?$/i.test(clean)) {
+    return { type: 'meta', text: clean };
+  }
+
   if (/^ingredients?:?$/i.test(clean)) {
     return { type: 'section_ingredients' };
   }
@@ -465,32 +467,33 @@ if (/^\d+\s*(mins?|minutes?|hours?|hrs?)(\s+\d+\s*(mins?|minutes?))?$/i.test(cle
     return { type: 'section_directions' };
   }
 
-  // Sections to ignore — editorial, nutrition, author notes
-if (/^(from the editor|editor'?s?\s*notes?|nutrition facts?|nutritional info|cook'?s?\s*notes?|author'?s?\s*notes?|note from the (author|chef|editor)|chef'?s?\s*notes?|tips?:|serving suggestions?|rate this recipe|from \d+ votes?|\d+ ratings?)/i.test(clean)) {
-  console.log('🚫 Ignoring section:', clean);
-  return { type: 'section_ignore' };
-}
+  if (/^(from the editor|editor'?s?\s*notes?|nutrition facts?|nutritional info|cook'?s?\s*notes?|author'?s?\s*notes?|note from the (author|chef|editor)|chef'?s?\s*notes?|tips?:|serving suggestions?|rate this recipe|from \d+ votes?|\d+ ratings?)/i.test(clean)) {
+    return { type: 'section_ignore' };
+  }
 
-
-  // Time/meta lines
   if (/^(prep|cook|total|active)\s*(time)?:?\s*\d+/i.test(clean)) {
     return { type: 'meta', text: clean };
   }
-
-  // Servings/serves/yield
   if (/^(servings?|serves?|yield):?\s*\d+/i.test(clean)) {
     return { type: 'meta', text: clean };
   }
 
-  // Has amount or known unit — likely ingredient
-if (hasAmount(clean) || hasKnownUnit(clean)) {
-  const data = parseIngredientLine(clean);
-  if (!data || !data.name) return { type: 'empty' };  // ← add this
-  return { type: 'ingredient', data };
-}
+  if (hasAmount(clean) || hasKnownUnit(clean)) {
+    const data = parseIngredientLine(clean);
+    if (!data || !data.name) return { type: 'empty' };
+    return { type: 'ingredient', data };
+  }
 
-  // Numbered direction or step label
   if (/^\d+[\.\)]\s+[A-Z]/.test(line.trim())) {
+    return { type: 'direction', text: clean };
+  }
+
+  // ----------------------------------------
+  // COOKING VERB DETECTION
+  // Lines starting with a cooking verb are directions
+  // even without a "Directions:" heading
+  // ----------------------------------------
+  if (startsWithCookingVerb(clean)) {
     return { type: 'direction', text: clean };
   }
 
@@ -498,10 +501,11 @@ if (hasAmount(clean) || hasKnownUnit(clean)) {
 }
 
 // ----------------------------------------
-// EXTRACT META (times, servings)
+// EXTRACT META
 // ----------------------------------------
 function extractMeta(text, recipe) {
   text = text.replace(/(\d+)(mins?|minutes?|hours?|hrs?)/gi, '$1 $2');
+
   const prepMatch = text.match(/prep\s*(time)?:?\s*(\d+)\s*(mins?|minutes?|hours?|hrs?)/i);
   if (prepMatch) {
     const val = parseInt(prepMatch[2]);
@@ -526,24 +530,16 @@ function extractMeta(text, recipe) {
   }
 
   const servingsMatch = text.match(/^servings?:?\s*(\d+)/i);
-  if (servingsMatch) {
-    recipe.servings = servingsMatch[1];
-  }
+  if (servingsMatch) recipe.servings = servingsMatch[1];
 
   const servesMatch = text.match(/^serves?:?\s*(\d+)/i);
-  if (servesMatch) {
-    recipe.servings = servesMatch[1];
-  }
+  if (servesMatch) recipe.servings = servesMatch[1];
 
   const yieldMatch = text.match(/^yield:?\s*(\d+)/i);
-  if (yieldMatch) {
-    recipe.servings = yieldMatch[1];
-  }
+  if (yieldMatch) recipe.servings = yieldMatch[1];
 
   const sourceMatch = text.match(/find it online at\s+(https?:\/\/\S+)/i);
-  if (sourceMatch) {
-    recipe.sourceUrl = sourceMatch[1];
-  }
+  if (sourceMatch) recipe.sourceUrl = sourceMatch[1];
 }
 
 // ----------------------------------------
@@ -573,7 +569,6 @@ export function parseRecipeText(text) {
 
     const classified = classifyLine(line);
 
-    // If in ignore mode skip everything except new real sections
     if (ignoreMode) {
       if (classified.type === 'section_ingredients') {
         ignoreMode = false;
@@ -600,7 +595,6 @@ export function parseRecipeText(text) {
         break;
 
       case 'section_ignore':
-        console.log('🚫 section_ignore triggered for:', line);
         ignoreMode = true;
         break;
 
@@ -638,9 +632,8 @@ export function parseRecipeText(text) {
         break;
 
       case 'unknown': {
-        // Check for source URL first
         const urlMatch = classified.text?.match(/find it online at\s+(https?:\/\/\S+)/i) ||
-                        classified.text?.match(/^source:?\s+(https?:\/\/\S+)/i);
+                         classified.text?.match(/^source:?\s+(https?:\/\/\S+)/i);
         if (urlMatch) {
           recipe.sourceUrl = urlMatch[1];
           break;
@@ -651,7 +644,6 @@ export function parseRecipeText(text) {
           break;
         }
 
-         // Skip rating/review noise
         if (/rate this recipe|from \d+ votes?|\d+ ratings?/i.test(classified.text)) {
           break;
         }
@@ -670,11 +662,8 @@ export function parseRecipeText(text) {
     }
   }
 
-
   if (recipe.name) {
-    console.log('name before strip:', recipe.name);
     recipe.name = recipe.name.replace(/\s*[-|–]\s*[^-|–]{3,50}$/, '').trim();
-    console.log('name after strip:', recipe.name);
   }
 
   if (!recipe.name) {

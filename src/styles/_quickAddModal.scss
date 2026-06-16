@@ -435,3 +435,14 @@
     flex: 2;
   }
 }
+
+.photo-add-btns {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 0.75rem;
+
+  .photo-add-btn {
+    flex: 1;
+    margin-bottom: 0;
+  }
+}
