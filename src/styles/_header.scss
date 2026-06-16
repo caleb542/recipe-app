@@ -686,16 +686,7 @@ nav.hide {
   opacity: 0;
   pointer-events: none;
 }
-.sort-bar {
-   
-    margin:0 auto;
-    margin-top:1rem;
-    display:flex;
-    align-items: center;
-    flex-direction: row;
-    justify-content: flex-end;
-    gap:2rem;
-}
+
 .search-control {
     flex: 1;
     display: flex;
@@ -782,32 +773,32 @@ nav.hide {
             color:#555;
                transition: all cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        &::picker(select) {
-            // background:red;
-            padding:20px;
-            transition: transform .5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            height:auto;
-            transform:translateY(-50%) scaleY(1);
-                @starting-style {
-                    height:200px;
+        // &::picker(select) {
+        //     // background:red;
+        //     padding:20px;
+        //     transition: transform .5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        //     height:auto;
+        //     transform:translateY(-50%) scaleY(1);
+        //         @starting-style {
+        //             height:200px;
                     
-                    transform:translateY(-50%) scaleY(0.6);
-                }
+        //             transform:translateY(-50%) scaleY(0.6);
+        //         }
          
-        }
-        &:open::picker-icon {
-            color:#555;
-            rotate:120deg;
+        // }
+        // &:open::picker-icon {
+        //     color:#555;
+        //     rotate:120deg;
             
-        }
-        &:open::picker(select) {
-            transform:translateY(-50%);
+        // }
+        // &:open::picker(select) {
+        //     transform:translateY(-50%);
 
-           @starting-style {
-               transform:translateY(0%);
-                transition: transform 1s linear;
-            }
-        }
+        //    @starting-style {
+        //        transform:translateY(0%);
+        //         transition: transform 1s linear;
+        //     }
+        // }
 
 
         
@@ -824,9 +815,7 @@ nav.hide {
     }
    
 }
-.content-wrap:has(div.empty-state) .sort-bar{
-    display:none;
-}
+
 
 
 @keyframes init {
@@ -1125,30 +1114,7 @@ header input[type="radio"] {
   
   }
    
-  // ----------------------------------------
-  // SORT BAR
-  // ----------------------------------------
-
-  .sort-bar {
-    padding: 0 1rem;
-    margin-top: 0.5rem;
-    justify-content: flex-end;
-    min-width: 0;
-  }
-
-  .sort-controls {
-    gap: 8px;
-
-    select {
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-    }
-
-    label {
-      font-size: 0.875rem;
-      padding: 0.5rem 0;
-    }
-  }
+  
 }
 
 // ----------------------------------------

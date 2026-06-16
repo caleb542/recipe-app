@@ -484,6 +484,7 @@
     margin-top: 0.5rem;
     justify-content: flex-start;
     min-width: 0;
+    animation: none;
   }
 
   .sort-controls {
@@ -694,27 +695,29 @@
       display:block;
       margin:0 0 1rem 0;
 
-      h2 {
+      h1 {
         font-size:1.5rem;
         text-align:center;
         max-width:100%;
-        font: normal normal 900 normal 2.75rem / 1.15 "LEague Spartan";
+        font: normal normal 700 normal 2.75rem / 1.15 "LEague Spartan";
         /* background-color: yellow; */
         display: block;
        color:#333;
         padding: 2px 2px 2px 2px;
         text-box-trim: trim-both;
     
-          margin:1rem 0 1rem 0; 
+          margin:1.5rem 0 0rem 0; 
       }
        .author {
         text-align:center;
         margin:0 auto;
-        color:#eee;
-        background-color: #333;
+        color:#c6872a;
         border-radius: 3px;
         padding:5px 10px;
         display: inline-block;
+        font: 1rem/10px cursive;
+        font-weight:100;
+        
       }
       .description.summary {
         text-align:center;
@@ -757,7 +760,83 @@
     padding: 0.75rem;
   }
 }
+// ----------------------------------------
+// CATEGORY PAGE CARDS — NYT style
+// ----------------------------------------
 
+.category-page {
+  .container .container {
+    padding:0 0;
+  }
+  .article-block {
+    padding:0 0;
+  }
+  div#recipes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 0;
+  }
+
+  a.card {
+    display: block;
+    text-decoration: none;
+    color: unset;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    border-bottom: 0.5px solid #f0f0f0;
+    box-shadow: none;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    figure {
+      margin: 0 0 0.5rem;
+    }
+
+    .imageElement {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-bottom: 0;
+      height: auto;
+    }
+
+    .text-area {
+      padding: 0;
+      text-align: left;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-family: var(--font-heading);
+    }
+
+    .card-author {
+      font-size: 0.75rem;
+      color: #666;
+      margin: 0 0 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-time {
+      font-size: 0.75rem;
+      color: #888;
+      margin: 0;
+    }
+  }
+}
 @media (max-width: 360px) {
   .site-header {
     height: auto;
@@ -793,3 +872,5 @@
     display: none !important;
   }
 }
+
+

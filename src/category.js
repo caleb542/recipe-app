@@ -6,7 +6,7 @@ import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { listRecipes } from './recipes.js';
-import { loadRecipes, getFeaturedImage } from './functions.js';
+import { loadRecipes, getFeaturedImage, hamburger } from './functions.js';
 import { hideWarning } from './functions.js';
 // import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
@@ -93,6 +93,7 @@ async function init() {
     document.body.classList.add('is-hydrated');
     // removeSpinner(1500);
     showDevNotice()
+    hamburger()
 
     const sortSelect = document.getElementById('filter-by');
     if (sortSelect) {
@@ -207,7 +208,7 @@ function renderRecipes() {
             <img src="${photoURL}" alt="${recipe.name}" class="imageElement" loading="lazy">
           </figure>
           <div class="text-area">
-            <h1>${recipe.name}</h1>
+            <h2>${recipe.name}</h2>
           </div>
         </article>
       </a>

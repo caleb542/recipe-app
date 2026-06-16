@@ -124,8 +124,7 @@ await listRecipes(recipes, currentUser?.sub);
   await listRecipes(recipes, currentUser?.sub);
   
   initBadgeVisibility();
-  injectBadgeToggle();
-  initBadgeToggle();
+
 });
   // Login to create
   splashLoginBtn.addEventListener('click', async () => {
