@@ -398,6 +398,17 @@ export function parseIngredientLine(rawLine) {
     }
   }
 
+  // ----------------------------------------
+  // STRIP REDUNDANT METRIC CONVERSION
+  // Cookbooks often list dual measurements, e.g.
+  // "2 tablespoons (30 mL) of vegetable oil"
+  // "2 pounds (900 g) of fatty ground beef"
+  // "2 cans (28 ounces/796 mL each) of diced tomatoes"
+  // The parenthetical immediately following the unit is a
+  // conversion, not part of the ingredient name — discard it.
+  // ----------------------------------------
+  line = line.replace(/^\(\s*[\d.\/½⅓⅔¼¾⅛⅜⅝⅞\s]+\s*(ml|mL|l|L|g|kg|oz|lb|lbs)?\.?\s*(\/\s*[\d.\/½⅓⅔¼¾⅛⅜⅝⅞\s]+\s*(ml|mL|l|L|g|kg)?\.?\s*)?(each)?\s*\)\s*/i, '');
+
   name = line.trim();
   name = name.replace(/^of\s+/i, '').trim();
 
@@ -477,7 +488,10 @@ function classifyLine(line) {
   if (/^(servings?|serves?|yield):?\s*\d+/i.test(clean)) {
     return { type: 'meta', text: clean };
   }
-
+  // In classifyLine, add near the other servings/yield checks:
+  if (/^makes\s+(a|an)?\s*.*(serving|sandwich|sandwiches|batch|dozen|piece|cookie|loaf|cake)/i.test(clean)) {
+    return { type: 'meta', text: clean };
+  }
   if (hasAmount(clean) || hasKnownUnit(clean)) {
     const data = parseIngredientLine(clean);
     if (!data || !data.name) return { type: 'empty' };
@@ -544,29 +558,63 @@ function extractMeta(text, recipe) {
 // then splits direction paragraphs into individual sentences
 // Called at the top of parseRecipeText as a pre-processing step
 // ----------------------------------------
-function reflowAndSplitText(text) {
-  // Step 1 — fix hyphenated line breaks from book scanning
+export function reflowAndSplitText(text) {
   text = text.replace(/(\w)-\n(\w)/g, '$1$2');
 
-  // Step 2 — reflow wrapped lines into full paragraphs
-  const paragraphs = [];
-  const rawLines = text.split('\n');
-  let current = '';
+  const isAllCapsLine = (line) => {
+    if (!line || line.length < 2 || line.length > 90) return false;
+    const letters = line.replace(/[^A-Za-z]/g, '');
+    if (letters.length < 2) return false;
+    return letters === letters.toUpperCase();
+  };
 
-  for (const line of rawLines) {
-    const trimmed = line.trim();
+  const rawLines = text.split('\n').map(l => l.trim());
+  const paragraphs = [];
+  let current = '';
+  let lastWasIngredientLine = false;
+
+  for (let i = 0; i < rawLines.length; i++) {
+    const trimmed = rawLines[i];
     if (!trimmed) {
       if (current) { paragraphs.push(current.trim()); current = ''; }
+      lastWasIngredientLine = false;
       continue;
     }
-    // Ingredient line — starts with number or fraction, keep separate
-    if (/^[\d½⅓⅔¼¾⅛]/.test(trimmed)) {
+
+    const startsWithDigit = /^[\d½⅓⅔¼¾⅛]/.test(trimmed);
+
+    if (startsWithDigit) {
       if (current) { paragraphs.push(current.trim()); current = ''; }
       paragraphs.push(trimmed);
+      lastWasIngredientLine = true;
       continue;
     }
-    // Join to current paragraph
+
+    // Check if this all-caps line is a REAL heading vs. a decorative
+    // drop-cap line that's actually the start of a lowercase sentence.
+    // Real headings don't continue onto a lowercase next line.
+    if (isAllCapsLine(trimmed)) {
+      const nextLine = rawLines[i + 1] || '';
+      const nextStartsLowercase = /^[a-z]/.test(nextLine.trim());
+
+      if (!nextStartsLowercase) {
+        // Genuine standalone heading
+        if (current) { paragraphs.push(current.trim()); current = ''; }
+        paragraphs.push(trimmed);
+        lastWasIngredientLine = false;
+        continue;
+      }
+      // else: fall through — treat as a normal sentence-starting line
+      // (drop-cap style intro), join it into the flowing paragraph below
+    }
+
+    if (lastWasIngredientLine && paragraphs.length > 0) {
+      paragraphs[paragraphs.length - 1] += ' ' + trimmed;
+      continue;
+    }
+
     current = current ? current + ' ' + trimmed : trimmed;
+    lastWasIngredientLine = false;
   }
   if (current) paragraphs.push(current.trim());
 
@@ -575,16 +623,23 @@ function reflowAndSplitText(text) {
 
   const result = [];
   for (const para of paragraphs) {
-    // Ingredient lines — keep as-is
     if (/^[\d½⅓⅔¼¾⅛]/.test(para)) {
       result.push(para);
       continue;
     }
 
-    // Protect abbreviation periods temporarily
-    const protectedPara = para.replace(abbrevPattern, (m) => m.replace('.', '###DOT###'));
+    // Only skip sentence-splitting for paragraphs that are ENTIRELY
+    // caps (true isolated headings) — not ones that start caps but
+    // contain lowercase continuation text.
+    const letters = para.replace(/[^A-Za-z]/g, '');
+    const isFullyAllCaps = letters.length >= 2 && letters === letters.toUpperCase();
 
-    // Split on sentence-ending punctuation followed by a capital letter
+    if (isFullyAllCaps) {
+      result.push(para);
+      continue;
+    }
+
+    const protectedPara = para.replace(abbrevPattern, (m) => m.replace('.', '###DOT###'));
     const sentences = protectedPara
       .split(/(?<=[.!?])\s+(?=[A-Z])/)
       .map(s => s.replace(/###DOT###/g, '.').trim())
@@ -689,33 +744,37 @@ export function parseRecipeText(text) {
         break;
 
       case 'unknown': {
-        const urlMatch = classified.text?.match(/find it online at\s+(https?:\/\/\S+)/i) ||
-                         classified.text?.match(/^source:?\s+(https?:\/\/\S+)/i);
-        if (urlMatch) {
-          recipe.sourceUrl = urlMatch[1];
-          break;
-        }
+  const urlMatch = classified.text?.match(/find it online at\s+(https?:\/\/\S+)/i) ||
+                   classified.text?.match(/^source:?\s+(https?:\/\/\S+)/i);
+  if (urlMatch) {
+    recipe.sourceUrl = urlMatch[1];
+    break;
+  }
 
-        if (!recipe.name && line.length > 3 && line.length < 120) {
-          recipe.name = line;
-          break;
-        }
+  // A real title is never an imperative direction sentence —
+  // reject lines starting with a cooking verb from being guessed as the name
+  const looksLikeTitle = !startsWithCookingVerb(line);
 
-        if (/rate this recipe|from \d+ votes?|\d+ ratings?/i.test(classified.text)) {
-          break;
-        }
+  if (!recipe.name && looksLikeTitle && line.length > 3 && line.length < 120) {
+    recipe.name = line;
+    break;
+  }
 
-        if (mode === 'directions') {
-          recipe.directions.push({
-            id: generateUUID(),
-            text: classified.text,
-            group: currentGroup || null,
-          });
-        } else if (mode === 'preamble' && recipe.name && !recipe.description) {
-          recipe.description = classified.text;
-        }
-        break;
-      }
+  if (/rate this recipe|from \d+ votes?|\d+ ratings?/i.test(classified.text)) {
+    break;
+  }
+
+  if (mode === 'directions') {
+    recipe.directions.push({
+      id: generateUUID(),
+      text: classified.text,
+      group: currentGroup || null,
+    });
+  } else if (mode === 'preamble' && recipe.name && !recipe.description) {
+    recipe.description = classified.text;
+  }
+  break;
+}
     }
   }
 

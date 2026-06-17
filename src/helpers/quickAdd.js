@@ -6,7 +6,7 @@ import { loadRecipes, saveRecipes } from '../functions.js';
 import { populateFields } from './fields.js';
 import { listDirections } from './directions.js';
 import { listIngredients } from './ingredients.js';
-import { parseRecipeText } from './ingredientParser.js';
+import { parseRecipeText, reflowAndSplitText } from './ingredientParser.js';
 import {
   updateIdentitySummary,
   updateDescriptionSummary,
@@ -42,7 +42,7 @@ export function showQuickAddModal(recipeId) {
       <p class="modal-subtitle">How would you like to start?</p>
 
       <div class="quick-add-options">
-        
+
         <button class="quick-add-option" data-method="url">
           <i class="fa-solid fa-link"></i>
           <div>
@@ -66,7 +66,7 @@ export function showQuickAddModal(recipeId) {
             <span>Photograph a cookbook, recipe card, or printout</span>
           </div>
         </button>
-        
+
         <button class="quick-add-option" data-method="manual">
           <i class="fa-solid fa-pencil"></i>
           <div>
@@ -75,7 +75,6 @@ export function showQuickAddModal(recipeId) {
           </div>
         </button>
 
-        
       </div>
 
       <div class="quick-add-input-area" hidden>
@@ -292,6 +291,9 @@ function showPhotoUploadScreen(modal, recipeId) {
         throw new Error('Could not extract any text from the photos');
       }
 
+      console.log('=== RAW OCR TEXT (combined from all photos) ===');
+      console.log(combinedText);
+
       showOCRReviewScreen(modal, recipeId, combinedText.trim(), photos);
 
     } catch (error) {
@@ -350,7 +352,7 @@ function showOCRReviewScreen(modal, recipeId, extractedText, photos) {
   });
 
   content.querySelector('#ocr-import-btn').addEventListener('click', async () => {
-    const text = content.querySelector('#ocr-text-area').value;
+    const rawText = content.querySelector('#ocr-text-area').value;
     const statusDiv = content.querySelector('#ocr-status');
     const importBtn = content.querySelector('#ocr-import-btn');
 
@@ -358,7 +360,18 @@ function showOCRReviewScreen(modal, recipeId, extractedText, photos) {
     importBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Importing...';
 
     try {
-      const parsedRecipe = parseRecipeText(text);
+      console.log('=== TEXT BEFORE PARSING (from review textarea) ===');
+      console.log(rawText);
+
+      const reflowed = reflowAndSplitText(rawText);
+      console.log('=== AFTER REFLOW/SPLIT (debug only — parseRecipeText also runs this internally) ===');
+      console.log(reflowed);
+
+      const parsedRecipe = parseRecipeText(rawText);
+
+      console.log('=== PARSED RECIPE ===');
+      console.log(JSON.stringify(parsedRecipe, null, 2));
+
       await populateParsedRecipe(parsedRecipe, recipeId);
       modal.close();
       modal.remove();
