@@ -42,14 +42,7 @@ export function showQuickAddModal(recipeId) {
       <p class="modal-subtitle">How would you like to start?</p>
 
       <div class="quick-add-options">
-        <button class="quick-add-option" data-method="manual">
-          <i class="fa-solid fa-pencil"></i>
-          <div>
-            <strong>Type it in</strong>
-            <span>Fill in the form manually</span>
-          </div>
-        </button>
-
+        
         <button class="quick-add-option" data-method="url">
           <i class="fa-solid fa-link"></i>
           <div>
@@ -73,6 +66,16 @@ export function showQuickAddModal(recipeId) {
             <span>Photograph a cookbook, recipe card, or printout</span>
           </div>
         </button>
+        
+        <button class="quick-add-option" data-method="manual">
+          <i class="fa-solid fa-pencil"></i>
+          <div>
+            <strong>Type it in</strong>
+            <span>Fill in the form manually</span>
+          </div>
+        </button>
+
+        
       </div>
 
       <div class="quick-add-input-area" hidden>
