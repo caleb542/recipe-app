@@ -117,14 +117,14 @@ const COOKING_VERBS = new Set([
   // H
   'heat', 'heating',
   // I
-  'increase', 'increasing',
+  'increase', 'increasing', 'in',
   // K
   'knead', 'kneading',
   // L
   'layer', 'layering', 'let', 'line', 'lining',
   // M
   'marinate', 'marinating', 'mash', 'mashing', 'mince', 'mincing',
-  'mix', 'mixing',
+  'mix', 'mixing', 'meanwhile',
   // O
   'oil', 'oiling',
   // P
@@ -146,11 +146,11 @@ const COOKING_VERBS = new Set([
   // T
   'taste', 'tasting', 'toast', 'toasting', 'top', 'topping',
   'transfer', 'transferring', 'trim', 'trimming', 'truss', 'trussing',
-  'turn', 'turning',
+  'turn', 'turning', 'throw',
   // U
   'uncover', 'uncovering',
   // W
-  'warm', 'warming', 'whisk', 'whisking',
+  'warm', 'warming', 'whisk', 'whisking', 'when',
   // Z
   'zest', 'zesting',
 ]);
@@ -292,7 +292,7 @@ export function stripLeadingNoise(line) {
     .trim()
     .replace(/[\u2018\u2019]/g, "'")
     .replace(/[\u201C\u201D]/g, '"')
-    .replace(/^[-–—•·▪▸►]\s+/, '')
+    .replace(/^[-–—•·▪▸►☐▢□☑☒✓✔]\s+/, '')
     .replace(/^\(?\[?\d+[\.\)\]:]\)?\s*/, '')
     .replace(/^step\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)[:\.\s]\s*/i, '')
     .replace(/^(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|finally|lastly|then|next)[:\.\s]\s*/i, '')
@@ -488,11 +488,7 @@ function classifyLine(line) {
     return { type: 'direction', text: clean };
   }
 
-  // ----------------------------------------
   // COOKING VERB DETECTION
-  // Lines starting with a cooking verb are directions
-  // even without a "Directions:" heading
-  // ----------------------------------------
   if (startsWithCookingVerb(clean)) {
     return { type: 'direction', text: clean };
   }
@@ -543,9 +539,70 @@ function extractMeta(text, recipe) {
 }
 
 // ----------------------------------------
+// REFLOW AND SPLIT OCR TEXT
+// Fixes hyphenated line breaks, rejoins wrapped lines,
+// then splits direction paragraphs into individual sentences
+// Called at the top of parseRecipeText as a pre-processing step
+// ----------------------------------------
+function reflowAndSplitText(text) {
+  // Step 1 — fix hyphenated line breaks from book scanning
+  text = text.replace(/(\w)-\n(\w)/g, '$1$2');
+
+  // Step 2 — reflow wrapped lines into full paragraphs
+  const paragraphs = [];
+  const rawLines = text.split('\n');
+  let current = '';
+
+  for (const line of rawLines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      if (current) { paragraphs.push(current.trim()); current = ''; }
+      continue;
+    }
+    // Ingredient line — starts with number or fraction, keep separate
+    if (/^[\d½⅓⅔¼¾⅛]/.test(trimmed)) {
+      if (current) { paragraphs.push(current.trim()); current = ''; }
+      paragraphs.push(trimmed);
+      continue;
+    }
+    // Join to current paragraph
+    current = current ? current + ' ' + trimmed : trimmed;
+  }
+  if (current) paragraphs.push(current.trim());
+
+  // Step 3 — split direction paragraphs into sentences
+  const abbrevPattern = /\b(oz|tsp|tbsp|tbs|lbs?|approx|i\.e|e\.g|St|Dr|Mr|Mrs|Ms|Jr|Sr|vs|etc|p|pp|vol|fig|no)\.\s/gi;
+
+  const result = [];
+  for (const para of paragraphs) {
+    // Ingredient lines — keep as-is
+    if (/^[\d½⅓⅔¼¾⅛]/.test(para)) {
+      result.push(para);
+      continue;
+    }
+
+    // Protect abbreviation periods temporarily
+    const protectedPara = para.replace(abbrevPattern, (m) => m.replace('.', '###DOT###'));
+
+    // Split on sentence-ending punctuation followed by a capital letter
+    const sentences = protectedPara
+      .split(/(?<=[.!?])\s+(?=[A-Z])/)
+      .map(s => s.replace(/###DOT###/g, '.').trim())
+      .filter(s => s.length > 0);
+
+    result.push(...sentences);
+  }
+
+  return result.join('\n');
+}
+
+// ----------------------------------------
 // MAIN RECIPE TEXT PARSER
 // ----------------------------------------
 export function parseRecipeText(text) {
+  // Pre-process — fix OCR line breaks and split into sentences
+  text = reflowAndSplitText(text);
+
   const lines = text.split('\n');
 
   const recipe = {
@@ -674,4 +731,4 @@ export function parseRecipeText(text) {
   }
 
   return recipe;
-} 
+}

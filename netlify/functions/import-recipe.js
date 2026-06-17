@@ -321,7 +321,8 @@ function parseServings(yield_) {
 function parseIngredient(str) {
     // Remove HTML if present
     str = str.replace(/<[^>]*>/g, '').trim();
-    
+     // Strip leading checkbox/bullet characters (WP Recipe Maker, etc.)
+    str = str.replace(/^[\u2610\u25A2\u25A1\u2611\u2612\u2713\u2714\s]+/, '');
     // Normalize unicode fractions to regular fractions
     str = str
         .replace(/¼/g, '1/4')

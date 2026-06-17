@@ -9,7 +9,6 @@ import { findExistingImage, registerImage } from './helpers/globalImageRegistry.
 import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { hideWarning } from './functions.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
-// import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
 
 
@@ -21,7 +20,6 @@ let currentProfile = null;
 let newAvatarUrl = null; // Store temporarily until save
 
 async function init() {
-  // showSpinner();
   await loadHeader()
   hideWarning ()
   setupSanityMegaMenu()
@@ -38,34 +36,28 @@ async function init() {
 
   if (!username) {
     showError('No username provided');
-    // removeSpinner();
     return;
   }
 
   // Load and display profile
   await loadAndDisplayProfile(username);
-  // removeSpinner(1500);
   showDevNotice();
 }
+
 function formatDate(dateValue) {
   if (!dateValue) return 'Unknown date';
   
   try {
-    // Handle array format: ["Oct 12th, 2022 16:00", 1665604800]
     if (Array.isArray(dateValue)) {
-      dateValue = dateValue[0]; // Use the string format
+      dateValue = dateValue[0];
     }
     
-    // Try parsing as ISO string first
     let date = new Date(dateValue);
     
-    // If invalid, try moment-style format
     if (isNaN(date.getTime()) && typeof dateValue === 'string') {
-      // Try parsing "MMM Do, YYYY HH:mm" format
       date = new Date(dateValue.replace(/(\d+)(st|nd|rd|th)/, '$1'));
     }
     
-    // If still invalid, give up
     if (isNaN(date.getTime())) {
       return 'Unknown date';
     }
@@ -75,21 +67,20 @@ function formatDate(dateValue) {
     return 'Unknown date';
   }
 }
+
 async function loadAndDisplayProfile(username) {
   const container = document.getElementById('profile-container');
   
   try {
-    // ✅ Get auth token if user is logged in
     const token = await getToken();
     const headers = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // Fetch public profile
     const response = await fetch(
       `/.netlify/functions/user-profile-public?username=${encodeURIComponent(username)}`,
-      { headers } // ✅ Add headers
+      { headers }
     );
 
     if (!response.ok) {
@@ -103,13 +94,12 @@ async function loadAndDisplayProfile(username) {
 
     const profile = await response.json();
    
-    currentProfile = profile; // Store globally
+    currentProfile = profile;
     displayProfile(profile);
 
   } catch (error) {
     console.error('Error loading profile:', error);
     showError('Failed to load profile');
-    // removeSpinner();
   }
 }
 
@@ -119,7 +109,6 @@ function displayProfile(profile) {
   const currentUser = getUserProfile();
   const isOwnProfile = currentUser?.username === profile.username;
 
- 
   const avatar = getAvatarHTML(profile.avatar, profile.profile.displayName);
 
   container.innerHTML = `
@@ -140,7 +129,6 @@ function displayProfile(profile) {
           ` : ''}
         </div>
 
-       
           <div class="profile-info">
             <h2 class="profile-display-name">${escapeHtml(profile.profile.displayName)}</h2>
             <p class="profile-username">@${escapeHtml(profile.username)}</p>
@@ -156,7 +144,6 @@ function displayProfile(profile) {
     <section class="about-stats">
       <div>
      ${profile.profile.bio ? `
-       
         <div class="profile-bio">
           <h3>About</h3>
           <p>${escapeHtml(profile.profile.bio)}</p>
@@ -266,7 +253,6 @@ function displayProfile(profile) {
     <div id="upload-status" style="margin-top: 1rem;"></div>
   `;
 
-  // Setup avatar upload listener if own profile
   if (isOwnProfile) {
     setupAvatarUpload();
   }
@@ -274,6 +260,7 @@ function displayProfile(profile) {
 
 /**
  * Render recipe card with published/unpublished status
+ * Compact horizontal layout — square image left, content right
  */
 function renderRecipeCard(recipe, isPublished) {
   return `
@@ -292,46 +279,37 @@ function renderRecipeCard(recipe, isPublished) {
         </div>
       ` : `
         <div class="recipe-card-image recipe-card-no-image">
-          <i class="fa-solid fa-utensils" style="font-size: 3rem; color: #ccc;"></i>
+          <i class="fa-solid fa-utensils" style="font-size: 2rem; color: #ccc;"></i>
         </div>
       `}
+      </div>
       <div class="recipe-card-content">
         <h4 class="recipe-card-title">${escapeHtml(recipe.name)}</h4>
         ${recipe.description ? `
-          <p class="recipe-card-description">${escapeHtml(recipe.description).substring(0, 100)}${recipe.description.length > 100 ? '...' : ''}</p>
+          <p class="recipe-card-description">${escapeHtml(recipe.description).substring(0, 90)}${recipe.description.length > 90 ? '...' : ''}</p>
         ` : ''}
         ${recipe.categories && recipe.categories.length > 0 ? `
           <div class="recipe-card-tags">
-          Categories:
             ${recipe.categories.slice(0, 3).map(cat => `
               <span class="recipe-tag">${escapeHtml(cat)}</span>
             `).join('')}
           </div>
         ` : ''}
-       <div class="recipe-card-meta">
-       Created:
+        <div class="recipe-card-meta">
           <span class="recipe-date">
             <i class="fa-solid fa-calendar"></i>
             ${formatDate(recipe.createdAt)}
           </span>
-          ${!isPublished ? `
-            <span class="recipe-action">
-              <i class="fa-solid fa-edit"></i> Edit
-            </span>
-          ` : ''}
+        </div>
+        <div class="profile-recipe-card-links">
+          <a class="btn-primary" href="${'/edit.html'}#${recipe.id}">
+            Edit
+          </a>
+          <a class="btn-secondary" href="${'/article.html'}#${recipe.id}">
+            View
+          </a>
         </div>
       </div>
-      </div>
-    
-      <div class="profile-recipe-card-links">
-        <a class="btn-primary" href="${'/edit.html'}#${recipe.id}">
-        Edit
-        </a>
-         <a class="btn-secondary" href="${'/article.html'}#${recipe.id}">
-       View Article
-        </a>
-      </div>
-
     </div>
   `;
 }
@@ -348,7 +326,6 @@ function setupAvatarUpload() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate
     if (!file.type.startsWith('image/')) {
       showUploadStatus('Please select an image file', 'error');
       return;
@@ -366,7 +343,6 @@ function setupAvatarUpload() {
       
       console.log(`📉 Avatar: ${(file.size / 1024).toFixed(0)}KB → ${(optimizedBlob.size / 1024).toFixed(0)}KB`);
       
-      // Check global registry for duplicate
       const fileHash = await generateFileHash(optimizedBlob);
       const existingImage = findExistingImage(fileHash);
       
