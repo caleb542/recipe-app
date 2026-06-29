@@ -486,34 +486,43 @@
     min-width: 0;
     animation: none;
   }
+.sort-bar {
+    width: 100%;
+    padding: 0 1rem;
+    margin-top: 0.5rem;
+    justify-content: flex-start;
+    min-width: 0;
+    animation: none;
+}
 
-  .sort-controls {
+.sort-controls {
     gap: 8px;
     flex-direction: column;
     align-items: stretch;
     width: 100%;
 
     .search-control {
-      width: 100%;
-      input[type="text"] { font-size: 0.875rem; }
+        width: 100%;
+        input[type="text"] { font-size: 0.875rem; }
     }
 
     .sort-control {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    select {
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
     }
 
     label {
-      font-size: 0.875rem;
-      padding: 0.5rem 0;
+        flex-shrink: 0;
     }
-  }
+
+    select {
+        flex: 1;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+}
 
   // ----------------------------------------
   // RECIPE CARD GRID
@@ -588,7 +597,7 @@
   }
 
   .shopping-list li:last-child {
-    margin-bottom: 6rem;
+    margin-bottom: 1.5rem;
   }
 
   // ----------------------------------------
@@ -637,48 +646,48 @@
   padding: 0 5px;
  }
 
- .breadcrumb {
-    display: flex;
-      flex-direction: column;
-  align-items: baseline;
-    gap: 2px;
-  
-}
-
-.breadcrumb-primary {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 11px;
-}
-
-.breadcrumb-also-in {
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 13px;
-  color: #c8892a;
-  padding-right: 2.5rem;
-  width:calc(100% - 3rem);
-
-  &.is-expanded {
-    white-space: normal;
-    overflow: visible;
-    padding-right: 0;
+  .breadcrumb {
+      display: flex;
+        flex-direction: column;
+    align-items: baseline;
+      gap: 2px;
+    
   }
-}
-.breadcrumb-expand {
-  position: absolute;
-  right: 0;
-  font-size: 10px;
-  color: #c8892a;
-  background: white;
-  border: none;
-  padding: 0 0 0 4px;
-  cursor: pointer;
-  text-decoration: underline;
-}
+
+  .breadcrumb-primary {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 11px;
+  }
+
+  .breadcrumb-also-in {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    color: #c8892a;
+    padding-right: 2.5rem;
+    width:calc(100% - 3rem);
+
+    &.is-expanded {
+      white-space: normal;
+      overflow: visible;
+      padding-right: 0;
+    }
+  }
+  .breadcrumb-expand {
+    position: absolute;
+    right: 0;
+    font-size: 10px;
+    color: #c8892a;
+    background: white;
+    border: none;
+    padding: 0 0 0 4px;
+    cursor: pointer;
+    text-decoration: underline;
+  }
 
   .recipe-page .content-wrap, .category-page .content-wrap, .edit-page .content-wrap, .profile-page .content-wrap, .admin-page .content-wrap {
     margin-top:70px;
@@ -741,11 +750,98 @@
       padding: 2rem 1rem;
 
   }
+    .curated-section-heading {
+      margin-bottom: 1.5rem;
+     
+      top: 70px;
+    
+  }
   .home-page p.curated-card-cuisine {
     margin-bottom:0;
   }
   .home-page p.curated-card-title {
     margin-bottom:1rem;
+  }
+
+
+    
+  // ----------------------------------------
+  // CATEGORY PAGE CARDS — NYT style
+  // ----------------------------------------
+
+  .category-page {
+    .container .container {
+      padding:0 0;
+    }
+    .article-block {
+      padding:0 0;
+    }
+    div#recipes {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      padding: 0;
+    }
+
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: unset;
+      background: transparent;
+      border-radius: 0;
+      padding: 0;
+      border-bottom: 0.5px solid #f0f0f0;
+      box-shadow: none;
+
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+
+      figure {
+        margin: 0 0 0.5rem;
+      }
+
+      .imageElement {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-bottom: 0;
+        height: auto;
+      }
+
+      .text-area {
+        padding: 0;
+        text-align: left;
+      }
+
+      h2 {
+        font-size: 1.15rem;
+        font-weight: 500;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-family: var(--font-heading);
+      }
+
+      .card-author {
+        font-size: 0.75rem;
+        color: #666;
+        margin: 0 0 0.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .card-time {
+        font-size: 0.75rem;
+        color: #888;
+        margin: 0;
+      }
+    }
+
   }
 }
 
@@ -766,84 +862,6 @@
     gap: 8px;
     padding: 0.75rem;
   }
-}
-// ----------------------------------------
-// CATEGORY PAGE CARDS — NYT style
-// ----------------------------------------
-
-.category-page {
-  .container .container {
-    padding:0 0;
-  }
-  .article-block {
-    padding:0 0;
-  }
-  div#recipes {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    padding: 0;
-  }
-
-  a.card {
-    display: block;
-    text-decoration: none;
-    color: unset;
-    background: transparent;
-    border-radius: 0;
-    padding: 0;
-    border-bottom: 0.5px solid #f0f0f0;
-    box-shadow: none;
-
-    &:hover {
-      transform: none;
-      box-shadow: none;
-    }
-
-    figure {
-      margin: 0 0 0.5rem;
-    }
-
-    .imageElement {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      border-radius: 4px;
-      margin-bottom: 0;
-      height: auto;
-    }
-
-    .text-area {
-      padding: 0;
-      text-align: left;
-    }
-
-    h2 {
-      font-size: 1.15rem;
-      font-weight: 500;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      font-family: var(--font-heading);
-    }
-
-    .card-author {
-      font-size: 0.75rem;
-      color: #666;
-      margin: 0 0 0.2rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .card-time {
-      font-size: 0.75rem;
-      color: #888;
-      margin: 0;
-    }
-  }
-
 }
 @media (max-width: 360px) {
   .site-header {

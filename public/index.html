@@ -115,7 +115,19 @@
                         <input size="40" type="text" id="search-filter" placeholder="Filter All Recipes" aria-label="Search recipes">
                     </div>
                     <div class="sort-control">
-                        <label for="filter-by">Sort:</label>
+                        <label for="filter-by" id="sort-label" aria-label="Sort recipes">
+                           
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <!-- Sort Lines (Descending) -->
+                                    <line x1="4" y1="6" x2="16" y2="6" />
+                                    <line x1="4" y1="12" x2="12" y2="12" />
+                                    <line x1="4" y1="18" x2="8" y2="18" />
+                                    
+                                    <!-- Dropdown Chevron Arrow -->
+                                    <polyline points="16 11 19 14 22 11" />
+                                    </svg>
+
+                        </label>
                         <select id="filter-by">
                             <option value="byEdited">Last modified</option>
                             <option value="byCreated">Created date</option>
@@ -140,5 +152,22 @@
     </div>
 
     <script type="module" src="/scripts/index-bundle.js"></script>
+    <script>
+    const filterLabel = document.getElementById('filter-label');
+    const filterSelect = document.getElementById('filter-by');
+
+    filterLabel.addEventListener('click', (event) => {
+        // 1. Prevent the default browser action (which only applies keyboard focus)
+        event.preventDefault(); 
+        
+        // 2. Programmatically trigger the browser's built-in dropdown UI picker
+        if (typeof filterSelect.showPicker === 'function') {
+            filterSelect.showPicker();
+        } else {
+            // Fallback for very old legacy browsers
+            filterSelect.focus();
+        }
+    });
+</script>
 </body>
 </html>

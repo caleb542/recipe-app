@@ -734,14 +734,11 @@ nav.hide {
         }
     }
 }
-  
 .sort-controls {
 
-
-    display:flex;
-    align-items:flex-end;
-    gap:16px;
-
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
 
     .sort-control {
         display: flex;
@@ -749,71 +746,89 @@ nav.hide {
         gap: 8px;
         flex-shrink: 0; // doesn't shrink
     }
+
     select, select::picker(select), select::picker-icon {
         appearance: base-select;
     }
-     label {
-        padding:0;
-        height:44px;
-        padding:0;
-        align-content:center;
+
+    label {
+        padding: 0;
+        height: 44px;
+        align-content: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        border: 1px solid #000;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: background 0.2s ease;
+
+        &:hover {
+            background: #f7f7f7;
+        }
+
+        svg {
+            display: block;
+        }
     }
+
     select {
-        height:44px;
-        padding:0;
+        height: 44px;
+        padding: 0;
         display: flex;
         align-items: center;
         justify-content: unset;
         padding: 0 1rem;
         border-radius: 0;
-        border:1px solid #000;
+        border: 1px solid #000;
         transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
-        &::picker-icon{
-            color:#555;
-               transition: all cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        &::picker-icon {
+            color: #555;
+            transition: all cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
         // &::picker(select) {
-        //     // background:red;
         //     padding:20px;
         //     transition: transform .5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         //     height:auto;
         //     transform:translateY(-50%) scaleY(1);
         //         @starting-style {
         //             height:200px;
-                    
         //             transform:translateY(-50%) scaleY(0.6);
         //         }
-         
         // }
         // &:open::picker-icon {
         //     color:#555;
         //     rotate:120deg;
-            
         // }
         // &:open::picker(select) {
         //     transform:translateY(-50%);
-
         //    @starting-style {
         //        transform:translateY(0%);
         //         transition: transform 1s linear;
         //     }
         // }
 
-
-        
         option:nth-of-type {
             font-family: monospace;
             text-transform: uppercase;
-            font-weight:normal;
-           
+            font-weight: normal;
 
             &:selected {
-                color:#333; background-color: #1abc9c;
+                color: #333;
+                background-color: #1abc9c;
             }
         }
     }
-   
+
+    @media (max-width: 600px) {
+        select {
+            max-width: 130px;
+            font-size: 13px;
+        }
+    }
 }
 
 

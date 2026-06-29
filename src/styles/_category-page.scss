@@ -55,17 +55,20 @@ body.category-page {
         animation-delay: #{0.25s + ($i - 1) * 0.07s};
       }
     }
+
+        
+      .text-area {
+        padding-left:0;
+          h2 {
+          text-align: left;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #111;
+          margin: 0;
+          line-height: 1.4;
+          text-wrap: pretty;
+        }
+    }
   }
 }
-//     .cards{
-//         display:flex;
-//         gap:20px;
 
-//         img {
-//             flex:1;
-//             aspect-ratio:3/4;
-//             aspect-ratio:4/4;
-//             aspect-ratio:4/3;
-//         }
-//     }
-// }
