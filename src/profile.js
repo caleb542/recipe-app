@@ -179,17 +179,28 @@ function displayProfile(profile) {
 
       ${/* Published Recipes Section */ ''}
       ${profile.publishedRecipes && profile.publishedRecipes.length > 0 ? `
-        <section class="profile-section">
-          <div class="section-header">
-            <h3>
-              <i class="fa-solid fa-check-circle" style="color: #2ecc71;"></i>
-              ${isOwnProfile ? 'Published Recipes' : `${profile.profile.displayName}'s Recipes`}
-            </h3>
-            ${isOwnProfile ? `
+        <section class="profile-section recipes-section">
+        <h2>Recipes</h2>
+        <ul>
+       
+         ${isOwnProfile ? `
+             <li>
               <a href="/edit.html" class="btn-create-recipe">
                 <i class="fa-solid fa-plus"></i> Create Recipe
               </a>
+            </li>
+            <li><a href="#unpublished-recipes">View unpublished recipes</li>
+           
+         
             ` : ''}
+          </ul>
+          <div class="section-header">
+        
+            <h3 id="published-recipes">
+              <i class="fa-solid fa-check-circle" style="color: #2ecc71;"></i>
+              ${isOwnProfile ? 'Published Recipes' : `${profile.profile.displayName}'s Recipes`}
+            </h3>
+           
           </div>
           <div class="recipe-grid">
             ${profile.publishedRecipes.map(recipe => renderRecipeCard(recipe, true)).join('')}
@@ -198,7 +209,7 @@ function displayProfile(profile) {
       ` : isOwnProfile ? `
         <div class="profile-section">
           <div class="section-header">
-            <h3>
+            <h3 id="published-recipes">
               <i class="fa-solid fa-check-circle" style="color: #2ecc71;"></i>
               Published Recipes
             </h3>
@@ -217,15 +228,25 @@ function displayProfile(profile) {
       ${isOwnProfile && profile.unpublishedRecipes && profile.unpublishedRecipes.length > 0 ? `
         <div class="profile-section">
           <div class="section-header">
-            <h3>
+            <h3 id="unpublished-recipes">
               <i class="fa-solid fa-eye-slash" style="color: #f39c12;"></i>
-              Drafts (Incomplete Unpublished Recipes)
+              Unpublished
             </h3>
           </div>
           <p class="section-note">
             <i class="fa-solid fa-info-circle"></i>
             These recipes are only visible to you. Publish them to share with others.
           </p>
+          <ul>
+             <li>
+              <a href="/edit.html" class="btn-create-recipe">
+                <i class="fa-solid fa-plus"></i> Create Recipe
+              </a>
+            </li>
+            <li><a href="#published-recipes">View published recipes</li>
+           
+          </ul>
+
           <div class="recipe-grid">
             ${profile.unpublishedRecipes.map(recipe => renderRecipeCard(recipe, false)).join('')}
           </div>

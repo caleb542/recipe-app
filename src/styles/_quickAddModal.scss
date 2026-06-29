@@ -1,6 +1,7 @@
 /* Quick Add Modal */
 
 .quick-add-modal {
+  position: relative;
   max-width: 480px;
   width: 90%;
   border: none;
@@ -22,7 +23,6 @@
 
 .quick-add-modal-content {
   padding: 1.75rem;
-  position: relative;
 }
 
 .quick-add-modal h2 {
