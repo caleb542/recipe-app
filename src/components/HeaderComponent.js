@@ -208,7 +208,7 @@ export function showEditButton(recipeId) {
 
   container.innerHTML = `
     <a href="/edit.html#${recipeId}" class="header-edit-btn">
-      <i class="fa-solid fa-pen-to-square"></i> Edit Recipe
+      <i class="fa-solid fa-pen-to-square"></i><span class="hide-on-mobile">Edit Recipe</span>
     </a>
   `;
 }
