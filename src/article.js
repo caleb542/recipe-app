@@ -16,6 +16,7 @@ import { setupSanityMegaMenu } from "./components/MegaMenuSanity.js";
 import { CATEGORIES, getCategoryNames } from "./helpers/categories.js";
 import { extractYouTubeId, extractVimeoId } from './helpers/youtubeEmbed.js';
 import { formatAmount } from './helpers/ingredientParser.js';
+import { canEditRecipe } from './auth/roles.js';
 
 
 
@@ -322,10 +323,11 @@ if (videosContainer && recItem.videos && recItem.videos.length > 0) {
 // Check ownership and show header edit button
 const authenticated = await isAuthenticated();
 if (authenticated) {
+  const userProfile = getUserProfile();
   const currentUser = await getUser();
-  const isAuthor = recItem.author?.auth0Id === currentUser.sub;
   const isLegacy = !recItem.author || recItem.author.name === "Legacy User";
-  if (isAuthor || isLegacy) {
+  
+  if (isLegacy || canEditRecipe(userProfile, recItem)) {
     showEditButton(currentRecipeId);
   }
 }

@@ -23,7 +23,8 @@ import { setupImageGallery, renderImageGallery } from './helpers/imageGallery.js
 
 import { initAuth0, isAuthenticated, getUser } from './auth/auth0.js';
 import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
-import { loadUserProfile } from './userContext.js';
+import { loadUserProfile, getUserProfile } from './userContext.js';
+import { canEditRecipe } from './auth/roles.js';
 
 import { setupPreview } from './helpers/preview.js'
 import { initStatusToggle, getCurrentPublishedState } from './helpers/statusToggle.js'
@@ -106,10 +107,10 @@ hideWarning();
 
   // ✅ Check ownership (matching your article.js logic)
   const isAuthor = recipe.author?.auth0Id === currentUserId;
+  const userProfile = getUserProfile();
   const isLegacy = !recipe.author || recipe.author?.name === "Legacy User";
 
-  if (!isAuthor && !isLegacy) {
-    // Not the author and not a legacy recipe
+  if (!isLegacy && !canEditRecipe(userProfile, recipe)) {
     alert('You can only edit recipes you created');
     location.assign(`/article.html#${recipeId}`);
     return;

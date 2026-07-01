@@ -14,10 +14,10 @@ let impersonationState = {
 };
 
 // ✅ NEW: Superadmin list
-const SUPERADMINS = [
-  'caleb542@gmail.com',
-  // Add more superadmin emails here
-];
+// const SUPERADMINS = [
+//   'caleb542@gmail.com',
+//   // Add more superadmin emails here
+// ];
 
 // Load user profile from API
 export async function loadUserProfile(skipFetch = false) {
@@ -38,7 +38,7 @@ export async function loadUserProfile(skipFetch = false) {
     const cachedUsername = localStorage.getItem('username');
     if (skipFetch && cachedUsername && currentUserProfile) {
       if (currentUserProfile) {
-        currentUserProfile.isSuperadmin = SUPERADMINS.includes(currentUserProfile.email);
+        currentUserProfile.isSuperadmin = currentUserProfile.role === 'superadmin';
       }
       await restoreImpersonationState();
       return currentUserProfile;
@@ -80,7 +80,7 @@ export async function loadUserProfile(skipFetch = false) {
     const profile = await response.json();
     
     // ✅ NEW: Add superadmin flag
-    profile.isSuperadmin = SUPERADMINS.includes(profile.email);
+    profile.isSuperadmin = profile.role === 'superadmin';
     
     // ✅ CHANGED: Store only username in localStorage (safe data)
     // Keep full profile in memory only
@@ -234,7 +234,7 @@ export async function updateUserProfile(updates) {
     const profile = await response.json();
     
     // ✅ Preserve superadmin flag
-    profile.isSuperadmin = SUPERADMINS.includes(profile.email);
+    profile.isSuperadmin = profile.role === 'superadmin';
     
     // ✅ CHANGED: Update memory and only store username
     currentUserProfile = profile;
@@ -290,4 +290,4 @@ export function getUserAvatar() {
 }
 
 // ✅ NEW: Export superadmins list
-export { SUPERADMINS };
+// export { SUPERADMINS };
