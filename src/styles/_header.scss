@@ -265,6 +265,12 @@
   background: transparent;
   border-radius: 50%;
 }
+.header-avatar-default {
+  width: 36px;
+  height: 36px;
+  display: block;
+  border-radius: 50%;
+}
 #user-info {
   display: flex;
   align-items: center;
@@ -287,11 +293,7 @@
   left: 0;
   height:40px;
   padding-left:10px;
-  // background-color: inherit;
-  // border:1px dashed #f0f0f0;
-  // border-top:3px solid #fff;
-  // border-radius:0 0 4px 4px;
-  // box-shadow: 3px 1px 2px 0px #eee;
+
 }
 
 .header-edit-btn {

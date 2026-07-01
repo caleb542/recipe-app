@@ -1,13 +1,14 @@
 import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { renderBreadcrumbs } from './components/Breadcrumbs.js';
 import { loadFooter } from './components/FooterComponent.js';
-import { initAuth0, isAuthenticated } from './auth/auth0.js';
 import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { listRecipes } from './recipes.js';
 import { loadRecipes, getFeaturedImage, hamburger } from './functions.js';
 import { hideWarning } from './functions.js';
+import { initAuth0, isAuthenticated, getUser } from './auth/auth0.js';
+import { generateRecipeBadges } from './components/RecipeBadges.js';
 // import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
 
@@ -16,6 +17,7 @@ let filteredRecipes = [];
 let currentCategory = '';
 let currentSlug = '';
 let CATEGORIES_MAP = {};
+let currentUserId = null;
 
 async function loadCategoriesMap() {
   try {
@@ -39,6 +41,8 @@ async function init() {
     const authenticated = await isAuthenticated();
     if (authenticated) {
       await loadUserProfile(true);
+       const user = await getUser();
+        currentUserId = user?.sub || null;
     }
     
     await updateAuthUI();
@@ -200,18 +204,20 @@ function renderRecipes() {
     const featuredImage = recipe.images?.find(img => img.isFeatured) || recipe.images?.[0];
     const photoURL = featuredImage?.url || recipe.photoURL || '/images/pexels-mali-maeder-1.jpg';
     const recipeLink = `/article/${recipe.slug || recipe._id}?from=${currentSlug}`;
+    const badges = generateRecipeBadges(recipe, currentUserId);
 
     return `
       <a href="${recipeLink}" class="card home">
-        <article>
-          <figure>
-            <img src="${photoURL}" alt="${recipe.name}" class="imageElement" loading="lazy">
-          </figure>
-          <div class="text-area">
-            <h2>${recipe.name}</h2>
-          </div>
-        </article>
-      </a>
+      <article>
+        ${badges}
+        <figure>
+          <img src="${photoURL}" alt="${recipe.name}" class="imageElement" loading="lazy">
+        </figure>
+        <div class="text-area">
+          <h2>${recipe.name}</h2>
+        </div>
+      </article>
+    </a>
     `;
   }).join('');
 }

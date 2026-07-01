@@ -95,7 +95,7 @@ try {
 } catch (e) {
     console.warn('Could not get user:', e.message);
 }
-await loadCuratedSections();
+await loadCuratedSections(currentUser?.sub);
 // await removeSpinner(1500);
 showDevNotice();
 await listRecipes(recipes, currentUser?.sub);
@@ -120,7 +120,7 @@ await listRecipes(recipes, currentUser?.sub);
   await updateAuthUI();
   setupAuthListeners();
   recipes = await loadRecipes(); // hits localStorage, already warm
-  await loadCuratedSections();
+  await loadCuratedSections(currentUser?.sub);
   await listRecipes(recipes, currentUser?.sub);
   
   initBadgeVisibility();

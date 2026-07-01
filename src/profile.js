@@ -7,9 +7,10 @@ import { optimizeImage, IMAGE_PRESETS } from './helpers/imageOptimizer.js';
 import { generateFileHash } from './helpers/duplicateCheck.js';
 import { findExistingImage, registerImage } from './helpers/globalImageRegistry.js';
 import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
-import { hideWarning } from './functions.js';
+import { hideWarning, hamburger, toggleMenu } from './functions.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
 import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
+
 
 
 const CLOUDINARY_CLOUD_NAME = 'day1f5nz8';
@@ -42,6 +43,7 @@ async function init() {
   // Load and display profile
   await loadAndDisplayProfile(username);
   showDevNotice();
+  hamburger()
 }
 
 function formatDate(dateValue) {

@@ -2,18 +2,18 @@ import { isSuperadmin } from '../userContext.js';
 import { logout } from '../auth/auth0.js';
 import { toggleBadgeVisibility, areBadgesHidden } from '../utils/badgeVisibility.js';
 
-const DEFAULT_AVATAR_SVG = `<svg class="header-avatar-default" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="18" cy="18" r="18" fill="#e8e0d5"/>
-  <circle cx="18" cy="14" r="6" fill="#c8a882"/>
-  <path d="M6 30c0-6.627 5.373-10 12-10s12 3.373 12 10" fill="#c8a882"/>
-</svg>`;
+function getAvatarSVG(initials = '') {
+  return `<svg class="header-avatar-default" viewBox="0 0 36 36" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="18" cy="18" r="18" fill="#e8e0d5"/>
+    <circle cx="18" cy="14" r="6" fill="#c8a882"/>
+    <path d="M6 30c0-6.627 5.373-10 12-10s12 3.373 12 10" fill="#c8a882"/>
+    ${initials ? `<text x="18" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="#fff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" letter-spacing="0.5">${initials}</text>` : ''}
+  </svg>`;
+}
 
 export function setupAvatarDropdown(user, avatar) {
   const avatarContainer = document.getElementById('user-avatar-container');
   const dialog = document.getElementById('avatar-dialog');
-
-    console.log('avatarContainer:', avatarContainer);
-  console.log('dialog:', dialog);
   if (!avatarContainer || !dialog) return;
 
   const displayName = user.profile?.displayName || user.username || 'User';
@@ -22,14 +22,15 @@ export function setupAvatarDropdown(user, avatar) {
   // ----------------------------------------
   // Render avatar button with SVG default
   // ----------------------------------------
-  avatarContainer.innerHTML = `
-    <button class="avatar-btn" id="avatar-btn" 
-      aria-expanded="false" 
-      aria-haspopup="dialog"
-      aria-controls="avatar-dialog">
-      ${DEFAULT_AVATAR_SVG}
-    </button>
-  `;
+ const initials = avatar?.type === 'initials' ? avatar.initials : '';
+avatarContainer.innerHTML = `
+  <button class="avatar-btn" id="avatar-btn" 
+    aria-expanded="false" 
+    aria-haspopup="dialog"
+    aria-controls="avatar-dialog">
+    ${getAvatarSVG(initials)}
+  </button>
+`;
 
   // Silently swap to real image once loaded
   if (avatar?.type === 'image' && avatar.url) {
@@ -51,9 +52,9 @@ export function setupAvatarDropdown(user, avatar) {
   // ----------------------------------------
   // Populate dialog content
   // ----------------------------------------
-  const avatarImgHTML = avatar?.type === 'image'
-    ? `<img src="${avatar.url}" alt="${displayName}" class="avatar-dropdown-avatar">`
-    : DEFAULT_AVATAR_SVG;
+const avatarImgHTML = avatar?.type === 'image'
+  ? `<img src="${avatar.url}" alt="${displayName}" class="avatar-dropdown-avatar">`
+  : getAvatarSVG(initials);
 
   dialog.innerHTML = `
   <button class="avatar-dialog-close" id="avatar-dialog-close" aria-label="Close menu">

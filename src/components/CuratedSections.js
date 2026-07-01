@@ -1,4 +1,5 @@
 import { loadCategories, loadRecipes, getFeaturedImage } from '../functions.js';
+import { generateRecipeBadges } from './RecipeBadges.js';
 
 const HOMEPAGE_SECTIONS = [
   { categorySlug: 'desserts-and-sweets', categoryName: 'Desserts & Sweets', label: 'Something Sweet', count: 4 },
@@ -38,15 +39,17 @@ async function fetchWorldFlavours() {
   }
 }
 
-function renderSectionCard(recipe) {
+function renderSectionCard(recipe, currentUserId) {
   const featuredImage = getFeaturedImage(recipe);
   const photoURL = featuredImage?.url || '/images/pexels-mali-maeder-1.jpg';
   const recipeLink = recipe.fullSlug
     ? `/article/${recipe.fullSlug}`
     : `/article.html#${recipe.id}`;
+  const badges = generateRecipeBadges(recipe, currentUserId);
 
   return `
     <a href="${recipeLink}" class="curated-card">
+      ${badges}
       <figure>
         <img src="${photoURL}" alt="${recipe.name}" loading="lazy">
       </figure>
@@ -55,16 +58,18 @@ function renderSectionCard(recipe) {
   `;
 }
 
-function renderWorldFlavoursCard(item) {
+function renderWorldFlavoursCard(item, currentUserId) {
   const { recipe, cuisineName, slug } = item;
   const featuredImage = getFeaturedImage(recipe);
   const photoURL = featuredImage?.url || '/images/pexels-mali-maeder-1.jpg';
   const recipeLink = recipe.fullSlug
     ? `/article/${recipe.fullSlug}`
     : `/article.html#${recipe.id}`;
+  const badges = generateRecipeBadges(recipe, currentUserId);
 
   return `
     <a href="${recipeLink}" class="curated-card">
+      ${badges}
       <figure>
         <img src="${photoURL}" alt="${recipe.name}" loading="lazy">
       </figure>
@@ -74,7 +79,7 @@ function renderWorldFlavoursCard(item) {
   `;
 }
 
-function renderWorldFlavoursSection(items) {
+function renderWorldFlavoursSection(items, currentUserId) {
   if (!items.length) return '';
 
   return `
@@ -84,13 +89,13 @@ function renderWorldFlavoursSection(items) {
         <p class="curated-section-desc">A taste of something from around the globe.</p>
       </div>
       <div class="curated-cards">
-        ${items.map(renderWorldFlavoursCard).join('')}
+        ${items.map(item => renderWorldFlavoursCard(item, currentUserId)).join('')}
       </div>
     </section>
   `;
 }
 
-function renderSection(section, recipes, meta) {
+function renderSection(section, recipes, meta, currentUserId) {
   if (!recipes.length) return '';
 
   const description = meta?.description || '';
@@ -102,7 +107,7 @@ function renderSection(section, recipes, meta) {
         ${description ? `<p class="curated-section-desc">${description}</p>` : ''}
       </div>
       <div class="curated-cards">
-        ${recipes.map(renderSectionCard).join('')}
+        ${recipes.map(r => renderSectionCard(r, currentUserId)).join('')}
       </div>
       <div class="curated-section-footer">
         <a href="/category/${section.categorySlug}" class="curated-see-all-btn">
@@ -113,7 +118,7 @@ function renderSection(section, recipes, meta) {
   `;
 }
 
-export async function loadCuratedSections() {
+export async function loadCuratedSections(currentUserId = null) {
   const container = document.getElementById('curated-sections');
   if (!container) return;
 
@@ -145,7 +150,7 @@ export async function loadCuratedSections() {
       recipe, cuisineName
     }));
 
-    const worldHTML = renderWorldFlavoursSection(worldItems);
+    const worldHTML = renderWorldFlavoursSection(worldItems, currentUserId);
 
     const sectionsHTML = HOMEPAGE_SECTIONS
       .map(section => {
@@ -156,7 +161,7 @@ export async function loadCuratedSections() {
         return { section, recipes: sectionRecipes, meta };
       })
       .filter(({ recipes }) => recipes.length > 0)
-      .map(({ section, recipes, meta }) => renderSection(section, recipes, meta))
+      .map(({ section, recipes, meta }) => renderSection(section, recipes, meta, currentUserId))
       .join('');
 
     container.innerHTML = worldHTML + sectionsHTML;
