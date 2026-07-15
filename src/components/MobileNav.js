@@ -41,7 +41,7 @@ export async function buildMobileNav() {
         <li class="mobile-nav-divider"></li>
         <li><a href="/" class="mobile-nav-link">Home</a></li>
    
-         <li><a href="/edit.html" class="mobile-nav-link mobile-nav-create">
+         <li><a href="/edit.html" data-requires-auth class="mobile-nav-link mobile-nav-create">
           <i class="fa fa-plus"></i> Create Recipe
         </a></li>
 

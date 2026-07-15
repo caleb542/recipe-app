@@ -27,7 +27,7 @@ export async function loadFooter() {
           <h4>Quick Links</h4>
           <ul class="footer-links">
             <li><a href="/">Home</a></li>
-            <li><a href="/edit.html">Create Recipe</a></li>
+            <li><a href="/edit.html" data-requires-auth>Create Recipe</a></li>
             <li><a href="https://github.com/caleb542/recipe-app" target="_blank" rel="noopener">
               <i class="fa-brands fa-github"></i> View on GitHub
             </a></li>

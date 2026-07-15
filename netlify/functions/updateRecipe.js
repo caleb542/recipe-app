@@ -113,11 +113,12 @@ export async function handler(event) {
     if (existing) {
       // ✅ Check if it's a legacy recipe (no author or "Legacy User")
       const isLegacy = !existing.author || 
-                       !existing.author.auth0Id || 
-                       existing.author.name === "Legacy User";
-      
-      // ✅ Verify ownership (but allow legacy recipes)
-      if (!isLegacy && existing.author?.auth0Id && existing.author.auth0Id !== auth0Id) {
+                      !existing.author.auth0Id || 
+                      existing.author.name === "Legacy User";
+
+      const isSuperAdmin = user.role === 'superadmin';
+
+      if (!isLegacy && !isSuperAdmin && existing.author?.auth0Id && existing.author.auth0Id !== auth0Id) {
         return {
           statusCode: 403,
           headers,

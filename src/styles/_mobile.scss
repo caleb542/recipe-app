@@ -478,51 +478,48 @@
   // ----------------------------------------
   // SORT BAR
   // ----------------------------------------
-
-  .sort-bar {
-    width: 100%;
-    padding: 0 1rem;
-    margin-top: 0.5rem;
-    justify-content: flex-start;
-    min-width: 0;
-    animation: none;
-  }
-.sort-bar {
-    width: 100%;
-    padding: 0 1rem;
-    margin-top: 0.5rem;
-    justify-content: flex-start;
-    min-width: 0;
-    animation: none;
+.category-page.is-hydrated .sort-bar {
+  margin-bottom:0.5rem;
+}
+ .sort-bar {
+  display: flex;
+  justify-content: flex-start; // pushes sort-controls to the right edge
+  width: 100%;
+  
 }
 
 .sort-controls {
-    gap: 8px;
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start; // ← was space-between; no longer needed once the select actually fills the row
+  align-items: center;
+  gap: 0px;
+  width: 100%;
+}
 
-    .search-control {
-        width: 100%;
-        input[type="text"] { font-size: 0.875rem; }
-    }
+ option {
+  position:relative;
+  width:100%;
+ }
+#filter-label {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto; // stays icon-sized, doesn't stretch
+  cursor: pointer;
+  border:1px solid hsl(30, 95%, 27%);
+  border-right:0px;
+  border-radius:4px 0 0 4px;
 
-    .sort-control {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        width: 100%;
-    }
+}
 
-    label {
-        flex-shrink: 0;
-    }
-
-    select {
-        flex: 1;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
-    }
+#filter-by {
+  flex: 1 0 auto; // ← was 1 1 auto; basis of 0 forces it to actually grow to fill remaining space
+  width: auto;
+  min-width: 160px;
+  border: 1px solid hsl(30, 95%, 27%);
+  border-left: 0px;
+  border-radius: 0 4px 4px 0;
+  max-width:unset;
 }
 
   // ----------------------------------------
@@ -782,6 +779,10 @@
     .article-block {
       padding:0 0;
     }
+    .category-hero {
+      min-height: 30svh !important;
+    }
+
     div#recipes {
       display: grid;
       grid-template-columns: repeat(2, 1fr);

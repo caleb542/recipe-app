@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>This Too Shall Pass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Cormorant+Garamond:wght@500&family=League+Spartan:wght@900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    color-scheme: light dark;
+  
+}
+ 
+  body {
+  
+    font-family: "Poppins";
+  }
+  .container {
+    min-height:100svh;
+ 
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2rem;
+  }
+  .segment1 {
+    background-color:light-dark(#ccc,#333);
+    color:light-dark(purple, orangered);
+  }
+  .segment2 {
+    background-color:light-dark(orange, darkgreen);
+    color:light-dark(navy, yellow);
+  }
+  h1,h2,h3 {
+    font-family: "Playfair Display";
+  }
+  h1 {
+    font-size: 5rem;
+  }
+  button {
+    cursor:pointer;
+  }
+  .btn{
+    padding:0.75em;
+    border-radius: 4px;
+    font-size: 1.5rem;
+  }
+  .btn--theme {
+    border-color:burlywood;
+    color: #ffffff;
+    background-color:cornflowerblue;
+
+    &:hover, 
+    &:focus-visible {
+        background-color: #3660ad;
+    }
+  }
+</style>
+</head>
+<body>
+    <div class="container segment1">
+        <h1>Light Dark</h1> 
+        <button id="theme-toggle" class="btn btn--theme">Switch Theme</button>
+    </div>
+
+     <div class="container segment2">
+        <h1>Lighter Darker</h1> 
+        <button  class="btn btn--theme">Switch Theme</button>
+    </div>
+   
+
+<script>
+  const toggleBtn = document.querySelectorAll('.btn--theme');
+    
+    toggleBtn.forEach( (button) => {
+         button.addEventListener('click', () => {
+             toggle();
+         })
+    });
+
+  function toggle(){
+    
+        // Check what the current computed or inline color scheme is
+        const currentScheme = document.documentElement.style.colorScheme;
+        
+        if (currentScheme === 'dark') {
+          document.documentElement.style.colorScheme = 'light';
+        } else {
+          document.documentElement.style.colorScheme = 'dark';
+        }
+
+  }
+ 
+</script>
+
+</body>
+</html>

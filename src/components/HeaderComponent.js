@@ -8,70 +8,54 @@ import { buildNav, setupSanityMegaMenu,setupEdgeWarning } from './MegaMenuSanity
 import { isSuperadmin } from '../userContext.js';
 import { buildMobileNav } from './MobileNav.js';
 import { isAuthenticated, login } from '../auth/auth0.js';
-
+import { setupAddRecipeGuard } from '../auth/authGuard.js';
 
 export async function loadHeader() {
   try {
     const response = await fetch('/partials/header-template.html');
-    
+
     if (!response.ok) {
       throw new Error('Failed to load header template');
     }
-    
+
     const headerHTML = await response.text();
-    
-    // Find or create header element
-let headerElement = document.querySelector('.page-container > header');
 
-if (!headerElement) {
-  headerElement = document.createElement('header');
-  const pageContainer = document.querySelector('.page-container');
-  if (pageContainer) {
-    pageContainer.insertBefore(headerElement, pageContainer.firstChild);
-  } else {
-    document.body.insertBefore(headerElement, document.body.firstChild);
-  }
-}
+    let headerElement = document.querySelector('.page-container > header');
 
-// Inject the header HTML
-headerElement.innerHTML = headerHTML;
+    if (!headerElement) {
+      headerElement = document.createElement('header');
+      const pageContainer = document.querySelector('.page-container');
+      if (pageContainer) {
+        pageContainer.insertBefore(headerElement, pageContainer.firstChild);
+      } else {
+        document.body.insertBefore(headerElement, document.body.firstChild);
+      }
+    }
 
-// Inject mobile overlay as direct child of body
-if(document.getElementById('nav-overlay')){
-  const overlay = document.getElementById('nav-overlay')
-  overlay.id = 'nav-overlay';
-  overlay.className = 'nav-overlay';
-  document.body.appendChild(overlay);
-  overlay.addEventListener('click', () => {
-    const toggle = document.getElementById('menu-toggle');
-    if (toggle) toggle.click();
-  });
-}
-  
-  
-    // Add admin link if superadmin
+    headerElement.innerHTML = headerHTML;
+
+    if (document.getElementById('nav-overlay')) {
+      const overlay = document.getElementById('nav-overlay');
+      overlay.id = 'nav-overlay';
+      overlay.className = 'nav-overlay';
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', () => {
+        const toggle = document.getElementById('menu-toggle');
+        if (toggle) toggle.click();
+      });
+    }
+
     addAdminLinkIfSuperadmin(headerElement);
 
-    // Build nav from DB then setup interactions
     await buildNav();
     setupSanityMegaMenu();
     setupEdgeWarning();
-    
-    
-    const addRecipeBtn = document.getElementById('create-recipe-link');
-    addRecipeBtn?.addEventListener('click', async () => {
-  
-      const authenticated = await isAuthenticated();
-      if (!authenticated) {
-        showAuthNotice();
-        return;
-      }
-      window.location.href = '/edit.html';
-    });
+    setupAddRecipeGuard();
+
     await buildMobileNav();
-    
+
     return true;
-    
+
   } catch (error) {
     console.error('Error loading header:', error);
     return false;

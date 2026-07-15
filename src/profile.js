@@ -187,7 +187,7 @@ function displayProfile(profile) {
        
          ${isOwnProfile ? `
              <li>
-              <a href="/edit.html" class="btn-create-recipe">
+              <a href="/edit.html" data-requires-auth class="btn-create-recipe">
                 <i class="fa-solid fa-plus"></i> Create Recipe
               </a>
             </li>
@@ -215,7 +215,7 @@ function displayProfile(profile) {
               <i class="fa-solid fa-check-circle" style="color: #2ecc71;"></i>
               Published Recipes
             </h3>
-            <a href="/edit.html" class="btn-create-recipe">
+            <a href="/edit.html" data-requires-auth class="btn-create-recipe">
               <i class="fa-solid fa-plus"></i> Create Recipe
             </a>
           </div>
@@ -241,7 +241,7 @@ function displayProfile(profile) {
           </p>
           <ul>
              <li>
-              <a href="/edit.html" class="btn-create-recipe">
+              <a href="/edit.html" data-requires-auth class="btn-create-recipe">
                 <i class="fa-solid fa-plus"></i> Create Recipe
               </a>
             </li>

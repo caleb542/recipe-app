@@ -326,17 +326,37 @@ const loadRecipes = async (forceRefresh = false) => {
     }
   }
 
-  // ✅ Fetch fresh data from database
+   // ✅ Fetch fresh data from database
   console.log('🌐 Fetching recipes from database' + (forceRefresh ? ' (forced refresh)' : ' (cache expired/missing)'));
-  const recipes = await getRecipesFromDatabase();
   
-  // ✅ Save to cache with timestamp
-  localStorage.setItem('recipes', JSON.stringify(recipes));
-  localStorage.setItem('recipes_timestamp', Date.now().toString());
-  console.log('💾 Cached ' + recipes.length + ' recipes');
-  
-  return recipes;
+  try {
+    const recipes = await getRecipesFromDatabase();
+    
+    // ✅ Save to cache with timestamp
+    localStorage.setItem('recipes', JSON.stringify(recipes));
+    localStorage.setItem('recipes_timestamp', Date.now().toString());
+    console.log('💾 Cached ' + recipes.length + ' recipes');
+    
+    return recipes;
+  } catch (err) {
+    console.warn('⚠️ Fetch failed (likely offline) — falling back to cache:', err.message);
+    
+    if (raw) {
+      try {
+        let parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          return parsed.map(recipe => migrateRecipeImages(recipe));
+        }
+      } catch (parseErr) {
+        console.error('❌ Stale cache unparseable:', parseErr);
+      }
+    }
+    
+    // Nothing usable cached at all — nothing we can do
+    throw err;
+  }
 };
+
 
 const loadCategories = async (forceRefresh = false) => {
   const raw = localStorage.getItem('categories');
@@ -349,13 +369,27 @@ const loadCategories = async (forceRefresh = false) => {
     return JSON.parse(raw);
   }
 
-  const res = await fetch('/.netlify/functions/get-categories');
-  const data = await res.json(); // { categories, grouped }
-  
-  localStorage.setItem('categories', JSON.stringify(data));
-  localStorage.setItem('categories_timestamp', Date.now().toString());
-  
-  return data;
+  try {
+    const res = await fetch('/.netlify/functions/get-categories');
+    const data = await res.json();
+    
+    localStorage.setItem('categories', JSON.stringify(data));
+    localStorage.setItem('categories_timestamp', Date.now().toString());
+    
+    return data;
+  } catch (err) {
+    console.warn('⚠️ Category fetch failed (likely offline) — falling back to cache:', err.message);
+    
+    if (raw) {
+      try {
+        return JSON.parse(raw);
+      } catch (parseErr) {
+        console.error('❌ Stale category cache unparseable:', parseErr);
+      }
+    }
+    
+    throw err;
+  }
 };
 
 
@@ -498,16 +532,14 @@ const toggleMenu = () => {
     document.body.classList.add('nav-open');
   }
 };
-const addToExistingRecipes = () => {
+const addToExistingRecipes = async () => {
     const newRecipe = loadNewRecipeFromLocalStorage()
-    let recipes = loadRecipes()
+    let recipes = await loadRecipes()
     const time = getTimestamp()
     newRecipe.createdAt = time
     newRecipe.id = uuidv4()
     recipes = [...recipes, newRecipe]
     saveRecipes(recipes)
-
-
 }
 
 // let recipes = await loadRecipes() // IS THIS THE ONE?

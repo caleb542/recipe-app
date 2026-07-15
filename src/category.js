@@ -14,6 +14,7 @@ import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
 
 let allRecipes = [];
 let filteredRecipes = [];
+let currentCategoryGroup = '';
 let currentCategory = '';
 let currentSlug = '';
 let CATEGORIES_MAP = {};
@@ -24,7 +25,7 @@ async function loadCategoriesMap() {
     const res = await fetch('/.netlify/functions/get-categories');
     const { categories } = await res.json();
     categories.forEach(cat => {
-      CATEGORIES_MAP[cat.slug] = cat.name;
+      CATEGORIES_MAP[cat.slug] = { name: cat.name, group: cat.group };
     });
   } catch (e) {
     console.warn('Could not load categories map:', e);
@@ -32,6 +33,7 @@ async function loadCategoriesMap() {
 }
 
 async function init() {
+  
   try {
     await loadHeader();
     hideWarning();
@@ -62,14 +64,16 @@ async function init() {
       currentSlug = slug;
     }
 
-    currentCategory = CATEGORIES_MAP[currentSlug];
+    const categoryEntry = CATEGORIES_MAP[currentSlug];
+    currentCategory = categoryEntry?.name;
+    currentCategoryGroup = categoryEntry?.group;
 
     if (!currentCategory) {
       console.error('Category not found for slug:', currentSlug);
-      // removeSpinner(0);
       renderError(`Category "${currentSlug}" not found`);
       return;
     }
+
 
     document.title = `${currentCategory} - Recipe Me`;
     setupSanityMegaMenu();
@@ -92,7 +96,7 @@ async function init() {
       return recipe.categories.includes(currentCategory);
     });
 
-    renderHero(currentCategory);
+    renderHero(currentCategory, currentCategoryGroup);
     renderRecipes();
     document.body.classList.add('is-hydrated');
     // removeSpinner(1500);
@@ -114,25 +118,8 @@ async function init() {
   }
 }
 
-// function renderBreadcrumbs(categoryName, slug) {
-//   const breadcrumbs = document.getElementById('breadcrumbs');
-//   if (!breadcrumbs) return;
 
-//   const params = new URLSearchParams(window.location.search);
-//   const from = params.get('from');
-
-//   let breadcrumbHTML = `<nav aria-label="Breadcrumb" class="breadcrumb"><a href="/">Home</a>`;
-
-//   if (from === 'categories') {
-//     breadcrumbHTML += ` <span aria-hidden="true">›</span> <a href="/categories">Categories</a>`;
-//   }
-
-//   breadcrumbHTML += ` <span aria-hidden="true">›</span> <span aria-current="page">${categoryName}</span>`;
-//   breadcrumbHTML += `</nav>`;
-
-//   breadcrumbs.innerHTML = breadcrumbHTML;
-// }
-function renderHero(categoryName) {
+function renderHero(categoryName, categoryGroup) {
   const hero = document.getElementById('category-hero');
   if (!hero) return;
 
@@ -141,30 +128,26 @@ function renderHero(categoryName) {
   const randomRecipe = recipesWithImages[Math.floor(Math.random() * recipesWithImages.length)];
   const featuredImg = randomRecipe?.images?.find(i => i.isFeatured) || randomRecipe?.images?.[0];
 
-  hero.innerHTML = `
-    <div class="category-hero">
+hero.innerHTML = `
+    <div class="category-hero" ${categoryGroup ? `data-group="${categoryGroup}"` : ''}>
+      <span class="hero-corner corner-tl"></span>
+      <span class="hero-corner corner-tr"></span>
+      <span class="hero-corner corner-bl"></span>
+      <span class="hero-corner corner-br"></span>
+
       <div class="category-hero-text">
-        <h1>${categoryName}</h1>
+        ${categoryGroup ? `<span class="category-group-badge">${categoryGroup}</span>` : ''}
+        <div class="hero-title-row">
+          <span class="hero-rule"></span>
+          <h1>${categoryName}</h1>
+          <span class="hero-rule"></span>
+        </div>
         <p class="recipe-count">${count} recipe${count !== 1 ? 's' : ''}</p>
       </div>
-      ${featuredImg ? `
-        <div class="category-hero-img" style="background-image: url('${featuredImg.url}')"></div>
-      ` : ''}
     </div>
   `;
 }
-// function renderHero(categoryName) {
-//   const hero = document.getElementById('category-hero');
-//   if (!hero) return;
-  
-//   const count = filteredRecipes.length;
-//   hero.innerHTML = `
-//     <div class="category-hero">
-//       <h1>${categoryName}</h1>
-//       <p class="recipe-count">${count} recipe${count !== 1 ? 's' : ''}</p>
-//     </div>
-//   `;
-// }
+
 
 function sortRecipes(sortBy) {
   switch (sortBy) {
@@ -185,8 +168,21 @@ function renderRecipes() {
   const count = filteredRecipes.length;
   const container = document.getElementById('recipes');
   if (!container) return;
-  
+
   container.setAttribute('data-count', count);
+
+  const addCard = `
+    <a href="/edit.html" data-requires-auth class="card home add-recipe-card">
+      <article>
+        <figure class="add-recipe-figure">
+          <i class="fa fa-plus"></i>
+        </figure>
+        <div class="text-area">
+          <h2>Add your own</h2>
+        </div>
+      </article>
+    </a>
+  `;
 
   if (!filteredRecipes.length) {
     container.innerHTML = `
@@ -194,13 +190,13 @@ function renderRecipes() {
         <i class="fa fa-utensils" style="font-size: 3rem; color: #ccc;"></i>
         <h2>No recipes found</h2>
         <p>There are no ${currentCategory.toLowerCase()} recipes yet.</p>
-        <a href="/edit.html" class="btn-primary">Create the first one!</a>
+        <a href="/edit.html" data-requires-auth class="btn-primary">Create the first one!</a>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = filteredRecipes.map(recipe => {
+  const recipeCards = filteredRecipes.map(recipe => {
     const featuredImage = recipe.images?.find(img => img.isFeatured) || recipe.images?.[0];
     const photoURL = featuredImage?.url || recipe.photoURL || '/images/pexels-mali-maeder-1.jpg';
     const recipeLink = `/article/${recipe.slug || recipe._id}?from=${currentSlug}`;
@@ -220,6 +216,8 @@ function renderRecipes() {
     </a>
     `;
   }).join('');
+
+  container.innerHTML = recipeCards + addCard;
 }
 
 function renderError(message) {
