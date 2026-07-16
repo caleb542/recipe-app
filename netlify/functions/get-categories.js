@@ -51,17 +51,23 @@ export const handler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json' },
       body: JSON.stringify({
         categories: counted,
         grouped
       })
     };
 
-  } catch (error) {
+ } catch (error) {
     console.error('get-categories error:', error);
     return {
       statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ error: error.message })
     };
   }
