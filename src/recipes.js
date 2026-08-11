@@ -100,6 +100,7 @@ let listRecipes = async (recipesParam, currentUserId = null) => {
       let article = document.createElement('article');
       let figure = document.createElement('figure');
       let image = document.createElement('img');
+      image.setAttribute("loading", "lazy");
       image.classList.add('imageElement');
    
       let creator = document.createElement('p');
