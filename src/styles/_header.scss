@@ -557,17 +557,24 @@ nav.hide {
     margin-right: 1rem;
 }
 
-#login-btn, #logout-btn {
-    padding: 0.5rem 1rem;
-    background: var(--primary-color, #007bff);
+#login-btn, #logout-btn, .signup{
+    // background: var(--primary-color, #007bff);
     color: white;
-    border: none;
+    // border: 2px solid var(--primary-color, hsl(36, 65%, 47%));
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9rem;
     transition: background 0.2s;
 }
-
+.signup {
+  background-color:var(--bg-blank-btn);
+  border-color:var(--color-blank-btn);
+  border-width:2px;
+  border-style:solid;
+  color:var(--color-blank-btn);
+  font-weight:500;
+  
+}
 #login-btn:hover, #logout-btn:hover {
     background: var(--primary-dark, #0056b3);
 }
@@ -1507,6 +1514,11 @@ nav.main-nav {
     align-content: center;
     min-height:100%;
     gap: 0.75rem;
+  }
+  .signup-or-register-container {
+    display: flex;
+    align-items: center;
+    gap:.5rem;
   }
 
   #login-btn, #logout-btn {

@@ -1,5 +1,5 @@
 /**
- * Quick Add - Import recipes from URL or pasted text
+ * Quick Add - Import recipes from URL or pasted text`
  */
 
 import { loadRecipes, saveRecipes } from '../functions.js';

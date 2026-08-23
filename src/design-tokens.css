@@ -72,12 +72,12 @@
      ---------------------------------------------------------------------------- */
   
   /* Base Hue Values - CUSTOMIZE THESE to change your entire color scheme */
-  --hue-primary: 217;        /* Blue (current) - Try: 270 (purple), 160 (teal), 30 (orange) */
+  --hue-primary: 36;        /* Blue (current) - Try: 270 (purple), 160 (teal), 30 (orange) */
   --hue-secondary: 160;      /* Green - accent color hue */
   --hue-neutral: 220;        /* Slight blue tint for neutrals - Try: 0 (true gray), 30 (warm gray) */
   --mark-bg:  #fbbf24;
   /* Brand Colors - Primary (variations of same hue) */
-  --color-primary: hsl(var(--hue-primary), 83%, 53%);           /* Main brand color */
+  --color-primary: hsl(var(--hue-primary), 75%, 47%);           /* Main brand color */
   --color-primary-hover: hsl(var(--hue-primary), 77%, 48%);     /* Hover state (darker) */
   --color-primary-light: hsl(var(--hue-primary), 95%, 92%);     /* Light backgrounds */
   --color-primary-dark: hsl(var(--hue-primary), 83%, 35%);      /* Dark variant */
@@ -87,6 +87,9 @@
   --color-secondary-hover: hsl(var(--hue-secondary), 88%, 30%); /* Hover (darker) */
   --color-secondary-light: hsl(var(--hue-secondary), 89%, 91%); /* Light backgrounds */
   --color-secondary-dark: hsl(var(--hue-secondary), 84%, 25%);  /* Dark variant */
+
+  --bg-blank-btn: hsl(0 0% 100% / 0);
+  --color-blank-btn: hsl(36, 75%, 47%);
   
   /* Neutrals - Grays (HSL variations with slight hue tint) */
   --color-neutral-50: hsl(var(--hue-neutral), 20%, 98%);
@@ -114,6 +117,7 @@
   --color-error-bg: hsl(var(--hue-error), 93%, 94%);
   --color-info: hsl(var(--hue-info), 92%, 63%);
   --color-info-bg: hsl(var(--hue-info), 95%, 92%);
+
   
   /* ----------------------------------------------------------------------------
      SURFACE COLORS (Backgrounds, Cards, etc.)

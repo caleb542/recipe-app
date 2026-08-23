@@ -68,14 +68,12 @@
         </li>
 
         </ul>
-        <ul class="nav-list nav-list-actions"> <li class="nav-item">
+        <!-- <ul class="nav-list nav-list-actions"> <li class="nav-item">
           <button href="/edit.html" id="create-recipe-link" class="nav-link create-recipe-link">
             <i class="fa fa-plus" aria-hidden="true"></i><span>&nbsp;Create Recipe</span>
           </button>
         </li>
-
-        
-      </ul>
+        </ul> -->
        
       
     </div>
@@ -85,7 +83,12 @@
 
   <!-- Auth — top right -->
 <div class="top-bar-user">
-  <button id="login-btn" class="primary sm" style="display:none;">Login</button>
+  <div class="signup-or-register-container">
+    
+    <button id="login-btn" class="primary sm" style="display:none;">Login</button>
+    <button id="auth-prompt-register" class="signup tertiary sm" >Sign up</button>
+  </div>
+ 
   <div id="user-info" style="display:none">
     <div class="user-specific">
       <div class="user-avatar-container" id="user-avatar-container"></div>

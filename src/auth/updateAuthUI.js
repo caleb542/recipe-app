@@ -1,4 +1,5 @@
 import { isAuthenticated, getUser, login, logout } from './auth0.js';
+import { redirectToAuth } from './authGuard.js';
 import { getUserProfile, getUserAvatar } from '../userContext.js';
 import { setupAvatarDropdown } from '../components/AvatarDropdown.js';
 
@@ -6,14 +7,16 @@ import { setupAvatarDropdown } from '../components/AvatarDropdown.js';
 export async function updateAuthUI() {
   const authenticated = await isAuthenticated();
   const loginBtn = document.getElementById('login-btn');
+  const signUpBtn = document.getElementById('auth-prompt-register');
   const userInfo = document.getElementById('user-info');
 
-  if (!loginBtn || !userInfo) {
+  if (!loginBtn || !userInfo || !signUpBtn) {
     console.warn('Auth UI elements not found');
     return;
   }
 
   if (authenticated) {
+    signUpBtn.style.display = 'none';
     loginBtn.style.display = 'none';
     userInfo.style.display = 'flex';
 
@@ -64,6 +67,7 @@ export async function updateAuthUI() {
       }
     }
   } else {
+    signUpBtn.style.display = 'block';
     loginBtn.style.display = 'block';
     userInfo.style.display = 'none';
   }
@@ -72,6 +76,7 @@ export async function updateAuthUI() {
 // Set up login/logout button listeners
 export const setupAuthListeners = () => {
   const loginBtn = document.getElementById('login-btn');
+  const signUpBtn = document.getElementById('auth-prompt-register');
   const logoutBtn = document.getElementById('logout-btn');
 
   if (loginBtn) {
@@ -79,7 +84,11 @@ export const setupAuthListeners = () => {
       await login();
     });
   }
-
+  if (signUpBtn) {
+    signUpBtn.addEventListener('click', async () => {
+      await redirectToAuth('signup');
+    });
+  }
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('userProfile');

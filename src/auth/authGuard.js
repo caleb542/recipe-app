@@ -19,7 +19,7 @@ export function setupAddRecipeGuard() {
   });
 }
 
-async function redirectToAuth(screenHint) {
+export async function redirectToAuth(screenHint) {
   await initAuth0();
   const auth0 = getAuth0Client();
 

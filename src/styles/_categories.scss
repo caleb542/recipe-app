@@ -37,6 +37,35 @@
     padding-bottom: 0.75rem;
     border-bottom: 0.5px solid #e8e8e8;
   }
+    // ----------------------------------------
+  // CARDS#RECIPES
+  // ----------------------------------------
+    div#recipes {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    @media (min-width: 501px) and  (max-width: 1024px) {
+       .container {
+        padding: 0 0;
+      }
+      .article-block {
+        padding:0;
+      }
+      div#recipes {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+     @media (min-width: 0px) and  (max-width: 500px) {
+      .container {
+        padding: 0 0;
+      }
+      .article-block {
+        padding:0;
+      }
+      div#recipes {
+        grid-template-columns: repeat(1, 1fr);
+      }
+    }
+
 
   // ----------------------------------------
   // CATEGORY CARDS GRID
@@ -44,16 +73,13 @@
 
   .categories-group-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, 1fr );
+    gap: 2rem;
 
-    @media (max-width: 1024px) {
-      grid-template-columns: repeat(3, 1fr);
+    @media (min-width: 0px) and  (max-width: 768px) {
+      grid-template-columns: repeat(auto-fit, 1fr);
     }
 
-    @media (max-width: 768px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
   }
 
   // ----------------------------------------

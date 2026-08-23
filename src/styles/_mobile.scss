@@ -504,7 +504,7 @@
 #filter-label {
   display: inline-flex;
   align-items: center;
-  flex: 0 0 auto; // stays icon-sized, doesn't stretch
+  flex: 1 0 auto; // stays icon-sized, doesn't stretch
   cursor: pointer;
   border:1px solid hsl(30, 95%, 27%);
   border-right:0px;

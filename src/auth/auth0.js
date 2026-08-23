@@ -106,7 +106,7 @@ const updateUI = async () => {
   if (isAuthenticated) {
     // User is logged in
     const user = await auth0.getUser();
-    
+     const signUpBtn = document.getElementById('auth-prompt-register');
     const loginBtn = document.getElementById('login-btn');
     const logoutBtn = document.getElementById('logout-btn');
     const userProfile = document.getElementById('user-profile');
@@ -124,6 +124,7 @@ const updateUI = async () => {
   } else {
     // User is not logged in
     const loginBtn = document.getElementById('login-btn');
+    const signUpBtn = document.getElementById('auth-prompt-register');
     const logoutBtn = document.getElementById('logout-btn');
     const userProfile = document.getElementById('user-profile');
     

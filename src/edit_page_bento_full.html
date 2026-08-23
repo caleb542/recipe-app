@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <style>
+* { box-sizing: border-box; }
+.wrap { font-family: var(--font-sans); padding: 0 0 1rem; }
+.sticky-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 0 12px; }
+.recipe-title-bar { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); }
+.btn-row { display: flex; gap: 6px; }
+.btn { font-size: 12px; padding: 6px 12px; border-radius: 8px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+.btn i { font-size: 12px; }
+.btn-save { background: var(--color-background-secondary); color: var(--color-text-tertiary); border-color: var(--color-border-tertiary); }
+.btn-unpub { background: #fff4d6; color: #b26a00; border-color: #fde08d; }
+.btn-del { color: #e24b4a; border-color: #f7c1c1; }
+
+.section-group { margin-bottom: 16px; }
+.group-label { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; padding-left: 2px; }
+
+.bento { display: grid; gap: 6px; }
+.bento-2 { grid-template-columns: 1fr 1fr; }
+.bento-3 { grid-template-columns: 1fr 1fr 1fr; }
+.bento-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.full { grid-column: 1 / -1; }
+.span2 { grid-column: span 2; }
+
+.b-card {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.1s;
+}
+.b-card:hover { border-color: var(--color-border-secondary); }
+.b-card.placeholder { opacity: 0.55; }
+
+.b-label { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 5px; margin-bottom: 8px; }
+.b-label i { font-size: 12px; }
+.b-label-right { margin-left: auto; display: flex; align-items: center; gap: 5px; }
+.b-dot { width: 6px; height: 6px; border-radius: 50%; background: #639922; flex-shrink: 0; }
+.b-dot.empty { background: transparent; border: 1.5px solid var(--color-border-secondary); }
+.b-dot.future { background: transparent; border: 1.5px dashed var(--color-border-secondary); }
+.b-chevron { font-size: 10px; color: var(--color-text-tertiary); }
+
+.recipe-name { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; line-height: 1.2; }
+.pills { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 4px; }
+.pill { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); }
+.pill.active { border-color: #c8a882; color: #854F0B; }
+.slug { font-size: 10px; color: var(--color-text-tertiary); font-family: var(--font-mono); margin-top: 2px; }
+
+.desc-text { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+.thumb-strip { display: flex; gap: 5px; margin-bottom: 6px; }
+.thumb { width: 44px; height: 44px; border-radius: 7px; overflow: hidden; flex-shrink: 0; position: relative; border: 0.5px solid var(--color-border-tertiary); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb.featured::after { content: ''; position: absolute; inset: 0; border: 2px solid #c8a882; border-radius: 7px; }
+.thumb-add { width: 44px; height: 44px; border-radius: 7px; border: 0.5px dashed var(--color-border-secondary); background: var(--color-background-secondary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.thumb-add i { font-size: 14px; color: var(--color-text-tertiary); }
+.img-legend { font-size: 10px; color: var(--color-text-tertiary); display: flex; align-items: center; gap: 3px; }
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; background: #c8a882; display: inline-flex; align-items: center; justify-content: center; }
+.legend-dot i { font-size: 6px; color: #fff; }
+
+.b-count { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.b-bullets { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; }
+.b-bullets li { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; display: flex; align-items: baseline; gap: 5px; }
+.b-bullets li::before { content: '–'; color: var(--color-text-tertiary); flex-shrink: 0; font-size: 11px; }
+.b-more { font-size: 10px; color: var(--color-text-tertiary); margin-top: 3px; }
+
+.meta-row { display: flex; flex-direction: column; gap: 4px; }
+.meta-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
+.meta-item i { font-size: 12px; color: var(--color-text-tertiary); flex-shrink: 0; }
+.meta-item .meta-val { font-weight: 500; color: var(--color-text-primary); }
+
+.placeholder-msg { font-size: 12px; color: var(--color-text-tertiary); font-style: italic; }
+
+.editorial-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+.editorial-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
+.editorial-item i { font-size: 12px; color: var(--color-text-tertiary); }
+
+.quick-add-row { display: flex; align-items: center; gap: 8px; }
+.quick-lbl { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; flex-shrink: 0; }
+.quick-txt { font-size: 12px; color: var(--color-text-secondary); flex: 1; }
+
+.future-badge { font-size: 10px; color: var(--color-text-tertiary); background: var(--color-background-secondary); border: 0.5px dashed var(--color-border-secondary); border-radius: 4px; padding: 1px 6px; margin-left: 4px; }
+</style>
+
+<div class="wrap">
+
+  <div class="sticky-bar">
+    <span class="recipe-title-bar">X-Mas Cran Mocktail</span>
+    <div class="btn-row">
+      <button class="btn btn-unpub"><i class="ti ti-eye-off" aria-hidden="true"></i> Unpublished</button>
+      <button class="btn"><i class="ti ti-eye" aria-hidden="true"></i> Preview</button>
+      <button class="btn btn-save"><i class="ti ti-device-floppy" aria-hidden="true"></i> Save</button>
+      <button class="btn btn-del"><i class="ti ti-trash" aria-hidden="true"></i></button>
+    </div>
+  </div>
+
+  <div class="section-group">
+    <div class="bento bento-2" style="grid-template-columns: 1fr;">
+      <div class="b-card" style="background: var(--color-background-secondary); padding: 9px 14px;">
+        <div class="quick-add-row">
+          <i class="ti ti-wand" style="font-size:13px; color:var(--color-text-tertiary);" aria-hidden="true"></i>
+          <span class="quick-lbl">Quick add</span>
+          <span class="quick-txt">Re-import from URL or text — overwrites existing fields</span>
+          <i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-group">
+    <div class="group-label">Core</div>
+    <div class="bento bento-2" style="grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+
+      <div class="b-card" style="grid-column: 1 / -1;">
+        <div class="b-label"><i class="ti ti-pencil" aria-hidden="true"></i> Identity<div class="b-label-right"><div class="b-dot"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="recipe-name">X-Mas Cran Mocktail</div>
+        <div class="pills">
+          <span class="pill active">Cocktails ✓</span>
+          <span class="pill active">Drinks ✓</span>
+          <span class="pill active">Mocktails &amp; Non-Alcoholic ✓</span>
+        </div>
+        <div class="slug">christmas-cran-mocktail</div>
+      </div>
+
+      <div class="b-card" style="grid-column: span 2;">
+        <div class="b-label"><i class="ti ti-align-left" aria-hidden="true"></i> Description<div class="b-label-right"><div class="b-dot"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="desc-text">A festive, tangy cranberry mocktail that looks as good as it tastes — perfect for holiday gatherings and non-drinkers who refuse to be boring.</div>
+      </div>
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-photo" aria-hidden="true"></i> Images<div class="b-label-right"><div class="b-dot"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="thumb-strip">
+          <div class="thumb featured"><img src="https://images.unsplash.com/photo-1638043139484-1534e2c14bcb?w=120&q=60" alt=""></div>
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1584312202111-801c8205782d?w=120&q=60" alt=""></div>
+          <div class="thumb-add"><i class="ti ti-plus" aria-hidden="true"></i></div>
+        </div>
+        <div class="img-legend"><span class="legend-dot"><i class="ti ti-check" aria-hidden="true"></i></span> Featured image</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-group">
+    <div class="group-label">Recipe</div>
+    <div class="bento" style="grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-list" aria-hidden="true"></i> Ingredients<div class="b-label-right"><div class="b-dot"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="b-count">6 ingredients</div>
+        <ul class="b-bullets">
+          <li>Cranberry juice</li>
+          <li>Sparkling water</li>
+          <li>Lime juice</li>
+          <li>Simple syrup</li>
+        </ul>
+        <div class="b-more">+ 2 more</div>
+      </div>
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-list-numbers" aria-hidden="true"></i> Directions<div class="b-label-right"><div class="b-dot"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="b-count">3 steps</div>
+        <ul class="b-bullets">
+          <li>Combine juices and syrup over ice</li>
+          <li>Top with sparkling water, stir gently</li>
+          <li>Garnish with cranberries and rosemary</li>
+        </ul>
+      </div>
+
+      <div class="b-card placeholder">
+        <div class="b-label"><i class="ti ti-tools-kitchen-2" aria-hidden="true"></i> Equipment <span class="future-badge">coming soon</span><div class="b-label-right"><div class="b-dot future"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Add tools and equipment needed for this recipe</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-group">
+    <div class="group-label">Context</div>
+    <div class="bento" style="grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;">
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-users" aria-hidden="true"></i> Servings<div class="b-label-right"><div class="b-dot empty"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Serves how many?</div>
+      </div>
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-gauge" aria-hidden="true"></i> Difficulty<div class="b-label-right"><div class="b-dot empty"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Beginner · Intermediate · Advanced</div>
+      </div>
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-leaf" aria-hidden="true"></i> Season<div class="b-label-right"><div class="b-dot empty"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Spring · Summer · Fall · Winter · All year</div>
+      </div>
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-link" aria-hidden="true"></i> Source<div class="b-label-right"><div class="b-dot empty"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Original recipe attribution or URL</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-group">
+    <div class="group-label">Nutrition &amp; Allergens</div>
+    <div class="bento" style="grid-template-columns: 1fr 1fr; gap: 6px;">
+
+      <div class="b-card placeholder">
+        <div class="b-label"><i class="ti ti-heart-rate-monitor" aria-hidden="true"></i> Nutrition <span class="future-badge">coming soon</span><div class="b-label-right"><div class="b-dot future"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Calories, macros — auto-calculated via Spoonacular</div>
+      </div>
+
+      <div class="b-card placeholder">
+        <div class="b-label"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Allergens <span class="future-badge">coming soon</span><div class="b-label-right"><div class="b-dot future"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Nuts · Dairy · Gluten · Eggs · Shellfish</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-group">
+    <div class="group-label">Editorial</div>
+    <div class="bento" style="grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-tag" aria-hidden="true"></i> Tags<div class="b-label-right"><div class="b-dot"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="pills">
+          <span class="pill">festive</span>
+          <span class="pill">no-alcohol</span>
+          <span class="pill">quick</span>
+          <span class="pill">cranberry</span>
+          <span class="pill">holiday</span>
+        </div>
+      </div>
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-layout-grid" aria-hidden="true"></i> Categories<div class="b-label-right"><div class="b-dot"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="pills" style="margin-bottom: 4px;">
+          <span class="pill active">Cocktails ✓</span>
+          <span class="pill active">Mocktails ✓</span>
+          <span class="pill active">Drinks ✓</span>
+        </div>
+        <div class="pills">
+          <span class="pill">Party &amp; Entertaining</span>
+          <span class="pill">Holiday</span>
+        </div>
+      </div>
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-clock" aria-hidden="true"></i> Times &amp; Author<div class="b-label-right"><div class="b-dot empty"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="meta-row">
+          <div class="meta-item"><i class="ti ti-clock" aria-hidden="true"></i> Prep <span class="meta-val">—</span></div>
+          <div class="meta-item"><i class="ti ti-stopwatch" aria-hidden="true"></i> Total <span class="meta-val">—</span></div>
+          <div class="meta-item"><i class="ti ti-user" aria-hidden="true"></i> Author <span class="meta-val">Chef Caleb</span></div>
+        </div>
+      </div>
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-note" aria-hidden="true"></i> Notes &amp; Tips<div class="b-label-right"><div class="b-dot empty"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Chef's notes, make-ahead tips, substitutions</div>
+      </div>
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-article" aria-hidden="true"></i> Article<div class="b-label-right"><div class="b-dot empty"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Long-form content, story behind the recipe</div>
+      </div>
+
+      <div class="b-card">
+        <div class="b-label"><i class="ti ti-brand-youtube" aria-hidden="true"></i> Video<div class="b-label-right"><div class="b-dot empty"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">YouTube or Vimeo link</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-group">
+    <div class="group-label">Meta</div>
+    <div class="bento" style="grid-template-columns: 1fr 1fr; gap: 6px;">
+      <div class="b-card placeholder">
+        <div class="b-label"><i class="ti ti-history" aria-hidden="true"></i> Version history <span class="future-badge">coming soon</span><div class="b-label-right"><div class="b-dot future"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Track changes, restore previous versions</div>
+      </div>
+      <div class="b-card placeholder">
+        <div class="b-label"><i class="ti ti-test-pipe" aria-hidden="true"></i> Testing log <span class="future-badge">coming soon</span><div class="b-label-right"><div class="b-dot future"></div><i class="ti ti-chevron-down b-chevron" aria-hidden="true"></i></div></div>
+        <div class="placeholder-msg">Record test batches, notes per iteration</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

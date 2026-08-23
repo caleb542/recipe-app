@@ -112,6 +112,7 @@ module.exports = (env, argv) => {
       new CopyWebpackPlugin({
         patterns: [
           { from: "src/partials", to: "../partials" },
+          { from: "src/assets", to: "../assets" },
         ]
       }),
       new webpack.DefinePlugin({
