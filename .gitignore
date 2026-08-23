@@ -30,4 +30,5 @@ src/styles/_edit-page_old.scss
 public/edit_old.html
 public/partials/header-template-old-v2.html
 src/partials/header-template-old-v2.html
-src/edit_page_bento_full.html
+src/edit_page_bento_full.htmlwhimsy-css/
+netlify/functions/seed-*.js
