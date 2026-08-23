@@ -3,7 +3,7 @@ import { updateRecipeInDatabase } from '../backend/updateRecipeInDatabase.js';
 import { loadRecipesFromLocalStorage } from '../functions.js';
 import { Notyf } from 'notyf';
 import { sanitizeHTML, sanitizeText } from '../utils/sanitize.js';
-
+import { invalidateCategories } from '../functions.js';
 const notyf = new Notyf();
 
 /**
@@ -120,6 +120,7 @@ function setupRecipeDeletion(recipe) {
   localStorage.setItem('recipes', JSON.stringify(updated));
   localStorage.removeItem('editingRecipe');
   localStorage.removeItem('recipes_timestamp'); // bust cache
+  invalidateCategories(); // bust categories cache — deletion changes recipeCount
       notyf.success("Recipe deleted!");
 
 
@@ -203,7 +204,8 @@ console.log('💾 Slug being saved:', baseSlug);
       console.log('💾 displayAuthor being sent:', updates.displayAuthor);
       const result = await updateRecipeInDatabase(recipe.id, updates);
       localStorage.setItem('editingRecipe', JSON.stringify(result.recipe));
-      
+      invalidateCategories(); // bust categories cache — save may change cuisine/publish status
+
       notyf.success("Recipe updated!");
 
       // ✅ CHANGED: Redirect to new slug URL if available

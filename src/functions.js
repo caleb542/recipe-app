@@ -392,6 +392,10 @@ const loadCategories = async (forceRefresh = false) => {
   }
 };
 
+const invalidateCategories = () => {
+  localStorage.removeItem('categories');
+  localStorage.removeItem('categories_timestamp');
+};
 
 const loadRecipesFromLocalStorage = async () => {
     if (localStorage.getItem('recipes')) {
@@ -698,6 +702,7 @@ export {
     getTimestamp,
     loadRecipes,
     loadCategories,
+    invalidateCategories ,
     loadRecipesFromLocalStorage,
     loadNewRecipeFromLocalStorage,
     saveNewRecipeToLocalStorage,
