@@ -213,6 +213,9 @@ async function hydrateArticle(recipes, recipeIdOverride = null) {
   const tt = tpl.querySelector(".total-time-value");
   if (tt) tt.textContent = recItem.totalTime || "Not specified";
 
+  const sv = tpl.querySelector(".servings-value");
+  if (sv) sv.textContent = recItem.servings || "Not specified";
+
   const dsum = tpl.querySelector(".description.summary");
   if (dsum) dsum.innerHTML = recItem.description;
 

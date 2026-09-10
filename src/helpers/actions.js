@@ -172,16 +172,17 @@ const baseSlug = slugInput?.value || generateSlug(recipe.name || 'untitled');
 
 console.log('💾 Slug being saved:', baseSlug);
     
-    const updates = {
+   const updates = {
       name: recipe.name || '',
       article: window.toastEditor ? window.toastEditor.getMarkdown() : recipe.article || '',
       createdAt: recipe.createdAt || '',
-      displayAuthor: (recipe.displayAuthor ?? '').trim(),
       displayAuthor: recipe.displayAuthor || '',
       description: recipe.description || '',
       tags: recipe.tags || [],
       prepTime: recipe.prepTime || '',
       totalTime: recipe.totalTime || '',
+      servings: recipe.servings || '',
+      rawImportText: recipe.rawImportText || '',
       categories: recipe.categories || [],
       ingredients: recipe.ingredients || [],
       directions: recipe.directions || [],

@@ -30,6 +30,11 @@ import {
 // that gets moved into the modal on open
 // ----------------------------------------
 const CARD_REGISTRY = {
+  'card-quick-add': {
+  label: 'Quick Add',
+  icon: 'fa-solid fa-wand-magic-sparkles',
+  contentId: 'modal-content-quick-add',
+  },
   'card-identity': {
     label: 'Identity',
     icon: 'fa-solid fa-pen',
@@ -259,8 +264,15 @@ export function openModal(cardId) {
   _dialog.showModal();
 
   if (cardId === 'card-video') {
-  window._videoModalInit?.();
-}
+    window._videoModalInit?.();
+  }
+  if (cardId === 'card-quick-add') {
+    const recipe = JSON.parse(localStorage.getItem('editingRecipe') || '{}');
+    const textarea = document.getElementById('quick-add-input');
+    if (textarea && recipe.rawImportText) {
+      textarea.value = recipe.rawImportText;
+    }
+  }
 
   // Focus first focusable element
   setTimeout(() => {
@@ -350,7 +362,7 @@ export function setupEditModal() {
 
     const card = header.closest('.edit-card');
     if (!card) return;
-    if (card.id === 'card-quick-add') return;
+    
     if (card.classList.contains('edit-card--placeholder')) return;
 
     e.preventDefault();

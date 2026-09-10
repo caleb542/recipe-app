@@ -32,6 +32,8 @@ import { listVideos, setupVideoDelegation, setupVideoInput, addVideo, removeVide
 import { loadHeader, showDevNotice } from './components/HeaderComponent.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
 
+import { setupQuickAddReparse } from './helpers/quickAdd.js';
+
 import {
   updateCategoriesSummary,
   updateTagsSummary,
@@ -144,6 +146,7 @@ hideWarning();
   setupQuickAddCard(true);
   setupRestoreBanner(recipeId);
   setupDescriptionCounter();
+  setupQuickAddReparse(recipeId);
 
   updateIdentitySummary(recipe);
   updateDescriptionSummary(recipe.description);
@@ -223,6 +226,8 @@ export async function initCreate() {
     name: "New unnamed recipe",
     prepTime: "",
     totalTime: "",
+    servings: "",
+    rawImportText: "",
     description: "",
     author: {
       auth0Id: currentUser.sub,
@@ -304,6 +309,8 @@ export async function initCreate() {
   setupPreview(newRecipeId);
   initStatusToggle();
   initProgressBar(newRecipe);
+
+  setupQuickAddReparse(newRecipeId);
 }
 
 /**

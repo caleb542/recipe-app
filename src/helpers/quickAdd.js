@@ -1,5 +1,5 @@
 /**
- * Quick Add - Import recipes from URL or pasted text`
+ * Quick Add - Import recipes from URL or pasted text
  */
 
 import { loadRecipes, saveRecipes } from '../functions.js';
@@ -28,7 +28,7 @@ const generateUUID = () => {
 };
 
 /**
- * Show Quick Add modal
+ * Show Quick Add modal (the "how would you like to start?" chooser flow)
  */
 export function showQuickAddModal(recipeId) {
   const modal = document.createElement('dialog');
@@ -139,6 +139,33 @@ export function showQuickAddModal(recipeId) {
   });
 }
 
+/**
+ * Wire up the "re-parse" button that lives in the Quick Add edit-card
+ * (#quick-add-input / #quick-add-parse-btn, inside #modal-content-quick-add
+ * in edit.html). This is a separate entry point from showQuickAddModal():
+ * it lets a bad render be corrected and re-submitted directly, without
+ * going back through the "how would you like to start?" chooser.
+ *
+ * Call this once at page-init time (not from inside showQuickAddModal),
+ * since #quick-add-parse-btn exists in the page's own markup regardless
+ * of whether the chooser modal has ever been opened.
+ */
+
+// export function setupQuickAddReparse(recipeId) {
+//   document.getElementById('quick-add-parse-btn')?.addEventListener('click', async () => {
+//     const input = document.getElementById('quick-add-input').value;
+//     await handleQuickAdd(input, recipeId, null);
+//   });
+// }
+export function setupQuickAddReparse(recipeId) {
+  document.getElementById('quick-add-parse-btn')?.addEventListener('click', async () => {
+    const el = document.getElementById('quick-add-input');
+    console.log('element found:', el);
+    console.log('value:', el?.value);
+    const input = el?.value ?? '';
+    await handleQuickAdd(input, recipeId, null);
+  });
+}
 /**
  * Photo upload screen
  */
@@ -359,6 +386,15 @@ function showOCRReviewScreen(modal, recipeId, extractedText, photos) {
     importBtn.disabled = true;
     importBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Importing...';
 
+    // Store the raw OCR text so it can be recovered if this parse comes out wrong
+    const recipesForPersist = await loadRecipes();
+    const recipeForPersist = recipesForPersist.find(r => r.id === recipeId);
+    if (recipeForPersist) {
+      recipeForPersist.rawImportText = rawText;
+      saveRecipes(recipesForPersist);
+      localStorage.setItem('editingRecipe', JSON.stringify(recipeForPersist));
+    }
+
     try {
       console.log('=== TEXT BEFORE PARSING (from review textarea) ===');
       console.log(rawText);
@@ -385,31 +421,51 @@ function showOCRReviewScreen(modal, recipeId, extractedText, photos) {
 }
 
 /**
- * Handle Quick Add - URL or text
+ * Handle Quick Add - URL or text.
+ *
+ * Called from two places with different modal lifecycles:
+ *  - showQuickAddModal()'s own "parse-recipe-btn", where `modal` is the
+ *    dynamically-created standalone <dialog> that should be closed and
+ *    removed on success.
+ *  - setupQuickAddReparse()'s "quick-add-parse-btn", where `modal` is
+ *    null because that button lives inside the shared #edit-section-modal
+ *    (editModal.js), which manages its own open/close lifecycle and
+ *    should not be closed/removed from here.
  */
 async function handleQuickAdd(input, recipeId, modal) {
-  const statusDiv = document.getElementById('parse-status');
-  const parseBtn = document.getElementById('parse-recipe-btn');
+  const statusDiv = document.getElementById('parse-status') || document.getElementById('quick-add-status');
+  const parseBtn = document.getElementById('parse-recipe-btn') || document.getElementById('quick-add-parse-btn');
 
   if (!input.trim()) {
-    statusDiv.innerHTML = '<p class="error">❌ Please paste a URL or recipe text</p>';
+    if (statusDiv) statusDiv.innerHTML = '<p class="error">❌ Please paste a URL or recipe text</p>';
     return;
+  }
+
+  // Store the raw input so it can be recovered if this parse comes out wrong
+  const recipesForPersist = await loadRecipes();
+  const recipeForPersist = recipesForPersist.find(r => r.id === recipeId);
+  if (recipeForPersist) {
+    recipeForPersist.rawImportText = input;
+    saveRecipes(recipesForPersist);
+    localStorage.setItem('editingRecipe', JSON.stringify(recipeForPersist));
   }
 
   const isURL = input.trim().match(/^https?:\/\//);
 
   try {
-    parseBtn.disabled = true;
-    parseBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Parsing...';
-    statusDiv.innerHTML = '<p class="loading">⏳ Parsing recipe...</p>';
+    if (parseBtn) {
+      parseBtn.disabled = true;
+      parseBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Parsing...';
+    }
+    if (statusDiv) statusDiv.innerHTML = '<p class="loading">⏳ Parsing recipe...</p>';
 
     let parsedRecipe;
 
     if (isURL) {
-      statusDiv.innerHTML = '<p class="loading">⏳ Fetching recipe from URL...</p>';
+      if (statusDiv) statusDiv.innerHTML = '<p class="loading">⏳ Fetching recipe from URL...</p>';
       parsedRecipe = await importFromURL(input.trim());
     } else {
-      statusDiv.innerHTML = '<p class="loading">⏳ Parsing recipe text...</p>';
+      if (statusDiv) statusDiv.innerHTML = '<p class="loading">⏳ Parsing recipe text...</p>';
       parsedRecipe = parseRecipeText(input);
     }
 
@@ -420,15 +476,21 @@ async function handleQuickAdd(input, recipeId, modal) {
     }
 
     await populateParsedRecipe(parsedRecipe, recipeId);
-    modal.close();
-    modal.remove();
+
+    if (modal) {
+      modal.close();
+      modal.remove();
+    }
+
     showSuccessNotification(parsedRecipe);
 
   } catch (error) {
     console.error('❌ Parse error:', error);
-    statusDiv.innerHTML = `<p class="error">❌ ${error.message}</p>`;
-    parseBtn.disabled = false;
-    parseBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Import Recipe';
+    if (statusDiv) statusDiv.innerHTML = `<p class="error">❌ ${error.message}</p>`;
+    if (parseBtn) {
+      parseBtn.disabled = false;
+      parseBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Import Recipe';
+    }
   }
 }
 

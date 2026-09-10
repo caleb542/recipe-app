@@ -184,6 +184,7 @@ export function updateEditorialSummary(recipe) {
     const parts = [];
     if (recipe?.prepTime) parts.push(`<span><i class="fa-regular fa-clock"></i> Prep ${recipe.prepTime}</span>`);
     if (recipe?.totalTime) parts.push(`<span><i class="fa-solid fa-stopwatch"></i> Total ${recipe.totalTime}</span>`);
+    if (recipe?.servings) parts.push(`<span><i class="fa-solid fa-users"></i> Serves ${recipe.servings}</span>`);
     timesEl.innerHTML = parts.join('');
   }
 
@@ -193,7 +194,7 @@ export function updateEditorialSummary(recipe) {
       .join('');
   }
 
-  const hasSomething = recipe?.prepTime || recipe?.totalTime || recipe?.tags?.length;
+  const hasSomething = recipe?.prepTime || recipe?.totalTime || recipe?.servings || recipe?.tags?.length;
   dot?.classList.toggle('is-partial', !!hasSomething);
 }
 
@@ -335,25 +336,11 @@ function formatTimeAgo(date) {
 // ----------------------------------------
 
 export function setupQuickAddCard(isExistingRecipe) {
-  const card = document.getElementById('card-quick-add');
   const warning = document.getElementById('reimport-warning');
-  if (!card) return;
-
   if (isExistingRecipe) {
-    // Collapse it
-    const header = card.querySelector('.edit-card__header');
-    const body = card.querySelector('.edit-card__body');
-    header?.setAttribute('aria-expanded', 'false');
-    body?.classList.remove('is-open');
-
-    // Show overwrite warning
     warning?.removeAttribute('hidden');
   } else {
-    // New recipe — open it, no warning
-    const header = card.querySelector('.edit-card__header');
-    const body = card.querySelector('.edit-card__body');
-    header?.setAttribute('aria-expanded', 'true');
-    body?.classList.add('is-open');
+    warning?.setAttribute('hidden', '');
   }
 }
 

@@ -306,9 +306,25 @@ export function stripLeadingNoise(line) {
 // SECTION HEADER DETECTION
 // ----------------------------------------
 function isSectionHeader(line) {
-  if (!/^[A-Za-z\s\(\)\/&,'\-]{2,50}:$/.test(line)) return false;
-  if (hasAmount(line)) return false;
-  return true;
+  // Colon-terminated headers (existing behavior)
+  if (/^[A-Za-z\s\(\)\/&,'\-]{2,50}:$/.test(line) && !hasAmount(line)) {
+    return true;
+  }
+
+  // Bare Title Case labels with no trailing colon — common for
+  // sub-recipe/group headers on sites that don't punctuate their group
+  // headings ("Cocktail", "Earl Grey Syrup", "Salmon", "Green Beans").
+  // Every word capitalized, no digits, no ending punctuation, short —
+  // strict enough to avoid catching real prose or ingredient lines.
+  if (!hasAmount(line) && !/[.!?,;:]$/.test(line) && line.length <= 40) {
+    const words = line.trim().split(/\s+/);
+    if (words.length >= 1 && words.length <= 4 &&
+        words.every(w => /^[A-Z][a-zé]*$/.test(w))) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 // ----------------------------------------
@@ -492,7 +508,10 @@ function classifyLine(line) {
   if (/^makes\s+(a|an)?\s*.*(serving|sandwich|sandwiches|batch|dozen|piece|cookie|loaf|cake)/i.test(clean)) {
     return { type: 'meta', text: clean };
   }
-  if (hasAmount(clean) || hasKnownUnit(clean)) {
+const NO_QUANTITY_INGREDIENTS = /^(kosher\s+)?salt(\s+and\s+(freshly\s+ground\s+)?(black\s+)?pepper)?|^(freshly\s+ground\s+)?(black\s+)?pepper|^salt\s+and\s+pepper|^olive\s+oil|^cooking\s+spray/i;
+  
+
+  if (hasAmount(clean) || hasKnownUnit(clean) || NO_QUANTITY_INGREDIENTS.test(clean)) {
     const data = parseIngredientLine(clean);
     if (!data || !data.name) return { type: 'empty' };
     return { type: 'ingredient', data };
@@ -539,14 +558,22 @@ function extractMeta(text, recipe) {
     recipe.totalTime = u.startsWith('h') ? `${val} hour${val > 1 ? 's' : ''}` : `${val} minutes`;
   }
 
-  const servingsMatch = text.match(/^servings?:?\s*(\d+)/i);
-  if (servingsMatch) recipe.servings = servingsMatch[1];
+  // Range format ("Yield: 4 to 6 servings") — must run BEFORE the
+  // single-number checks below, since those match on the first digit
+  // alone and would otherwise capture only "4" and stop there.
+  const rangeMatch = text.match(/(?:yield|servings?|serves?):?\s*(\d+)\s*to\s*(\d+)\s*servings?/i);
+  if (rangeMatch) {
+    recipe.servings = `${rangeMatch[1]} to ${rangeMatch[2]}`;
+  } else {
+    const servingsMatch = text.match(/^servings?:?\s*(\d+)/i);
+    if (servingsMatch) recipe.servings = servingsMatch[1];
 
-  const servesMatch = text.match(/^serves?:?\s*(\d+)/i);
-  if (servesMatch) recipe.servings = servesMatch[1];
+    const servesMatch = text.match(/^serves?:?\s*(\d+)/i);
+    if (servesMatch) recipe.servings = servesMatch[1];
 
-  const yieldMatch = text.match(/^yield:?\s*(\d+)/i);
-  if (yieldMatch) recipe.servings = yieldMatch[1];
+    const yieldMatch = text.match(/^yield:?\s*(\d+)/i);
+    if (yieldMatch) recipe.servings = yieldMatch[1];
+  }
 
   const sourceMatch = text.match(/find it online at\s+(https?:\/\/\S+)/i);
   if (sourceMatch) recipe.sourceUrl = sourceMatch[1];
@@ -558,8 +585,49 @@ function extractMeta(text, recipe) {
 // then splits direction paragraphs into individual sentences
 // Called at the top of parseRecipeText as a pre-processing step
 // ----------------------------------------
+
+// Known section-heading words. Forces a paragraph break whenever one
+// appears on its own line, independent of blank lines or case — this
+// is what lets dense pastes (no blank lines between title / description /
+// Ingredients / Directions) still get correctly split into sections.
+const HEADING_WORDS = /^(ingredients?|directions?|instructions?|method|steps?|preparation|how to (make|prepare)|notes?|tips?):?$/i;
+
 export function reflowAndSplitText(text) {
   text = text.replace(/(\w)-\n(\w)/g, '$1$2');
+
+  // ----------------------------------------
+  // FIX ZERO-SEPARATOR CONCATENATION
+  // Some sites' copy output collapses separate block elements (headings,
+  // list items, paragraphs) with NO whitespace at all between them —
+  // not just a missing blank line, but zero characters:
+  // "...ChickenPrep time: 20 minutesCook time:..."
+  // "...black pepper1 large bunch fresh thyme..."
+  // Restore real boundaries before any line-based logic runs.
+  // ----------------------------------------
+
+  // 1. Sentence punctuation glued directly to the next capital letter
+  //    ("layer.Prep", ").Rest") — insert a space so the existing
+  //    sentence-splitter (which requires whitespace after punctuation)
+  //    can actually see the boundary.
+  text = text.replace(/([.!?])([A-Z])/g, '$1 $2');
+
+  // 1.5. General lowercase→uppercase glue point — mark with a distinct
+  //      token (not just \n) so the paragraph-merge step below knows this
+  //      break must be respected even though the resulting line doesn't
+  //      start with a digit.
+  text = text.replace(/([a-z])([A-Z][a-z])/g, '$1\n###HARDBREAK###$2');
+
+  // 2. Known heading/meta words glued to preceding text — insert a real
+  //    newline so each becomes its own line for HEADING_WORDS and the
+  //    meta regexes in classifyLine to detect.
+  const GLUED_HEADING = /([a-z0-9%)])((?:Prep time|Cook time|Total time|Active time|Yield|Servings?|Serves|Ingredients?|Instructions?|Directions?|Method|Preparation|Notes)\b)/g;
+  text = text.replace(GLUED_HEADING, '$1\n$2');
+
+  // 3. A new ingredient glued directly onto the end of the previous one —
+  //    a lowercase letter, ')', or '%' immediately followed by a digit
+  //    with zero separator ("pepper1 large", "halved1 head") signals a
+  //    missing list-item break.
+  text = text.replace(/([a-z)%])(\d)/g, '$1\n$2');
 
   const isAllCapsLine = (line) => {
     if (!line || line.length < 2 || line.length > 90) return false;
@@ -572,11 +640,69 @@ export function reflowAndSplitText(text) {
   const paragraphs = [];
   let current = '';
   let lastWasIngredientLine = false;
+  let isFirstLine = true;
 
   for (let i = 0; i < rawLines.length; i++) {
-    const trimmed = rawLines[i];
+    let trimmed = rawLines[i];
     if (!trimmed) {
       if (current) { paragraphs.push(current.trim()); current = ''; }
+      lastWasIngredientLine = false;
+      continue;
+    }
+
+    // Detect and strip the hard-break marker before any other check
+    // runs, so the rest of the loop sees clean text either way.
+    const isHardBreak = trimmed.startsWith('###HARDBREAK###');
+    if (isHardBreak) {
+      trimmed = trimmed.replace('###HARDBREAK###', '');
+    }
+
+    // The very first non-empty line is always the title. Never merge it
+    // with what follows, even if there's no blank line or punctuation
+    // separating it from the next line (dense pastes have none of either).
+    if (isFirstLine) {
+      if (current) { paragraphs.push(current.trim()); current = ''; }
+      paragraphs.push(trimmed);
+      isFirstLine = false;
+      lastWasIngredientLine = false;
+      continue;
+    }
+
+    // Known heading words ("Ingredients", "Directions", etc.) always
+    // start a new paragraph on their own, regardless of blank lines
+    // or case.
+    if (HEADING_WORDS.test(trimmed)) {
+      if (current) { paragraphs.push(current.trim()); current = ''; }
+      paragraphs.push(trimmed);
+      lastWasIngredientLine = false;
+      continue;
+    }
+
+    // Standalone "Step N" lines carry no information beyond ordering,
+    // which array order already preserves — drop them outright rather
+    // than merging into the paragraph before or after.
+    if (/^step\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)$/i.test(trimmed)) {
+      continue;
+    }
+
+    // A bare Title Case line with no digits or ending punctuation is
+    // very likely a sub-recipe/group label ("Cocktail", "Earl Grey
+    // Syrup", "Salmon", "Green Beans") rather than prose or a wrapped
+    // continuation fragment — isolate it as its own paragraph so it
+    // never gets merged into the ingredient/step before or after it.
+    // (isSectionHeader recognizes it as a real section once it reaches
+    // classifyLine on its own line.)
+    const looksLikeSubheading = (l) => {
+      if (!l || l.length > 40) return false;
+      if (/\d/.test(l)) return false;
+      if (/[.!?,;:]$/.test(l)) return false;
+      const words = l.split(/\s+/);
+      if (words.length > 4) return false;
+      return words.every(w => /^[A-Z][a-zé]*$/.test(w));
+    };
+    if (looksLikeSubheading(trimmed)) {
+      if (current) { paragraphs.push(current.trim()); current = ''; }
+      paragraphs.push(trimmed);
       lastWasIngredientLine = false;
       continue;
     }
@@ -587,6 +713,14 @@ export function reflowAndSplitText(text) {
       if (current) { paragraphs.push(current.trim()); current = ''; }
       paragraphs.push(trimmed);
       lastWasIngredientLine = true;
+      continue;
+    }
+
+    // Check hardbreak
+    if (isHardBreak) {
+      if (current) { paragraphs.push(current.trim()); current = ''; }
+      paragraphs.push(trimmed);
+      lastWasIngredientLine = false;
       continue;
     }
 
@@ -751,8 +885,6 @@ export function parseRecipeText(text) {
     break;
   }
 
-  // A real title is never an imperative direction sentence —
-  // reject lines starting with a cooking verb from being guessed as the name
   const looksLikeTitle = !startsWithCookingVerb(line);
 
   if (!recipe.name && looksLikeTitle && line.length > 3 && line.length < 120) {
@@ -768,6 +900,17 @@ export function parseRecipeText(text) {
     recipe.directions.push({
       id: generateUUID(),
       text: classified.text,
+      group: currentGroup || null,
+    });
+  } else if (mode === 'ingredients') {
+    recipe.ingredients.push({
+      id: generateUUID(),
+      amount: '',
+      unit: '',
+      measureWord: '',
+      name: classified.text,
+      description: '',
+      alternatives: [],
       group: currentGroup || null,
     });
   } else if (mode === 'preamble' && recipe.name && !recipe.description) {

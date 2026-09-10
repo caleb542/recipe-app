@@ -71,39 +71,19 @@
 
             <!-- QUICK ADD — accordion, not modal -->
             <div class="bento-quick-add">
-                <div class="edit-card" id="card-quick-add">
-                    <button class="edit-card__header" data-card="quick-add" aria-expanded="false">
-                        <div class="edit-card__top-row">
-                            <div class="edit-card__icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                            <span class="edit-card__label">Quick Add</span>
-                            <div class="edit-card__actions">
-                                <span class="edit-card__summary-inline">Import from URL or paste recipe text</span>
-                                <i class="fa-solid fa-chevron-down edit-card__chevron"></i>
-                            </div>
-                        </div>
-                    </button>
-                    <div class="edit-card__body">
-                        <div class="edit-card__body-inner">
-                            <div class="reimport-warning" id="reimport-warning" hidden>
-                                <i class="fa-solid fa-triangle-exclamation"></i>
-                                This will overwrite existing fields
-                            </div>
-                            <div class="quick-add-input-group">
-                                <input type="text" id="quick-add-input"
-                                    placeholder="Paste recipe URL, or recipe text"
-                                    class="quick-add-input" />
-                                <button id="quick-add-parse-btn" class="btn-parse">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Parse Recipe
-                                </button>
-                            </div>
-                            <div id="quick-add-status" class="quick-add-status"></div>
-                            <p class="quick-add-hint">
-                                💡 Tip: Paste a URL from AllRecipes, Food Network, etc., or paste the full recipe text
-                            </p>
-                        </div>
-                    </div>
+    <div class="edit-card" id="card-quick-add">
+        <button class="edit-card__header" aria-label="Edit Quick Add">
+            <div class="edit-card__top-row">
+                <div class="edit-card__icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <span class="edit-card__label">Quick Add</span>
+                <div class="edit-card__actions">
+                    <span class="edit-card__summary-inline">Import from URL or paste recipe text</span>
+                    <i class="fa-solid fa-chevron-right edit-card__chevron"></i>
                 </div>
             </div>
+        </button>
+    </div>
+</div>
 
             <!-- ================================================
                  CORE GROUP
@@ -240,7 +220,7 @@
             <!-- ================================================
                  CONTEXT GROUP — placeholders
                  ================================================ -->
-            <div class="bento-group" data-group="context">
+            <!-- <div class="bento-group" data-group="context">
                 <div class="bento-group__label">Context</div>
                 <div class="bento-row bento-row--quarters">
                     <div class="edit-card edit-card--placeholder" id="card-servings">
@@ -280,12 +260,12 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- ================================================
                  NUTRITION & ALLERGENS — placeholders
                  ================================================ -->
-            <div class="bento-group" data-group="nutrition">
+            <!-- <div class="bento-group" data-group="nutrition">
                 <div class="bento-group__label">Nutrition &amp; Allergens</div>
                 <div class="bento-row bento-row--halves">
                     <div class="edit-card edit-card--placeholder" id="card-nutrition">
@@ -309,7 +289,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- ================================================
                  EDITORIAL GROUP
@@ -375,7 +355,7 @@
 
                 <div class="bento-row bento-row--thirds">
 
-                    <div class="edit-card edit-card--placeholder" id="card-notes">
+                    <!-- <div class="edit-card edit-card--placeholder" id="card-notes">
                         <button class="edit-card__header" disabled>
                             <div class="edit-card__top-row">
                                 <div class="edit-card__icon"><i class="fa-solid fa-note-sticky"></i></div>
@@ -384,7 +364,7 @@
                             </div>
                             <div class="edit-card__preview"><span class="edit-card__preview-empty">Make-ahead tips, substitutions, chef's notes</span></div>
                         </button>
-                    </div>
+                    </div> -->
 
                     <div class="edit-card" id="card-article-editorial">
                         <button class="edit-card__header" aria-label="Edit Article" onclick="document.getElementById('card-article').querySelector('.edit-card__header').click()">
@@ -424,7 +404,7 @@
             <!-- ================================================
                  META GROUP
                  ================================================ -->
-            <div class="bento-group" data-group="meta">
+            <!-- <div class="bento-group" data-group="meta">
                 <div class="bento-group__label">Meta</div>
                 <div class="bento-row bento-row--halves">
                     <div class="edit-card edit-card--placeholder" id="card-versions">
@@ -448,7 +428,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
         </div><!-- /edit-form-wrap -->
 
@@ -460,7 +440,27 @@
          Modal moves content in/out of these on open/close.
          ================================================ -->
     <div id="form-stashes" hidden aria-hidden="true">
-
+        <div id="modal-content-quick-add">
+            <div class="em-form-content">
+                <div class="reimport-warning" id="reimport-warning" hidden>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    This will overwrite existing fields
+                </div>
+                <div class="quick-add-input-group">
+                <textarea id="quick-add-input"
+                    placeholder="Paste recipe URL, or recipe text"
+                    class="quick-add-input"
+                    rows="8"></textarea>
+                    <button type="button" id="quick-add-parse-btn" class="btn-parse">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Parse Recipe
+                    </button>
+                </div>
+                <div id="quick-add-status" class="quick-add-status"></div>
+                <p class="quick-add-hint">
+                    💡 Tip: Paste a URL from AllRecipes, Food Network, etc., or paste the full recipe text
+                </p>
+            </div>
+        </div>
         <div id="modal-content-identity">
             <div class="em-form-content">
                 <div class="form-group">
@@ -598,7 +598,12 @@
                         <label for="recipe-total-time">Total Time</label>
                         <input id="recipe-total-time" type="text" placeholder="1.5 hours">
                     </div>
+                    <div class="form-group">
+                        <label for="recipe-servings">Servings</label>
+                        <input type="text" id="recipe-servings"  placeholder="4 to 6">
+                    </div>
                 </div>
+               
             </div>
         </div>
 

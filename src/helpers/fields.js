@@ -24,6 +24,7 @@ function populateFields(recipe) {
   
   document.getElementById('recipe-prep-time').value = recipe.prepTime || '';
   document.getElementById('recipe-total-time').value = recipe.totalTime || '';
+  document.getElementById('recipe-servings').value = recipe.servings || '';
 
   // Categories (checkboxes) — exclude cuisine hidden checkboxes, handled by tag-input
 const categoryInputs = document.querySelectorAll('input[name="category"]:not(.cuisine-hidden-checkbox)');
@@ -70,6 +71,7 @@ function wireFieldListeners(recipeId) {
   const authorInput = document.getElementById('recipe-author');
   const prepTimeInput = document.getElementById('recipe-prep-time');
   const totalTimeInput = document.getElementById('recipe-total-time');
+  const servingsInput = document.getElementById('recipe-servings');
   const tagsInput = document.getElementById('recipe-tags');
   const categoryInputs = document.querySelectorAll('input[name="category"]');
 
@@ -125,6 +127,14 @@ if (slugInput) {
   if (totalTimeInput) {
     totalTimeInput.addEventListener('input', e => {
       updateLocalStorage(recipeId, { totalTime: e.target.value });
+      markUnsaved();
+    });
+  }
+
+  // Servings - updates as you type
+  if (servingsInput) {
+    servingsInput.addEventListener('input', e => {
+      updateLocalStorage(recipeId, { servings: e.target.value });
       markUnsaved();
     });
   }
