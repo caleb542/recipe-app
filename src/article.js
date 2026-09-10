@@ -1,5 +1,6 @@
 import "./style.scss";
 import { loadRecipes, formatDate, hamburger, getFeaturedImage, getAllImages, hideWarning, loadRecipesFromLocalStorage, loadCategories } from "./functions.js";
+import { loadFooter } from './components/FooterComponent.js';
 import { renderBreadcrumbs } from "./components/Breadcrumbs.js";
 import { marked } from "marked";
 import { setupShoppingList } from "./helpers/shoppingList.js";
@@ -73,7 +74,7 @@ if (!container) {
 
 console.log("✅ Container found:", container);
 // showSpinner();
-
+ await loadFooter();
 // Initialize Auth0
 await initAuth0();
 const authenticated = await isAuthenticated();

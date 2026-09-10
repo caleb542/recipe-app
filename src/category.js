@@ -36,62 +36,62 @@ async function loadCategoriesMap() {
 async function init() {
   
   try {
-    await loadHeader();
-    hideWarning();
-    await loadFooter();
-      // Initialize Auth0
-    await initAuth0();
-    const authenticated = await isAuthenticated();
-    if (authenticated) {
-      await loadUserProfile(true);
-       const user = await getUser();
-        currentUserId = user?.sub || null;
-    }
-    
-    await updateAuthUI();
-    setupAuthListeners();
-    initImpersonationBanner();
-    await loadCategoriesMap();
+      await loadHeader();
+      hideWarning();
+        // Initialize Auth0
+      await initAuth0();
+      const authenticated = await isAuthenticated();
+      if (authenticated) {
+        await loadUserProfile(true);
+        const user = await getUser();
+          currentUserId = user?.sub || null;
+      }
+      
+      await loadFooter();
+      await updateAuthUI();
+      setupAuthListeners();
+      initImpersonationBanner();
+      await loadCategoriesMap();
   
 
-    const params = new URLSearchParams(window.location.search);
-    const slug = params.get('category');
+      const params = new URLSearchParams(window.location.search);
+      const slug = params.get('category');
 
-    if (!slug) {
-      currentSlug = window.location.pathname
-        .replace(/^\/category\//, '')
-        .replace(/\/$/, '');
-    } else {
-      currentSlug = slug;
-    }
+      if (!slug) {
+        currentSlug = window.location.pathname
+          .replace(/^\/category\//, '')
+          .replace(/\/$/, '');
+      } else {
+        currentSlug = slug;
+      }
 
-    const categoryEntry = CATEGORIES_MAP[currentSlug];
-    currentCategory = categoryEntry?.name;
-    currentCategoryGroup = categoryEntry?.group;
+      const categoryEntry = CATEGORIES_MAP[currentSlug];
+      currentCategory = categoryEntry?.name;
+      currentCategoryGroup = categoryEntry?.group;
 
-    if (!currentCategory) {
-      console.error('Category not found for slug:', currentSlug);
-      renderError(`Category "${currentSlug}" not found`);
-      return;
-    }
+      if (!currentCategory) {
+        console.error('Category not found for slug:', currentSlug);
+        renderError(`Category "${currentSlug}" not found`);
+        return;
+      }
 
 
-    document.title = `${currentCategory} - Recipe Me`;
-    setupSanityMegaMenu();
-    renderBreadcrumbs({
-      primary: [{ label: 'Home', href: '/' }],
-      current: currentCategory
-    });
+      document.title = `${currentCategory} - Recipe Me`;
+      setupSanityMegaMenu();
+      renderBreadcrumbs({
+        primary: [{ label: 'Home', href: '/' }],
+        current: currentCategory
+      });
 
     // showSpinner();
 
     allRecipes = await loadRecipes();
-   allRecipes = allRecipes.filter(recipe => {
-  const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
-  const hasDirections = recipe.directions && recipe.directions.length > 0;
-  const isOwner = recipe.author?.auth0Id === currentUserId;
-  return hasIngredients && hasDirections && (recipe.isPublic !== false || isOwner);
-});
+    allRecipes = allRecipes.filter(recipe => {
+      const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
+      const hasDirections = recipe.directions && recipe.directions.length > 0;
+      const isOwner = recipe.author?.auth0Id === currentUserId;
+      return hasIngredients && hasDirections && (recipe.isPublic !== false || isOwner);
+    });
 
     filteredRecipes = allRecipes.filter(recipe => {
       if (!recipe.categories) return false;
