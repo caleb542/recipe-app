@@ -83,7 +83,7 @@ $desktopCardHeight: 400px;
 
     .meta-icons {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         gap: 0;
     }
 
@@ -464,6 +464,7 @@ article h1 {
 
 .image-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.25rem;
     justify-content: space-between;
 }

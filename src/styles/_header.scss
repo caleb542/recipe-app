@@ -1182,7 +1182,7 @@ header input[type="radio"] {
 
 @keyframes navc {
   to {
-    color: #c8892a;
+    // color: #c8892a;
   }
 }
 
@@ -1364,7 +1364,7 @@ nav.main-nav {
     align-items: center;
     justify-content: center;
 
-    animation-name: navc;
+    // animation-name: navc;
     animation-timing-function: linear;
     animation-timeline: scroll();
     animation-range: entry 80px exit 130px;
@@ -1390,7 +1390,7 @@ nav.main-nav {
 .admin-page {
   a,
   button.nav-link {
-    color:#c8892a;
+    color:#333;
     animation-range: entry 0px exit 0px;
   }
 }
