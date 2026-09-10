@@ -176,7 +176,15 @@ export async function handler(event) {
         console.log(`🔗 Custom slug: ${fullSlug}`);
       }
       
-      // Build update object
+      // Build update object.
+      // NOTE: processedUpdates is spread wholesale here — there is no
+      // field whitelist at this layer. Any key present in `updates`
+      // (e.g. servings, rawImportText, or any future field added on
+      // the client) is written to MongoDB automatically. The only
+      // place that filters which fields get sent is the client-side
+      // `updates` object built in actions.js's setupSaveButton — if a
+      // new field isn't showing up in the saved document, check there
+      // first, not here.
       const updateFields = {
         ...processedUpdates,
         ...slugUpdates,
@@ -243,6 +251,9 @@ export async function handler(event) {
 
     } else {
       // ✅ INSERT (new recipe)
+      // Same note as above: processedUpdates is spread wholesale into
+      // newRecipe, so any field present in `updates` (servings,
+      // rawImportText, etc.) is persisted automatically on creation too.
       const processedUpdates = ensureImagesArray({ ...updates });
 
       // ✅ Generate slug for new recipe

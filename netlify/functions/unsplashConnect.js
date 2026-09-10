@@ -5,7 +5,7 @@ const unsplash = createApi({
   fetch: (...args) => fetch(...args)
 });
 
-exports.handler = async function (event) {
+export const handler =  async function (event) {
   try {
     const query = event.queryStringParameters.query || 'food';
     const page = event.queryStringParameters.page || 1;
