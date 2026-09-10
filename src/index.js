@@ -1,9 +1,7 @@
 import "./style.scss";
 import 'notyf/notyf.min.css'; 
 import { stringify, v4 as uuidv4 } from 'uuid';
-import {
-  createApi
-} from './unsplash.js'
+
 import {
   getFilters,
   setFilters
@@ -12,9 +10,7 @@ import {
   sortRecipes,
   listRecipes
 } from './recipes.js'
-import {
-  unsplashme
-} from "./unsplash.js";
+
 import { loadCuratedSections } from './components/CuratedSections.js';
 
 import { initRoleBasedUI } from './auth/roleUI.js';

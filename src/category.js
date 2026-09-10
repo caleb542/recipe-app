@@ -9,6 +9,7 @@ import { loadRecipes, getFeaturedImage, hamburger } from './functions.js';
 import { hideWarning } from './functions.js';
 import { initAuth0, isAuthenticated, getUser } from './auth/auth0.js';
 import { generateRecipeBadges } from './components/RecipeBadges.js';
+import { initBadgeVisibility } from './utils/badgeVisibility.js';
 // import { showSpinner, removeSpinner } from "./components/SpinnerUtils.js";
 import { setupSanityMegaMenu } from './components/MegaMenuSanity.js';
 
@@ -85,11 +86,12 @@ async function init() {
     // showSpinner();
 
     allRecipes = await loadRecipes();
-    allRecipes = allRecipes.filter(recipe => {
-      const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
-      const hasDirections = recipe.directions && recipe.directions.length > 0;
-      return hasIngredients && hasDirections && recipe.isPublic !== false;
-    });
+   allRecipes = allRecipes.filter(recipe => {
+  const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
+  const hasDirections = recipe.directions && recipe.directions.length > 0;
+  const isOwner = recipe.author?.auth0Id === currentUserId;
+  return hasIngredients && hasDirections && (recipe.isPublic !== false || isOwner);
+});
 
     filteredRecipes = allRecipes.filter(recipe => {
       if (!recipe.categories) return false;
@@ -217,6 +219,8 @@ function renderRecipes() {
     `;
   }).join('');
 
+  
+  initBadgeVisibility();
   container.innerHTML = recipeCards + addCard;
 }
 

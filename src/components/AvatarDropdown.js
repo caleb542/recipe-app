@@ -68,6 +68,14 @@ const avatarImgHTML = avatar?.type === 'image'
     </p>
   </div>
   <div class="avatar-dropdown-divider"></div>
+   <a href="/edit.html" data-requires-auth="" class="avatar-dropdown-item btn-create-recipe">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i> Create Recipe
+    </a>
+
+    <button class="avatar-dropdown-item" id="avatar-badge-toggle">
+      <i class="fa-solid fa-eye"></i> <span id="avatar-badge-toggle-label">Hide recipe badges</span>
+    </button>
+  <div class="avatar-dropdown-divider"></div>
   <a href="/profile.html?username=${user.username}" class="avatar-dropdown-item">
     <i class="fa-solid fa-user"></i> Visit Profile
   </a>
@@ -75,15 +83,15 @@ const avatarImgHTML = avatar?.type === 'image'
     <i class="fa-solid fa-pen"></i> Edit Profile
   </a>
   ${isSuperAdmin ? `
+
+
   <div class="avatar-dropdown-divider"></div>
   <a href="/admin.html" class="avatar-dropdown-item">
     <i class="fa-solid fa-shield-halved"></i> Admin Panel
   </a>
   ` : ''}
   <div class="avatar-dropdown-divider"></div>
-  <button class="avatar-dropdown-item" id="avatar-badge-toggle">
-    <i class="fa-solid fa-eye"></i> <span id="avatar-badge-toggle-label">Hide recipe badges</span>
-  </button>
+
   <div class="avatar-dropdown-divider"></div>
   <button class="avatar-dropdown-item avatar-dropdown-signout" id="avatar-signout">
     <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
@@ -110,7 +118,7 @@ const avatarImgHTML = avatar?.type === 'image'
     logout();
   });
 
-  const badgeToggleBtn = dialog.querySelector('#avatar-badge-toggle');
+const badgeToggleBtn = dialog.querySelector('#avatar-badge-toggle');
 const badgeToggleLabel = dialog.querySelector('#avatar-badge-toggle-label');
 if (badgeToggleBtn) {
   // sync initial state

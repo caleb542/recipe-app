@@ -6,7 +6,7 @@ import { getFilters } from './filters.js'
 import { loadRecipes, saveRecipes, sortRecipes, getFeaturedImage } from './functions.js';
 // import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
 import { generateRecipeBadges } from './components/RecipeBadges.js';
-import { isAuthenticated, getUser, isAuthor } from './auth/auth0.js';
+import { isAuthenticated, getUser } from './auth/auth0.js';
 
 let listRecipes = async (recipesParam, currentUserId = null) => {
  let recipes = await loadRecipes();
