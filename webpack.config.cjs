@@ -17,7 +17,7 @@ module.exports = (env, argv) => {
     mode: argv.mode,
     
     // Enable watch mode for development
-    watch: isDevelopment,
+    // watch: isDevelopment,
     
     // UNCOMMENT AND FIX WATCH OPTIONS
     watchOptions: {
