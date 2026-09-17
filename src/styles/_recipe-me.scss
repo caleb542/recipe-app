@@ -423,7 +423,7 @@ button:disabled {
 
 .modal::backdrop {
   background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(2px);
 }
 
 /* Modal sizes */
@@ -734,12 +734,13 @@ Status:
 /* ============================================================================
    RESPONSIVE UTILITIES
    ============================================================================ */
-
-@media (max-width: 768px) {
-  .container {
+@media (max-width:1024px) {
+.container {
     padding: 0 var(--space-4);
   }
-
+}
+@media (max-width: 768px) {
+ 
   .grid-2,
   .grid-3,
   .grid-4 {

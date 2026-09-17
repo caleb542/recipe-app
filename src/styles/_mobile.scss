@@ -403,7 +403,9 @@
   // ----------------------------------------
   // MOBILE NAV AUTH
   // ----------------------------------------
-
+  .signup-or-register-container {
+    display: none;
+  }
   .mobile-nav-list {
     list-style: none;
     padding: 0;
@@ -730,7 +732,10 @@
       }
       .description.summary {
         text-align:center;
+        max-width:unset;
         margin:1rem auto;
+        text-wrap-style: pretty;
+        text-box-trim: trim-both;
       }
       
     }
@@ -764,6 +769,7 @@
   }
 
   //<!-- STICKY ACTION BAR -->
+  
   .edit-sticky-bar .actions-text {
     display:none;
   }
@@ -943,6 +949,29 @@
       display: none; 
     }
   }
+  .recipe-page #header-edit-action {
+  position: absolute;
+    width: 40px;
+    height: 40px;
+    left: unset;
+    top: 50%;
+    right: 0px;
+    opacity:0;
+    transform: translate(0, -50%);
+    animation: slide-up 1s ease forwards 1.75s;
+
+}
+@keyframes slide-up {
+  from {
+    opacity:0;
+    top:80px;
+  }
+  to {
+    opacity:1;
+    top:118%;
+    right:-30%;
+  }
+}
   
 }
 
@@ -1001,3 +1030,9 @@
 }
 
 
+
+
+body.category-page .category-hero .category-hero-text h1::after,
+body.category-page .category-hero .category-hero-text h1::before {
+  display:none;
+}

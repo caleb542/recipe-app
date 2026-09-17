@@ -247,7 +247,7 @@
   color: white;
    justify-content: flex-end;
     opacity:0;
-  animation: fade-in 1.2s forwards 0.5s;
+  animation: fade-in 1s forwards;
 
 }
 
@@ -309,7 +309,7 @@
     top:50%;
   }
 }
-.header-edit-btn {
+.header-edit-btn {              
     padding: 0px;
     border-radius: 999px;
     background: hotpink;

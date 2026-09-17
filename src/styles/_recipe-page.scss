@@ -150,6 +150,12 @@
     gap: 48px;
     align-items: start;
   }
+  // @media screen and (min-width:768px) and (max-width:1004px) {
+  //   .recipe-body, .recipe-videos, .summary {
+  //     padding-left:16px;
+  //     padding-right:16px;
+  //   }
+  // }
 
   .recipe-page .recipe-body:has(.shopping-list.hide) {
     gap:0px;

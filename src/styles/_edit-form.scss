@@ -86,7 +86,7 @@
 // ----------------------------------------
 .edit-sticky-bar {
   position: sticky;
-  top: 110px;
+  top: 100px;
   z-index: 100;
   width: 100%;
   background: #fff;
@@ -114,14 +114,29 @@
   text-overflow: ellipsis;
 }
 
-.edit-sticky-bar__right {
-  display: flex;
+// .edit-sticky-bar__right {
+//   display: flex;
+//   align-items: center;
+//   gap: 6px;
+//   flex-shrink: 0;
+//   margin-left: auto;
+// }
+.edit-recipe-title-container {
+  display:flex;
   align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  margin-left: auto;
-}
+  justify-content: center;
+  gap:10px;
 
+  h2, span {
+    font-family: "Poppins";
+    font-weight: 600;
+    font-size: 1.25rem;
+    line-height:1;
+    padding:0;
+    margin:0;
+    color:#333;
+  }
+}
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -1233,7 +1248,7 @@ fieldset.feature-image {
   width: 100%;
   font-family: inherit;
 
-  &::backdrop { background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+  &::backdrop { background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); }
 }
 
 .button__footer {
@@ -1450,7 +1465,16 @@ fieldset.feature-image {
 
   .form-cols-2 { grid-template-columns: 1fr; }
 
-  .edit-sticky-bar { padding: 0.5rem 0.75rem; flex-wrap: wrap; gap: 6px; top: 0; }
+  .edit-sticky-bar { 
+          padding: 0.5rem 0.75rem;
+        flex-wrap: wrap;
+        gap: 6px;
+        row-gap: 6px;
+        column-gap: 6px;
+        position: sticky;
+        top: 70px;
+        border-top:1px solid #f0f0f0;
+  }
 
   .quick-add-input-group { flex-direction: column; }
 }
@@ -1612,7 +1636,7 @@ fieldset.feature-image {
 
   &::backdrop {
     background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(2px);
   }
 
   &:not([open]) {

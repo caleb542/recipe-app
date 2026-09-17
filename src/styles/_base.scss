@@ -132,26 +132,77 @@ date {
 .page-container > header {
   view-transition-name: site-header;
 }
+ #header-edit-action {
+   view-transition-name: edit-action;
+ }
+#user-info .avatar-btn {
+   view-transition-name: user-info-avatar;
+   transform-origin: center;
+   text-align: center                                                       ;
+}
+::view-transition-old(edit-action) {
+  animation: shift 0.5s ease-out forwards;
+  opacity: 1;
+}
+::view-transition-new(edit-action) {
+  animation: shifty 0.5s ease-out forwards;
+  opacity: 1;
+}
+
+::view-transition-old(user-info-avatar) {
+  animation: nofadeout 0.5s ease-out forwards;
+  opacity: 1;
+}
+::view-transition-new(user-info-avatar) {
+  animation: nofadein 0.5s ease-in forwards 1s;
+  opacity: 1;
+}
+
+
 
 ::view-transition-old(site-header) {
-  animation: nofadeout 0.5s ease-in forwards;
+  animation: nofadeout 1s ease-in forwards;
   opacity: 1;
 }
 ::view-transition-new(site-header) {
-  animation: nofadein 0.5s ease-in forwards;
+  
+  animation: nofadein 1s ease-in forwards;
   opacity: 1;
 }
 
-::view-transition-group(site-header) {
-  animation: none;
-}
+// ::view-transition-group(site-header) {
+//   animation: nofadein;
+// }
 
-::view-transition-old(root) {
-  animation: fade-out 0.5s ease-out forwards;
-}
+// ::view-transition-old(root) {
+//   animation: fade-out 0.7s ease-out forwards;
+// }
 
-::view-transition-new(root) {
-  animation: fade-in 0.5s ease-in forwards;
+// ::view-transition-new(root) {
+//   animation: fade-in 0.7s ease-out forwards;
+// }
+@keyframes shift {
+  0% {
+  
+    scale:1;
+  }
+  
+  100% {
+   
+    scale:0;
+  }
+
+}
+@keyframes shifty {
+  0% {
+  
+    scale:0;
+  }
+  
+  100% {
+   
+    scale:1;
+  }
 }
 @keyframes nofadeout {
  0% {
@@ -159,16 +210,17 @@ date {
   }
  
   100% { 
-    opacity: 0;
+    opacity: 1;
   }
 }
 @keyframes nofadein {
-     100% {
+     0% {
     opacity: 1;
+   
   }
  
-    0% { 
-    opacity: 0;
+    100% { 
+    opacity: 1;
   }
 }
 
@@ -263,3 +315,42 @@ margin-right: auto;
 .home-page article {
     height: auto;
 }
+
+
+
+
+/*
+--------  ---
+CSS Animation 
+--------  ---
+*/
+/*
+.nav-list-links > li {
+  opacity: 0.2;
+  scale: 0.1;
+}
+.nav-list-links > li {
+  animation: staggered-reveal;
+  animation-timing-function: ease;
+  animation-duration: 0.4s;
+  animation-direction: forwards;
+  animation-delay: calc( sibling-index() * 300ms);
+}
+
+@keyframes staggered-reveal {
+  0% {
+    opacity: 0;
+    scale: 0.1;
+  }
+  10% {
+    opacity:1;
+     scale: 0.1;
+  }
+  70% {
+    scale: 1;
+  }
+  100% {
+    opacity: 1;
+    scale:1;
+  }
+}*/

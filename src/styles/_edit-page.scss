@@ -29,37 +29,42 @@
   }
 }
 
-// ----------------------------------------
-// STICKY ACTION BAR
-// ----------------------------------------
+// // ----------------------------------------
+// // STICKY ACTION BAR
+// // ----------------------------------------
 
-.edit-sticky-bar {
-  position: sticky;
-    top: 120px;
-    z-index: 100;
-    background: #fff;
-    border-bottom: 1px solid var(--ef-border);
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    /* padding: 0 20px; */
-    gap: 1rem;
-    width: stretch;
+// .edit-sticky-bar {
+//     position: sticky;
+//     top: 100px;
+//     z-index: 100;
+//     background: #fff;
+//     border-bottom: 1px solid var(--ef-border);
+//     display: flex;
+//     align-items: center;
+//     justify-content: flex-end;
+//     /* padding: 0 20px; */
+//     gap: 1rem;
+//     width: stretch;
 
-  &__left {
-    min-width: 0;
-    flex: 1 1;
-  }
+//   &__left {
+//     min-width: 0;
+//     flex: 1 1;
+//   }
 
-  &__right {
-    flex:1 1;
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    flex-shrink: 0;
-  }
+//   &__right {
+//     flex:1 1;
+//     display: flex;
+//     align-items: center;
+//     gap: 0.625rem;
+//     flex-shrink: 0;
+//   }
+// }
+
+.edit-recipe-title-container {
+  display:flex;
+  align-items: center;
+  justify-content: center;
 }
-
 .edit-recipe-title {
   font-size: 0.9rem;
   font-weight: 500;
@@ -1251,7 +1256,7 @@ label.ingredient-label {
 
   &::backdrop {
     background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(24px);
   }
 }
 
