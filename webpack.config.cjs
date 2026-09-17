@@ -174,11 +174,11 @@ module.exports = (env, argv) => {
     publicPath: "/scripts/",
     writeToDisk: true,
     // ADD THIS - disable all caching in dev
-    headers: {
-      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-    }
+    // headers: {
+    //   'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    //   'Pragma': 'no-cache',
+    //   'Expires': '0',
+    // }
   },
   
   hot: false,

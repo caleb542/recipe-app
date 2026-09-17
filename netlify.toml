@@ -90,3 +90,13 @@ command = "npm run build"
 # FALLBACK - Removed the /* catch-all
 # Let 404s be 404s
 # ========================================
+
+
+# ========================================
+# Cache Control
+# ========================================
+
+[[headers]]
+  for = "/partials/header-template.html"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"
