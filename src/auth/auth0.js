@@ -212,7 +212,7 @@ export const getToken = async () => {
     ) {
       console.warn('⚠️ Token expired, attempting silent refresh...');
       try {
-        return await auth0.getTokenSilently({ cacheMode: 'off' });
+        return await auth0.getTokenSilently({ cacheMode: 'on' });
       } catch (refreshError) {
         console.warn('⚠️ Silent refresh failed, user needs to re-authenticate');
         // Clear stale state
