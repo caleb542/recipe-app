@@ -5,8 +5,7 @@ import { updateAuthUI, setupAuthListeners } from './auth/updateAuthUI.js';
 import { initImpersonationBanner } from './components/ImpersonationBanner.js';
 import { loadUserProfile, getUserProfile } from './userContext.js';
 import { listRecipes } from './recipes.js';
-import { loadRecipes, getFeaturedImage, hamburger } from './functions.js';
-import { hideWarning } from './functions.js';
+import { loadRecipes, loadCategories, getFeaturedImage, hamburger, hideWarning } from './functions.js';
 import { initAuth0, isAuthenticated, getUser } from './auth/auth0.js';
 import { generateRecipeBadges } from './components/RecipeBadges.js';
 import { initBadgeVisibility } from './utils/badgeVisibility.js';
@@ -21,17 +20,17 @@ let currentSlug = '';
 let CATEGORIES_MAP = {};
 let currentUserId = null;
 
-async function loadCategoriesMap() {
-  try {
-    const res = await fetch('/.netlify/functions/get-categories');
-    const { categories } = await res.json();
-    categories.forEach(cat => {
-      CATEGORIES_MAP[cat.slug] = { name: cat.name, group: cat.group };
-    });
-  } catch (e) {
-    console.warn('Could not load categories map:', e);
-  }
-}
+// async function loadCategoriesMap() {
+//   try {
+//     const res = await fetch('/.netlify/functions/get-categories');
+//     const { categories } = await res.json();
+//     categories.forEach(cat => {
+//       CATEGORIES_MAP[cat.slug] = { name: cat.name, group: cat.group };
+//     });
+//   } catch (e) {
+//     console.warn('Could not load categories map:', e);
+//   }
+// }
 
 async function init() {
   
@@ -51,8 +50,11 @@ async function init() {
       await updateAuthUI();
       setupAuthListeners();
       initImpersonationBanner();
-      await loadCategoriesMap();
-  
+      // await loadCategoriesMap();
+      const { categories } = await loadCategories();
+      categories.forEach(cat => {
+        CATEGORIES_MAP[cat.slug] = { name: cat.name, group: cat.group };
+      });
 
       const params = new URLSearchParams(window.location.search);
       const slug = params.get('category');
@@ -140,9 +142,9 @@ hero.innerHTML = `
       <div class="category-hero-text">
         ${categoryGroup ? `<span class="category-group-badge">${categoryGroup}</span>` : ''}
         <div class="hero-title-row">
-          <span class="hero-rule"></span>
+       
           <h1>${categoryName}</h1>
-          <span class="hero-rule"></span>
+       
         </div>
         <p class="recipe-count">${count} recipe${count !== 1 ? 's' : ''}</p>
       </div>

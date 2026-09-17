@@ -4,14 +4,15 @@ import {
     v4 as uuidv4
 } from 'uuid';
 // import * as Realm from "realm-web";
-import {
-    getImageGroup
-} from './unsplash.js';
+// import {
+    // getImageGroup
+// } from './unsplash.js';
 
 import { getRecipesFromDatabase } from './backend/getRecipesFromDatabase.js';
 import { updateRecipeInDatabase } from './backend/updateRecipeInDatabase.js';
 import { syncRecipeUpdate } from './helpers/syncRecipe.js';
 import { sanitizeHTML, sanitizeText } from './utils/sanitize.js';
+import { markUnsaved } from './helpers/editAccordion.js';
 
 
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
@@ -138,7 +139,9 @@ const openDirectionsDialogue = async (id, text) => {
         d.id === id ? { ...d, text: newText } : d
       );
     });
-
+    
+    markUnsaved();
+    
     // Update ONLY the specific direction's text
     const directionItem = document.querySelector(`li[data-id="${id}"] span`);
     if (directionItem) {
@@ -208,31 +211,32 @@ const removeDirection = async (itemID, text) => {
     directionsList.innerHTML = '';
     listDirections(updatedRec.directions);
   }
+  markUnsaved();
 };
 
 
-const addIngredients = () => {
-    const addIngredientsButton = document.querySelectorAll('.addIngredient');
-    addIngredients.forEach(button => {
-        button.addEventListener('click', function () {
-            // console.log(newRecipe)
-            newRecipe.ingredients.push({
-                name: "",
-                description: "",
-                amount: "",
-                unit: "",
-                measureWord: "",
-                alternatives: [],
-                id: `${uuidv4()}`
-            })
-            saveNewRecipeToLocalStorage(newRecipe)
+// const addIngredients = () => {
+//     const addIngredientsButton = document.querySelectorAll('.addIngredient');
+//     addIngredients.forEach(button => {
+//         button.addEventListener('click', function () {
+//             // console.log(newRecipe)
+//             newRecipe.ingredients.push({
+//                 name: "",
+//                 description: "",
+//                 amount: "",
+//                 unit: "",
+//                 measureWord: "",
+//                 alternatives: [],
+//                 id: `${uuidv4()}`
+//             })
+//             saveNewRecipeToLocalStorage(newRecipe)
 
-            newRecipe = loadNewRecipeFromLocalStorage()
-            createForm(newRecipe)
+//             newRecipe = loadNewRecipeFromLocalStorage()
+//             createForm(newRecipe)
            
-        })
-    })
-}
+//         })
+//     })
+// }
 
 
 // Sort your notes by one of three ways
@@ -428,6 +432,7 @@ const loadNewRecipeFromLocalStorage = () => {
 }
 const saveRecipes = (newRecipes) => {
     localStorage.setItem('recipes', JSON.stringify(newRecipes))
+      localStorage.setItem('recipes_timestamp', Date.now().toString());
 
 }
 
@@ -441,19 +446,19 @@ const listeners = () => {
 
   
 }
-const sendRecipes = async () => {
-    const APP_ID = 'data-puyvo'
-    const app = new Realm.App({
-        id: APP_ID
-    });
-    const credentials = Realm.Credentials.anonymous();
-    let recipes = loadRecipes()
+// const sendRecipes = async () => {
+//     const APP_ID = 'data-puyvo'
+//     const app = new Realm.App({
+//         id: APP_ID
+//     });
+//     const credentials = Realm.Credentials.anonymous();
+//     let recipes = loadRecipes()
 
 
-    const user = await app.logIn(credentials);
-    const recsd = await user.functions.updateAllRecipes(recipes);
+//     const user = await app.logIn(credentials);
+//     const recsd = await user.functions.updateAllRecipes(recipes);
 
-}
+// }
 const hideWarning = () => {
   const warningCloseButton = document.getElementById('hide-this-header');
   const warningBanner = document.querySelector(".dev-notice");
@@ -695,7 +700,7 @@ export {
     removeDirection,
     removeRecipe,
     // getRecipesFromDatabase,
-    addIngredients,
+    // addIngredients,
     addToExistingRecipes,
     sortRecipes,
     saveRecipes,

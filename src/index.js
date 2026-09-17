@@ -54,7 +54,7 @@ console.log('🔐 initAuth0 complete, authenticated:', await isAuthenticated());
 const authenticated = await isAuthenticated();
 
 if (authenticated) {
-  await loadUserProfile(false); // ✅ Force fresh fetch (skipFetch = false)
+  await loadUserProfile(true); // ✅ Force fresh fetch (skipFetch = false)
 }
 
 await updateAuthUI();

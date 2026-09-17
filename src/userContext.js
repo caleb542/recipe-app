@@ -22,9 +22,8 @@ let impersonationState = {
 // Load user profile from API
 export async function loadUserProfile(skipFetch = false) {
   try {
-    // Get token first — this handles refresh and expiry
     const token = await getToken();
-    
+
     if (!token) {
       console.warn('⚠️ No token — clearing session');
       currentUserProfile = null;
@@ -34,12 +33,11 @@ export async function loadUserProfile(skipFetch = false) {
       return null;
     }
 
-    // Skip fetch if we have everything cached
-    const cachedUsername = localStorage.getItem('username');
-    if (skipFetch && cachedUsername && currentUserProfile) {
-      if (currentUserProfile) {
-        currentUserProfile.isSuperadmin = currentUserProfile.role === 'superadmin';
-      }
+    // Check LS first — survives navigation, unlike the in-memory variable
+    const cachedProfile = localStorage.getItem('userProfile');
+    if (skipFetch && cachedProfile) {
+      currentUserProfile = JSON.parse(cachedProfile);
+      currentUserProfile.isSuperadmin = currentUserProfile.role === 'superadmin';
       await restoreImpersonationState();
       return currentUserProfile;
     }
@@ -78,20 +76,13 @@ export async function loadUserProfile(skipFetch = false) {
     }
 
     const profile = await response.json();
-    
-    // ✅ NEW: Add superadmin flag
     profile.isSuperadmin = profile.role === 'superadmin';
-    
-    // ✅ CHANGED: Store only username in localStorage (safe data)
-    // Keep full profile in memory only
+
     currentUserProfile = profile;
+    localStorage.setItem('userProfile', JSON.stringify(profile));
     localStorage.setItem('username', profile.username);
 
-    console.log('✓ User profile loaded:', profile.username);
-    
-    // ✅ NEW: Restore impersonation state if exists
     await restoreImpersonationState();
-    
     return profile;
 
   } catch (error) {
