@@ -2,12 +2,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { loadRecipes, loadRecipesFromLocalStorage, saveRecipes } from '../functions.js';
 import { openDirectionsDialogue, editDirection, removeDirection } from '../functions.js';
 import { syncRecipeUpdate } from './syncRecipe.js'
-import { sanitizeHTML, sanitizeText } from '../utils/sanitize.js'; 
+import { sanitizeHTML, sanitizeText } from '../utils/sanitize.js';
+import { setupDragReorder } from './dragReorder.js';
+import { markUnsaved } from './editAccordion.js';
 
 /**
  * Render all directions for a given recipe
  */
-function listDirections(directions) {
+function listDirections(directions, recipeId) {
   const directionsList = document.getElementById('directions-list');
   directionsList.innerHTML = '';
 
@@ -16,14 +18,18 @@ function listDirections(directions) {
     const li = document.createElement('li');
     li.classList.add('direction-step');
     li.dataset.id = step.id;
+    li.draggable = true;
     li.innerHTML = `
+     <div class="drag-handle" title="Drag to reorder">
+    <i class="fa-solid fa-grip-vertical" aria-hidden="true"></i>
+  </div>
   <label for="${step.id}"><span>${sanitizeText(step.text)}</span></label> 
  <div class="ingredient-actions">
-  <button id="${step.id}" data-id="${step.id}" aria-label="Edit ${step.name}" class="item-buttons edit-direction">
+  <button id="${step.id}" data-id="${step.id}" aria-label="Edit ${step.text}" class="item-buttons edit-direction">
     <i class="fa fa-pencil" aria-hidden="true"></i>
   </button> 
 
-  <button class="item-buttons remove-direction" aria-label="Delete ${step.name}" data-name="${step.id}" data-id="${step.id}">
+  <button class="item-buttons remove-direction" aria-label="Delete ${step.text}" data-name="${step.id}" data-id="${step.id}">
     <i class="fa fa-trash-can" aria-hidden="true"></i>
   </button>
   </div>
@@ -33,6 +39,18 @@ function listDirections(directions) {
 
   // Append all items at once
   directionsList.append(...items);
+
+   if (recipeId) {
+    setupDragReorder('.direction-step', 'id', async (newOrderIds) => {
+      await syncRecipeUpdate(recipeId, recipe => {
+        const reordered = newOrderIds
+          .map(id => recipe.directions.find(d => d.id === id))
+          .filter(Boolean);
+        recipe.directions = reordered;
+      });
+        markUnsaved();
+    });
+  }
 }
 
 /**
@@ -55,7 +73,7 @@ function setupDirections(recipeId) {
     });
 
     openDirectionsDialogue(newDirection.id, newDirection.text);
-    listDirections(recItem.directions);
+    listDirections(recItem.directions, recipeId);
   });
 
   // Delegated listener for edit/remove
@@ -87,7 +105,7 @@ directionsList.addEventListener('click', async e => {
     const recipes = await loadRecipesFromLocalStorage();
     const recItem = recipes.find(r => r.id === recipeId);
     if (recItem) {
-      listDirections(recItem.directions);
+      listDirections(recItem.directions, recipeId);
     }
   }
 });

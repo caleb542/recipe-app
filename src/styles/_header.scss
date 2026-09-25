@@ -309,7 +309,8 @@
     top:50%;
   }
 }
-.header-edit-btn {              
+.header-edit-btn {     
+    
     padding: 0px;
     border-radius: 999px;
     background: hotpink;
@@ -324,6 +325,7 @@
     display: inline-flex;
     display: grid;
     place-content: center;
+    transition:0.25s;
 
   i { font-size:1rem; }
   &:hover { filter: saturate(1.5); }
@@ -335,6 +337,12 @@
     height:0;
     padding:0;
 
+  }
+  &:is(:hover,:focus-visible, :focus) {
+    background:turquoise;
+    outline: 2px solid #f0f;
+    outline-offset: 4px;
+    box-shadow: unset;
   }
 }
 
@@ -381,9 +389,14 @@
   top: 0.2rem; 
   transition:all 0.5s ease-out;
 }
-
+.nav-bar-logo a {
+  transition:0.5s;
+}
 .nav-bar-logo a:hover {
-  text-decoration: none;
+    text-decoration: none;
+    outline: 2px solid #f0f;
+    outline-offset: 4px;
+    box-shadow: unset;
 }
 .nav-bar-logo a:hover span {
     color:hsl(36, 70%, 40%);  
@@ -623,8 +636,10 @@ nav.hide {
     }
 }
 
+
 /* Header Avatar Styles */
-.avatar-btn {
+#user-info .avatar-btn {
+  cursor:pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -633,21 +648,23 @@ nav.hide {
   cursor: pointer;
   padding: 0;
   border-radius: 50%;
-  overflow: hidden;
+  // overflow: hidden;
   transition: opacity 0.2s;
+  outline:1px solif #f0f;
 
-  &:hover { opacity: 0.85; }
-  &:focus { outline: none; }
-  &:focus-visible {
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+  &:focus-visible { 
+    outline: 2px solid #f0f;
+    outline-offset: 4px;
+    box-shadow: unset;
   }
+
 }
-.avatar-btn[aria-expanded="true"] {
+#user-info .avatar-btn[aria-expanded="true"] {
   background: rgba(0, 0, 0, 0.06);
   box-shadow: none;
   border-radius: 8px;
 }
-.header-avatar {
+#user-info  .header-avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -1559,6 +1576,14 @@ nav.main-nav {
     animation-timeline: scroll();
     animation-range: entry 0px exit 100px;
     animation-fill-mode: forwards;
+
+    &:focus-visible {
+      outline: 2px solid #f0f;
+      outline-offset: 4px;
+      box-shadow: unset;
+      overflow:visible;
+    }
+      
     }
 
   #user-info button {

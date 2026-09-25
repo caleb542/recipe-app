@@ -86,12 +86,18 @@ button {
     
 }
 
-:where( textarea:focus, input:focus, button:focus, a:focus) {
+:where( textarea:focus-visible, input:focus-visible, button:not(.edit-form-wrap button):focus-visible, a:focus-visible) {
     box-shadow: 0 0 0 0.25rem rgb(150, 200, 224, 0.5);
     text-decoration: none;
     outline: none;
+    overflow: visible;
 }
-
+.edit-card:has(button:focus-visible) {
+   box-shadow: 0 0 0 0.25rem rgb(150, 200, 224, 0.5);
+    text-decoration: none;
+    outline: none;
+    overflow: visible;
+}
 .hidden {
     display: none;
 }

@@ -1,5 +1,6 @@
 // src/helpers/featureImage.js
 import { sanitizeText } from '../utils/sanitize.js';
+import { markUnsaved } from './editAccordion.js';
 
 
 
@@ -194,6 +195,8 @@ export async function selectUnsplashImageForGallery(recipeId, url, photographer,
     photographer,
     photographerLink // Already includes UTM params from renderImageSelector
   });
+
+  markUnsaved();
 
   // Show success message
   showImageAddedMessage();

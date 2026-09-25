@@ -161,7 +161,7 @@ hideWarning();
 
   wireFieldListeners(recipeId);
 
-  listDirections(recipe.directions);
+  listDirections(recipe.directions, recipeId);
   setupDirections(recipeId);
 
   setupTagsUI(recipeId, recipe);
@@ -279,7 +279,7 @@ export async function initCreate() {
 
   wireFieldListeners(newRecipe.id);
 
-  listDirections(newRecipe.directions);
+  listDirections(newRecipe.directions, newRecipe.id);
   setupDirections(newRecipe.id);
   setupTagsUI(newRecipeId, newRecipe);
 

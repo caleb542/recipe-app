@@ -1902,3 +1902,34 @@ fieldset.feature-image {
     padding: 1rem 1rem 3rem;
   }
 }
+
+// ----------------------------------------
+// DRAG HANDLE (shared: images, ingredients, directions)
+// ----------------------------------------
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  color: var(--ef-text-3);
+  cursor: grab;
+  flex-shrink: 0;
+
+  &:active { cursor: grabbing; }
+
+  i { font-size: 0.75rem; }
+}
+
+.direction-step {
+  cursor: move;
+
+  &.dragging {
+    opacity: 0.5;
+    transform: scale(1.02);
+  }
+
+  label {
+    flex:1;
+  }
+}

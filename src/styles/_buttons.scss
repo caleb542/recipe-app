@@ -302,7 +302,6 @@ button.feature-image {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.25s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .action-btn i {
@@ -310,7 +309,7 @@ button.feature-image {
 }
 
 .action-btn:hover {
-    transform: translateY(-2px);
+   
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
@@ -421,7 +420,7 @@ button.feature-image {
 }
 
 .status-toggle:hover {
-    transform: translateY(-2px);
+
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 

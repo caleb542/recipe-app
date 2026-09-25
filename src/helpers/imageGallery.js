@@ -5,6 +5,8 @@ import { optimizeImage, IMAGE_PRESETS } from './imageOptimizer.js';
 import { generateFileHash, checkDuplicateByFilename } from './duplicateCheck.js';
 import { findExistingImage, registerImage, unregisterImageFromRecipe, getImageRegistry } from './globalImageRegistry.js';
 import { sanitizeHTML, sanitizeText } from '../utils/sanitize.js';
+import { markUnsaved } from './editAccordion.js';
+import { setupDragReorder } from './dragReorder.js';
 
 const CLOUDINARY_CLOUD_NAME = 'day1f5nz8';
 const CLOUDINARY_UPLOAD_PRESET = 'recipe_images';
@@ -257,6 +259,7 @@ async function addImageToRecipe(recipeId, imageData) {
   
   saveRecipes(recipes);
   localStorage.setItem('editingRecipe', JSON.stringify(recipe));
+  markUnsaved();
 }
 
 /**
@@ -313,23 +316,9 @@ export async function renderImageGallery(recipeId) {
             <i class="fa-solid fa-star"></i>
           </button>
           
-          <button 
-            class="btn-small" 
-            onclick="window.moveImageUp('${recipeId}', '${img.id}')"
-            title="Move up"
-            ${img.order === 0 ? 'disabled' : ''}
-          >
-            <i class="fa-solid fa-arrow-up"></i>
-          </button>
-          
-          <button 
-            class="btn-small" 
-            onclick="window.moveImageDown('${recipeId}', '${img.id}')"
-            title="Move down"
-            ${img.order === sortedImages.length - 1 ? 'disabled' : ''}
-          >
-            <i class="fa-solid fa-arrow-down"></i>
-          </button>
+         <div class="btn-small drag-handle" title="Drag to reorder">
+          <i class="fa-solid fa-grip-vertical"></i>
+        </div>
           
           <button 
             class="btn-small ${img.attribution ? 'has-attribution' : ''}" 
@@ -358,8 +347,23 @@ export async function renderImageGallery(recipeId) {
     `).join('')}
   `;
 
-  // Setup drag-and-drop for reordering
-  setupDragAndDrop(recipeId);
+// Setup drag-and-drop for reordering
+  
+   setupDragReorder('.image-card', 'imageId', async (newOrderIds) => {
+     const recipes = await loadRecipes();
+     const recipe = recipes.find(r => r.id === recipeId);
+     if (!recipe || !recipe.images) return;
+
+     newOrderIds.forEach((imageId, index) => {
+       const img = recipe.images.find(i => i.id === imageId);
+       if (img) img.order = index;
+     });
+
+     recipe.updatedAt = new Date().toISOString();
+     saveRecipes(recipes);
+     localStorage.setItem('editingRecipe', JSON.stringify(recipe));
+     markUnsaved();
+   });
 }
 
 /**
@@ -380,7 +384,7 @@ function formatAttribution(image) {
     return sanitizeHTML(attr.customCredit);
   }
   
-  let text = `Photo by sanitizeText(${attr.photographer})`;
+ let text = `Photo by ${sanitizeText(attr.photographer)}`;
   
   if (attr.photographerUrl) {
     text = sanitizeHTML(`<a href="${attr.photographerUrl}" target="_blank" rel="noopener">${text}</a>`);
@@ -432,7 +436,9 @@ window.editAttribution = async function(recipeId, imageId) {
     saveRecipes(recipes);
     localStorage.setItem('editingRecipe', JSON.stringify(recipe));
     await renderImageGallery(recipeId);
+     markUnsaved();
   }
+   
 };
 
 /**
@@ -456,7 +462,7 @@ function showAttributionDialog(currentAttribution) {
             type="text" 
             id="photographer-name" 
             placeholder="e.g., Jane Smith Photography"
-            value="sanitizeText(${currentAttribution?.photographer || ''})"
+            value="${sanitizeText(currentAttribution?.photographer || '')}"
           >
         </div>
         
@@ -466,7 +472,7 @@ function showAttributionDialog(currentAttribution) {
             type="url" 
             id="photographer-url" 
             placeholder="https://janesmith.com"
-            value="sanitizeText(${currentAttribution?.photographerUrl || ''})"
+            value="${sanitizeText(currentAttribution?.photographerUrl || '')}"
           >
         </div>
         
@@ -476,7 +482,7 @@ function showAttributionDialog(currentAttribution) {
             type="text" 
             id="custom-credit" 
             placeholder="e.g., Photography by Jane Smith"
-            value="sanitizeText(${currentAttribution?.customCredit || ''})"
+            value="${sanitizeText(currentAttribution?.customCredit || '')}"
           >
           <small>If blank, will auto-generate from photographer name</small>
         </div>
@@ -592,85 +598,10 @@ window.setFeaturedImage = async function(recipeId, imageId) {
   localStorage.setItem('editingRecipe', JSON.stringify(recipe));
   
   await renderImageGallery(recipeId);
+  markUnsaved()
 };
 
-/**
- * Move image up
- */
-window.moveImageUp = async function(recipeId, imageId) {
-  const recipes = await loadRecipes();
-  const recipe = recipes.find(r => r.id === recipeId);
-  if (!recipe || !recipe.images) return;
 
-  // Work on sorted array
-  const sorted = [...recipe.images].sort((a, b) => a.order - b.order);
-  const index = sorted.findIndex(img => img.id === imageId);
-  if (index <= 0) return;
-
-  // Swap orders
-  const tempOrder = sorted[index].order;
-  sorted[index].order = sorted[index - 1].order;
-  sorted[index - 1].order = tempOrder;
-
-  // Write back
-  sorted.forEach(sortedImg => {
-    const img = recipe.images.find(i => i.id === sortedImg.id);
-    if (img) img.order = sortedImg.order;
-  });
-
-  recipe.updatedAt = new Date().toISOString();
-  saveRecipes(recipes);
-  localStorage.setItem('editingRecipe', JSON.stringify(recipe));
-  
-  await renderImageGallery(recipeId);
-};
-
-window.moveImageDown = async function(recipeId, imageId) {
-  const recipes = await loadRecipes();
-  const recipe = recipes.find(r => r.id === recipeId);
-  if (!recipe || !recipe.images) return;
-
-  const sorted = [...recipe.images].sort((a, b) => a.order - b.order);
-  const index = sorted.findIndex(img => img.id === imageId);
-  if (index === -1 || index >= sorted.length - 1) return;
-
-  const tempOrder = sorted[index].order;
-  sorted[index].order = sorted[index + 1].order;
-  sorted[index + 1].order = tempOrder;
-
-  sorted.forEach(sortedImg => {
-    const img = recipe.images.find(i => i.id === sortedImg.id);
-    if (img) img.order = sortedImg.order;
-  });
-
-  recipe.updatedAt = new Date().toISOString();
-  saveRecipes(recipes);
-  localStorage.setItem('editingRecipe', JSON.stringify(recipe));
-  
-  await renderImageGallery(recipeId);
-};
-
-/**
- * Move image down
- */
-window.moveImageDown = async function(recipeId, imageId) {
-  const recipes = await loadRecipes();
-  const recipe = recipes.find(r => r.id === recipeId);
-  if (!recipe || !recipe.images) return;
-
-  const index = recipe.images.findIndex(img => img.id === imageId);
-  if (index === -1 || index >= recipe.images.length - 1) return;
-
-  const temp = recipe.images[index].order;
-  recipe.images[index].order = recipe.images[index + 1].order;
-  recipe.images[index + 1].order = temp;
-
-  recipe.updatedAt = new Date().toISOString();
-  saveRecipes(recipes);
-  localStorage.setItem('editingRecipe', JSON.stringify(recipe));
-  
-  await renderImageGallery(recipeId);
-};
 
 /**
  * Remove image
@@ -729,80 +660,11 @@ window.removeImage = async function(recipeId, imageId) {
   
   await renderImageGallery(recipeId);
   showUploadStatus('Image removed', 'success');
+  markUnsaved();
 };
 
-/**
- * Setup drag-and-drop reordering
- */
-function setupDragAndDrop(recipeId) {
-  const imageCards = document.querySelectorAll('.image-card');
-  let draggedElement = null;
 
-  imageCards.forEach(card => {
-    card.addEventListener('dragstart', (e) => {
-      draggedElement = card;
-      card.classList.add('dragging');
-    });
 
-    card.addEventListener('dragend', () => {
-      card.classList.remove('dragging');
-    });
-
-    card.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      const afterElement = getDragAfterElement(card.parentElement, e.clientY);
-      if (afterElement == null) {
-        card.parentElement.appendChild(draggedElement);
-      } else {
-        card.parentElement.insertBefore(draggedElement, afterElement);
-      }
-    });
-
-    card.addEventListener('drop', async (e) => {
-      e.preventDefault();
-      await reorderImagesAfterDrag(recipeId);
-    });
-  });
-}
-
-/**
- * Get element to insert dragged item after
- */
-function getDragAfterElement(container, y) {
-  const draggableElements = [...container.querySelectorAll('.image-card:not(.dragging)')];
-
-  return draggableElements.reduce((closest, child) => {
-    const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height / 2;
-
-    if (offset < 0 && offset > closest.offset) {
-      return { offset: offset, element: child };
-    } else {
-      return closest;
-    }
-  }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
-
-/**
- * Save new order after drag-and-drop
- */
-async function reorderImagesAfterDrag(recipeId) {
-  const recipes = await loadRecipes();
-  const recipe = recipes.find(r => r.id === recipeId);
-  if (!recipe || !recipe.images) return;
-
-  const imageCards = document.querySelectorAll('.image-card');
-  const newOrder = Array.from(imageCards).map(card => card.dataset.imageId);
-
-  newOrder.forEach((imageId, index) => {
-    const img = recipe.images.find(i => i.id === imageId);
-    if (img) img.order = index;
-  });
-
-  recipe.updatedAt = new Date().toISOString();
-  saveRecipes(recipes);
-  localStorage.setItem('editingRecipe', JSON.stringify(recipe));
-}
 
 /**
  * Show upload status
